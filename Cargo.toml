@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-type-fields-macros = { path = "../type-fields-macros" }
+type-fields-macros = { git = "https://github.com/bevy-rust-gpu/type-fields-macros" }
