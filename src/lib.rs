@@ -8,10 +8,11 @@ pub mod cons;
 pub mod field;
 pub mod path;
 
+pub use type_fields_macros::Field;
+
 #[cfg(test)]
 pub mod tests {
-    use crate::{cons::Cons, field::Field};
-    pub use type_fields_macros::Field;
+    use crate::{cons::Cons, field::Field, Field};
 
     #[derive(Default, Field)]
     struct Wrapper<Sdf> {
