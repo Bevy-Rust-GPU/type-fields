@@ -1,53 +1,73 @@
-use crate::cons::Cons;
-
-use super::path::Path;
-
-pub trait FieldPath {
-    type Type;
-}
-
-impl<T> FieldPath for T
-where
-    T: Cons,
-{
-    type Type = T::Cons;
-}
+use crate::{cons::Cons, path::Path};
 
 /// Type-level field access using [`Path`]
-pub trait Field<P>: Sized
+pub trait Field<V, P>: Sized
 where
-    P: FieldPath,
-    P::Type: Path<Self>,
+    P: FieldPath<V, Self>,
 {
-    fn get(&mut self, _: P) -> &<P::Type as Path<Self>>::Type {
-        P::Type::field(self)
+    fn get(&mut self, path: P) -> &P::Type {
+        path.field(self)
     }
 
-    fn get_mut(&mut self, _: P) -> &<P::Type as Path<Self>>::Type {
-        P::Type::field(self)
+    fn get_mut(&mut self, path: P) -> &P::Type {
+        path.field(self)
     }
 
-    fn set(&mut self, _: P, value: <P::Type as Path<Self>>::Type) {
-        *P::Type::field(self) = value;
+    fn set(&mut self, path: P, value: P::Type) {
+        *path.field(self) = value;
     }
 
-    fn with(mut self, path: P, value: <P::Type as Path<Self>>::Type) -> Self {
+    fn with(mut self, path: P, value: P::Type) -> Self {
         self.set(path, value);
         self
     }
 
-    fn map<F>(mut self, _: P, f: F) -> Self
+    fn map<F>(mut self, path: P, f: F) -> Self
     where
-        F: Fn(&mut <P::Type as Path<Self>>::Type),
+        F: Fn(&mut P::Type),
     {
-        f(P::Type::field(&mut self));
+        f(path.field(&mut self));
         self
     }
 }
 
-impl<T, P> Field<P> for T
+/// Blanket impl
+impl<V, T, P> Field<V, P> for T where P: FieldPath<V, T> + 'static {}
+
+/// Marker type for [`Cons`] impls
+pub enum Cell {}
+
+/// Marker type for [`Fn`] impls
+pub enum Leaf {}
+
+/// Composes [`Path`] impls over [`Cons`] and [`Fn`]
+pub trait FieldPath<V, T> {
+    type Type;
+
+    fn field(self, t: &mut T) -> &mut Self::Type;
+}
+
+/// Leaf [`Fn`] type blanket impl
+impl<F, T, O> FieldPath<Leaf, T> for F
 where
-    P: FieldPath,
-    P::Type: Path<T>,
+    F: Fn(&mut T) -> &mut O,
 {
+    type Type = O;
+
+    fn field(self, t: &mut T) -> &mut Self::Type {
+        self(t)
+    }
+}
+
+/// Cell [`Cons`] type blanket impl
+impl<C, T> FieldPath<Cell, T> for C
+where
+    C: Cons,
+    <C as Cons>::Cons: Path<T>,
+{
+    type Type = <<C as Cons>::Cons as Path<T>>::Type;
+
+    fn field(self, t: &mut T) -> &mut Self::Type {
+        self.cons().field(t)
+    }
 }

@@ -12,7 +12,7 @@ pub use type_fields_macros::Field;
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{cons::Cons, field::Field, Field};
+    use crate::{field::Field, Field};
 
     #[derive(Default, Field)]
     struct Wrapper<Sdf> {
@@ -26,11 +26,9 @@ pub mod tests {
 
     #[test]
     fn test_parameters() {
-        let sdf = Wrapper::<()>::SDF;
-        let radius = Leaf::RADIUS;
-
-        Wrapper::<Leaf>::default().with(sdf, Leaf { radius: 1.0 });
-        Wrapper::<Wrapper<Leaf>>::default().with((sdf, sdf).cons(), Leaf { radius: 1.0 });
-        Wrapper::<Wrapper<Leaf>>::default().with((sdf, sdf, radius).cons(), 1.0);
+        Wrapper::<Leaf>::default().with(Wrapper::sdf, Leaf { radius: 1.0 });
+        Wrapper::<Wrapper<Leaf>>::default()
+            .with((Wrapper::sdf, Wrapper::sdf), Leaf { radius: 1.0 });
+        Wrapper::<Wrapper<Leaf>>::default().with((Wrapper::sdf, Wrapper::sdf, Leaf::radius), 1.0);
     }
 }

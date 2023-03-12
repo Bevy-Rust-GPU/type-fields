@@ -2,9 +2,24 @@
 pub trait Path<T> {
     type Type;
 
-    fn field(t: &mut T) -> &mut Self::Type;
+    fn field(self, t: &mut T) -> &mut Self::Type;
 }
 
+/// Fn type blanket impl.
+/// Allows mutable getters to be treated as path segments.
+impl<F, T, O> Path<T> for F
+where
+    F: Fn(&mut T) -> &mut O,
+{
+    type Type = O;
+
+    fn field(self, t: &mut T) -> &mut Self::Type {
+        self(t)
+    }
+}
+
+/// Cons cell blanket impls.
+/// Allows nested cons cells to be treated as a path.
 impl<LHS, RHS, T> Path<T> for (LHS, RHS)
 where
     LHS: Path<T>,
@@ -13,8 +28,8 @@ where
 {
     type Type = <RHS as Path<LHS::Type>>::Type;
 
-    fn field(t: &mut T) -> &mut Self::Type {
-        <RHS as Path<LHS::Type>>::field(<LHS as Path<T>>::field(t))
+    fn field(self, t: &mut T) -> &mut Self::Type {
+        self.1.field(self.0.field(t))
     }
 }
 
@@ -27,4 +42,3 @@ macro_rules ! path {
         $ident
     };
 }
-
