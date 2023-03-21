@@ -3,5 +3,9 @@ name = "type-fields"
 version = "0.1.0"
 edition = "2021"
 
+[patch.crates-io]
+#type-fields-macros = { git = "https://github.com/bevy-rust-gpu/type-fields-macros" }
+type-fields-macros = { path = "../type-fields-macros" }
+
 [dependencies]
-type-fields-macros = { git = "https://github.com/bevy-rust-gpu/type-fields-macros" }
+type-fields-macros = "0.1.0"
