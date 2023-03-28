@@ -29,7 +29,16 @@ where
     type Type = <RHS as Path<LHS::Type>>::Type;
 
     fn field(self, t: &mut T) -> &mut Self::Type {
-        self.1.field(self.0.field(t))
+        let (lhs, rhs) = self;
+        rhs.field(lhs.field(t))
+    }
+}
+
+impl<T> Path<T> for () {
+    type Type = T;
+
+    fn field(self, t: &mut T) -> &mut Self::Type {
+        t
     }
 }
 
