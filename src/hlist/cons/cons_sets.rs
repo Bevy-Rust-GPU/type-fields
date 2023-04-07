@@ -4,23 +4,23 @@ use super::{ConsList, ConsSet};
 
 /// A `ConsList` that can replace multiple items by type.
 pub trait ConsSets<T, P>: ConsList {
-    type Paths: Paths;
+    type ConsSets;
 
-    fn cons_sets(self, t: T) -> Self;
+    fn cons_sets(self, t: T) -> Self::ConsSets;
 }
 
 impl<T, Head, Tail, PathHead, PathTail> ConsSets<(Head, Tail), (PathHead, PathTail)> for T
 where
-    T: Clone + ConsSet<Head, PathHead> + ConsSets<Tail, PathTail>,
+    T: ConsSet<Head, PathHead>,
+    T::ConsSet: ConsSets<Tail, PathTail>,
     (PathHead, PathTail): Paths,
     PathHead: Path,
     PathTail: Paths,
 {
-    type Paths = (PathHead, PathTail);
+    type ConsSets = <T::ConsSet as ConsSets<Tail, PathTail>>::ConsSets;
 
-    fn cons_sets(mut self, (head, tail): (Head, Tail)) -> Self {
-        self = self.cons_set(head);
-        self.cons_sets(tail)
+    fn cons_sets(self, (head, tail): (Head, Tail)) -> Self::ConsSets {
+        self.cons_set(head).cons_sets(tail)
     }
 }
 
@@ -28,12 +28,12 @@ impl<T, Head, PathHead> ConsSets<(Head, ()), (PathHead, ())> for T
 where
     Self: ConsList,
     (PathHead, ()): Paths,
-    T: ConsSet<Head, PathHead>,
+    T: ConsSet<Head, PathHead, ConsSet = T>,
     PathHead: Path,
 {
-    type Paths = (PathHead, ());
+    type ConsSets = T::ConsSet;
 
-    fn cons_sets(self, (head, _): (Head, ())) -> Self {
+    fn cons_sets(self, (head, _): (Head, ())) -> Self::ConsSets {
         self.cons_set(head)
     }
 }

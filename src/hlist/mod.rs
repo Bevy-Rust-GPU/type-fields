@@ -2,8 +2,10 @@
 //! Useful for recursive trait evaluation.
 
 pub mod cons;
-pub mod tuple;
 pub mod path;
+pub mod tuple;
+
+mod type_machine;
 
 mod macros;
 mod tuple_impl;

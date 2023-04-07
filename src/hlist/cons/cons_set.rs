@@ -7,20 +7,20 @@ use super::ConsList;
 /// This is short-circuiting,
 /// so only the first found instance of the given type will be replaced.
 pub trait ConsSet<T, P>: ConsList {
-    type Path: Path;
+    type ConsSet;
 
-    fn cons_set(self, t: T) -> Self;
+    fn cons_set(self, t: T) -> Self::ConsSet;
 }
 
 impl<Head, Tail, PathTail, T> ConsSet<T, (Next, PathTail)> for (Head, Tail)
 where
     Self: ConsList,
-    Tail: ConsSet<T, PathTail>,
+    Tail: ConsSet<T, PathTail, ConsSet = Tail>,
     PathTail: Path,
 {
-    type Path = (Next, PathTail);
+    type ConsSet = Self;
 
-    fn cons_set(self, t: T) -> Self {
+    fn cons_set(self, t: T) -> Self::ConsSet {
         (self.0, self.1.cons_set(t))
     }
 }
@@ -29,9 +29,9 @@ impl<Tail, T> ConsSet<T, (Here, ())> for (T, Tail)
 where
     Self: ConsList,
 {
-    type Path = (Here, ());
+    type ConsSet = Self;
 
-    fn cons_set(self, t: T) -> Self {
+    fn cons_set(self, t: T) -> Self::ConsSet {
         (t, self.1)
     }
 }

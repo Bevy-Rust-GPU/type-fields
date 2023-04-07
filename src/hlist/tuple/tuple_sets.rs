@@ -1,28 +1,27 @@
 use crate::hlist::{
-    cons::{ConsList, ConsSets, Uncons},
+    cons::{ConsSets, Uncons},
     path::Paths,
 };
 
 use super::{Cons, TupleList};
 
 pub trait TupleSets<T, P>: TupleList {
-    type Input: Cons;
-    type InputCons: ConsList;
+    type TupleSets;
 
-    fn tuple_sets(self, t: T) -> Self;
+    fn tuple_sets(self, t: T) -> Self::TupleSets;
 }
 
 impl<T, P, In> TupleSets<In, P> for T
 where
     Self: TupleList,
-    Self::Cons: ConsSets<In::Cons, P, Paths = P>,
+    Self::Cons: ConsSets<In::Cons, P>,
     In: Cons,
     P: Paths,
+    <Self::Cons as ConsSets<In::Cons, P>>::ConsSets: Uncons,
 {
-    type Input = In;
-    type InputCons = In::Cons;
+    type TupleSets = <<Self::Cons as ConsSets<In::Cons, P>>::ConsSets as Uncons>::Uncons;
 
-    fn tuple_sets(self, t: In) -> Self {
+    fn tuple_sets(self, t: In) -> Self::TupleSets {
         self.cons().cons_sets(t.cons()).uncons()
     }
 }
