@@ -36,6 +36,14 @@ where
     }
 }
 
+impl<T> ConsSet<T, ()> for () {
+    type ConsSet = (T, ());
+
+    fn cons_set(self, t: T) -> Self::ConsSet {
+        (t, self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::hlist::{
@@ -46,6 +54,15 @@ mod tests {
     #[test]
     fn test_cons_set() {
         let list = (1, 2.0, "three").cons();
+        let list = list.cons_set(6);
+        let list = list.cons_set(5.0);
+        let list = list.cons_set("four");
+        assert_eq!((6, 5.0, "four"), list.uncons());
+    }
+
+    #[test]
+    fn test_cons_set_append() {
+        let list = ();
         let list = list.cons_set(6);
         let list = list.cons_set(5.0);
         let list = list.cons_set("four");
