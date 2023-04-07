@@ -5,9 +5,9 @@ use crate::hlist::{
 
 /// Remove an element from a cons list by type, doing nothing if that type is not present.
 pub trait ConsRemoveImpl<T, Path>: ConsList {
-    type ConsTryRemove: ConsList;
+    type ConsRemove: ConsList;
 
-    fn cons_remove_impl(self) -> Self::ConsTryRemove;
+    fn cons_remove_impl(self) -> Self::ConsRemove;
 }
 
 trait ValidPath: Path {}
@@ -21,11 +21,11 @@ where
     Self: ConsList,
     Tail: ConsRemoveImpl<T, PathTail>,
     PathTail: ValidPath,
-    (Head, Tail::ConsTryRemove): ConsList,
+    (Head, Tail::ConsRemove): ConsList,
 {
-    type ConsTryRemove = (Head, Tail::ConsTryRemove);
+    type ConsRemove = (Head, Tail::ConsRemove);
 
-    fn cons_remove_impl(self) -> Self::ConsTryRemove {
+    fn cons_remove_impl(self) -> Self::ConsRemove {
         (self.0, self.1.cons_remove_impl())
     }
 }
@@ -35,15 +35,15 @@ where
     Self: ConsList,
     Tail: ConsList,
 {
-    type ConsTryRemove = Tail;
+    type ConsRemove = Tail;
 
-    fn cons_remove_impl(self) -> Self::ConsTryRemove {
+    fn cons_remove_impl(self) -> Self::ConsRemove {
         self.1
     }
 }
 
 pub trait ConsRemove<Path>: ConsList {
-    fn cons_remove<T>(self) -> Self::ConsTryRemove
+    fn cons_remove<T>(self) -> Self::ConsRemove
     where
         Self: ConsRemoveImpl<T, Path>;
 }
@@ -52,7 +52,7 @@ impl<T, Path> ConsRemove<Path> for T
 where
     T: ConsList,
 {
-    fn cons_remove<In>(self) -> <T as ConsRemoveImpl<In, Path>>::ConsTryRemove
+    fn cons_remove<In>(self) -> <T as ConsRemoveImpl<In, Path>>::ConsRemove
     where
         Self: ConsRemoveImpl<In, Path>,
     {

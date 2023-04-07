@@ -13,6 +13,7 @@ mod tuple_mut;
 mod tuple_push_back;
 mod tuple_push_front;
 mod tuple_ref;
+mod tuple_remove;
 mod tuple_set;
 mod tuple_sets;
 
@@ -27,6 +28,6 @@ pub use tuple_mut::*;
 pub use tuple_push_back::*;
 pub use tuple_push_front::*;
 pub use tuple_ref::*;
+pub use tuple_remove::*;
 pub use tuple_set::*;
 pub use tuple_sets::*;
-
