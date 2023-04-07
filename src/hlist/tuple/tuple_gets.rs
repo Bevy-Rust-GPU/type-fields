@@ -7,7 +7,7 @@ use super::{Cons, TupleList};
 
 pub trait TupleGets<In, P>: TupleList {
     type Input: Cons;
-    type Cons: ConsGets<<Self::Input as Cons>::Cons, P>;
+    type Cons;
 
     fn tuple_gets(self) -> Self::Input;
 }
@@ -24,6 +24,18 @@ where
 
     fn tuple_gets(self) -> Self::Input {
         self.cons().cons_gets().uncons()
+    }
+}
+
+impl<T> TupleGets<(), ()> for T
+where
+    T: TupleList,
+{
+    type Input = ();
+    type Cons = ();
+
+    fn tuple_gets(self) -> Self::Input {
+        ()
     }
 }
 

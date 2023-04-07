@@ -21,6 +21,15 @@ where
     }
 }
 
+impl<T> TupleSets<(), ()> for T
+where
+    T: TupleList,
+{
+    fn tuple_sets(self, _: ()) -> Self {
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::hlist::tuple::TupleSets;

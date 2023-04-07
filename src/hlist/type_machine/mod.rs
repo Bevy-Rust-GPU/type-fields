@@ -6,7 +6,7 @@ pub mod instruction_inputs;
 pub mod run_instruction;
 
 #[test]
-fn test_type_machine() {
+fn test_register_machine() {
     use crate::hlist::type_machine::{
         apply_instructions::ApplyInstructions, instruction::Instruction,
     };
@@ -19,6 +19,16 @@ fn test_type_machine() {
     #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd)]
     struct Velocity(f32);
 
+    /// Unit instruction with no input or output
+    struct NoOp;
+
+    impl Instruction for NoOp {
+        type Input<'a> = ();
+        type Output = ();
+
+        fn exec<'a>(self, _: Self::Input<'a>) -> Self::Output {}
+    }
+
     /// Force integration `Instruction`
     struct Integrate;
 
@@ -28,18 +38,6 @@ fn test_type_machine() {
 
         fn exec<'a>(self, (position, velocity): Self::Input<'a>) -> Self::Output {
             (Position(position.0 + velocity.0),)
-        }
-    }
-
-    /// Debug logging `Instruction`
-    struct NoOp;
-
-    impl Instruction for NoOp {
-        type Input<'a> = (&'a Position, &'a Velocity);
-        type Output = (Position, Velocity);
-
-        fn exec<'a>(self, (pos, vel): Self::Input<'a>) -> Self::Output {
-            (*pos, *vel)
         }
     }
 
