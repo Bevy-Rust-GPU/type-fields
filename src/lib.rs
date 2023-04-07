@@ -4,7 +4,7 @@
 
 extern crate self as type_fields;
 
-pub mod cons;
+pub mod hlist;
 pub mod field;
 pub mod path;
 

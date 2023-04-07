@@ -1,4 +1,4 @@
-use crate::{cons::Cons, path::Path};
+use crate::{hlist::tuple::Cons, path::Path};
 
 /// Type-level field access using [`Path`]
 pub trait Field<V, P>: Sized
