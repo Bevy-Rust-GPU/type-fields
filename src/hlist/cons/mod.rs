@@ -12,6 +12,10 @@ mod cons_push_front;
 mod cons_set;
 mod uncons;
 
+mod cons_set_or_append {
+
+}
+
 pub use cons_get::*;
 pub use cons_gets::*;
 pub use cons_length::*;

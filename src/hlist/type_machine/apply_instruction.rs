@@ -6,14 +6,17 @@ use super::run_instruction::RunInstruction;
 pub trait ApplyInstruction<Inst, PathGets, PathSets>:
     RunInstruction<Inst, PathGets> + TupleSets<Self::Output, PathSets>
 {
-    fn apply_instruction(self, inst: Inst) -> Self::TupleSets;
+    type AppliedInstruction;
+    fn apply_instruction(self, inst: Inst) -> Self::AppliedInstruction;
 }
 
 impl<T, Inst, PathGets, PathSets> ApplyInstruction<Inst, PathGets, PathSets> for T
 where
     T: RunInstruction<Inst, PathGets> + TupleSets<Self::Output, PathSets>,
 {
-    fn apply_instruction(self, inst: Inst) -> T::TupleSets {
+    type AppliedInstruction = Self;
+
+    fn apply_instruction(self, inst: Inst) -> Self::AppliedInstruction {
         let output = self.run_instruction(inst);
         self.tuple_sets(output)
     }

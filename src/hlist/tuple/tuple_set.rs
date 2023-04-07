@@ -6,21 +6,16 @@ use crate::hlist::{
 use super::{Cons, TupleList};
 
 pub trait TupleSet<T, P>: TupleList {
-    type TupleSet: TupleList;
-
-    fn tuple_set(self, t: T) -> Self::TupleSet;
+    fn tuple_set(self, t: T) -> Self;
 }
 
 impl<T, P, In> TupleSet<In, P> for T
 where
     T: Cons,
-    T::Cons: ConsSet<In, P>,
-    <T::Cons as ConsSet<In, P>>::ConsSet: Uncons,
+    T::Cons: ConsSet<In, P> + Uncons<Uncons = T>,
     P: Path,
 {
-    type TupleSet = <<T::Cons as ConsSet<In, P>>::ConsSet as Uncons>::Uncons;
-
-    fn tuple_set(self, t: In) -> <<T::Cons as ConsSet<In, P>>::ConsSet as Uncons>::Uncons {
+    fn tuple_set(self, t: In) -> T {
         self.cons().cons_set(t).uncons()
     }
 }

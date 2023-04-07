@@ -6,9 +6,7 @@ use crate::hlist::{
 use super::{Cons, TupleList};
 
 pub trait TupleSets<T, P>: TupleList {
-    type TupleSets;
-
-    fn tuple_sets(self, t: T) -> Self::TupleSets;
+    fn tuple_sets(self, t: T) -> Self;
 }
 
 impl<T, P, In> TupleSets<In, P> for T
@@ -17,11 +15,8 @@ where
     Self::Cons: ConsSets<In::Cons, P>,
     In: Cons,
     P: Paths,
-    <Self::Cons as ConsSets<In::Cons, P>>::ConsSets: Uncons,
 {
-    type TupleSets = <<Self::Cons as ConsSets<In::Cons, P>>::ConsSets as Uncons>::Uncons;
-
-    fn tuple_sets(self, t: In) -> Self::TupleSets {
+    fn tuple_sets(self, t: In) -> Self {
         self.cons().cons_sets(t.cons()).uncons()
     }
 }
