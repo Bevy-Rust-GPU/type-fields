@@ -1,7 +1,4 @@
-use super::{
-    instruction::{OutputMode, Instruction},
-    run_instruction::RunInstruction,
-};
+use super::{instruction::Instruction, output_mode::OutputMode, run_instruction::RunInstruction};
 
 /// Given an instruction, run it, and apply the output to `Self`
 pub trait ApplyInstruction<Inst, PathGets, PathSets>: RunInstruction<Inst, PathGets> {

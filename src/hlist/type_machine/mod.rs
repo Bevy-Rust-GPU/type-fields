@@ -1,8 +1,9 @@
-
 pub mod apply_instruction;
 pub mod apply_instructions;
 pub mod apply_instructions_cons;
+pub mod input_mode;
 pub mod instruction;
+pub mod output_mode;
 pub mod run_instruction;
 
 #[test]
@@ -11,7 +12,9 @@ fn test_register_machine() {
         tuple::TuplePushBack,
         type_machine::{
             apply_instructions::ApplyInstructions,
-            instruction::{InputNone, InputRefGets, Instruction, OutputNone, OutputSet, InputRefGet, InputGet},
+            input_mode::{InputGet, InputNone, InputRefGets},
+            instruction::Instruction,
+            output_mode::{OutputNone, OutputSet},
         },
     };
 

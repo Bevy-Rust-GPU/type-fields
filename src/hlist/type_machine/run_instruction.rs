@@ -1,4 +1,4 @@
-use super::instruction::{InputMode, Instruction};
+use super::{input_mode::InputMode, instruction::Instruction};
 
 /// Given an instruction, fetch its inputs from `Self` and execute it
 pub trait RunInstruction<Inst, Path> {
