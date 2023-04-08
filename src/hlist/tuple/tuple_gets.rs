@@ -5,39 +5,57 @@ use crate::hlist::{
 
 use super::TupleList;
 
-pub trait TupleGets<In, P>: TupleList {
-    fn tuple_gets(self) -> In;
+pub trait TupleGetsImpl<In, P>: TupleList {
+    fn gets_impl(self) -> In;
 }
 
-impl<T, P, In> TupleGets<In, P> for T
+impl<T, P, In> TupleGetsImpl<In, P> for T
 where
     T: TupleList,
     In: TupleList,
     T::Cons: ConsGets<In::Cons, P>,
     P: Paths,
 {
-    fn tuple_gets(self) -> In {
+    fn gets_impl(self) -> In {
         self.cons().cons_gets().uncons()
     }
 }
 
-impl<T> TupleGets<(), ()> for T
+impl<T> TupleGetsImpl<(), ()> for T
 where
     T: TupleList,
 {
-    fn tuple_gets(self) -> () {
+    fn gets_impl(self) -> () {
         ()
+    }
+}
+
+pub trait TupleGets<P>: TupleList {
+    fn gets<T>(self) -> T
+    where
+        Self: TupleGetsImpl<T, P>;
+}
+
+impl<T, P> TupleGets<P> for T
+where
+    T: TupleList,
+{
+    fn gets<In>(self) -> In
+    where
+        Self: TupleGetsImpl<In, P>,
+    {
+        self.gets_impl()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::hlist::tuple::TupleGets;
+    use crate::hlist::tuple::TupleGetsImpl;
 
     #[test]
     fn test_tuple_gets() {
         let list = (1, 2.0, "three");
-        let (string, float, int) = TupleGets::<(&str, f32, usize), _>::tuple_gets(list);
+        let (string, float, int) = TupleGetsImpl::<(&str, f32, usize), _>::gets_impl(list);
         assert_eq!((1, 2.0, "three"), (int, float, string));
     }
 }

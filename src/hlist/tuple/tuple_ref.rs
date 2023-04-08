@@ -8,7 +8,7 @@ pub trait TupleRef: ConsRef {
     where
         Self: 'a;
 
-    fn tuple_ref<'a>(&'a self) -> Self::TupleRef<'a>;
+    fn as_ref<'a>(&'a self) -> Self::TupleRef<'a>;
 }
 
 impl<T> TupleRef for T
@@ -17,7 +17,7 @@ where
 {
     type TupleRef<'a> = <T::ConsRef<'a> as Uncons>::Uncons where T: 'a;
 
-    fn tuple_ref<'a>(&'a self) -> Self::TupleRef<'a> {
+    fn as_ref<'a>(&'a self) -> Self::TupleRef<'a> {
         self.cons_ref().uncons()
     }
 }
@@ -28,7 +28,7 @@ mod tests {
 
     #[test]
     fn test_tuple_ref() {
-        let list = (1, 2.0, "three").tuple_ref();
+        let list = (1, 2.0, "three").as_ref();
         assert_eq!((&1, &2.0, &"three"), list);
     }
 }

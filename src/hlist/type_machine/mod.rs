@@ -1,3 +1,7 @@
+use self::apply_instructions::ApplyInstructions;
+
+use super::tuple::TupleList;
+
 pub mod apply_instruction;
 pub mod apply_instructions;
 pub mod apply_instructions_cons;
@@ -6,14 +10,31 @@ pub mod instruction;
 pub mod output_mode;
 pub mod run_instruction;
 
+pub trait TypeMachine<Context, PathGets, PathSets>: Sized {
+    type Output;
+
+    fn run(self, context: Context) -> Self::Output;
+}
+
+impl<Inst, Context, PathGets, PathSets> TypeMachine<Context, PathGets, PathSets> for Inst
+where
+    Inst: TupleList,
+    Context: ApplyInstructions<Inst, PathGets, PathSets>,
+{
+    type Output = <Context as ApplyInstructions<Inst, PathGets, PathSets>>::AppliedInstructions;
+
+    fn run(self, context: Context) -> Self::Output {
+        context.apply_instructions(self)
+    }
+}
+
 #[test]
-fn test_register_machine() {
+fn test_type_machine() {
     use crate::hlist::{
-        tuple::TuplePushBack,
+        tuple::TupleGet,
         type_machine::{
-            apply_instructions::ApplyInstructions,
             input_mode::{InputGet, InputNone, InputRefGets},
-            instruction::Instruction,
+            instruction::{Instruction, PushBack, Set},
             output_mode::{OutputNone, OutputSet},
         },
     };
@@ -37,6 +58,7 @@ fn test_register_machine() {
     impl Instruction for NoOp {
         type Input<'a> = ();
         type InputMode = InputNone;
+
         type Output = ();
         type OutputMode = OutputNone;
 
@@ -50,6 +72,7 @@ fn test_register_machine() {
     impl Instruction for Inc {
         type Input<'a> = Acc;
         type InputMode = InputGet;
+
         type Output = Acc;
         type OutputMode = OutputSet;
 
@@ -63,8 +86,9 @@ fn test_register_machine() {
     struct Integrate;
 
     impl Instruction for Integrate {
-        type InputMode = InputRefGets;
         type Input<'a> = (&'a Position, &'a Velocity);
+        type InputMode = InputRefGets;
+
         type Output = Position;
         type OutputMode = OutputSet;
 
@@ -73,25 +97,26 @@ fn test_register_machine() {
         }
     }
 
-    let context =
-        ().tuple_push_back(Position(0.0))
-            .tuple_push_back(Velocity(1.0))
-            .tuple_push_back(Acc(0));
+    let result = (
+        PushBack(Position(0.0)),
+        PushBack(Velocity(1.0)),
+        PushBack(Acc(0)),
+        Inc,
+        Integrate,
+        Inc,
+        NoOp,
+        Inc,
+        Integrate,
+        Inc,
+        NoOp,
+        Inc,
+        NoOp,
+        Integrate,
+        Set(Acc(1)),
+    )
+        .run(());
 
-    let instructions: (
-        Inc,
-        Integrate,
-        Inc,
-        NoOp,
-        Inc,
-        Integrate,
-        Inc,
-        NoOp,
-        Inc,
-        NoOp,
-        Integrate,
-    ) = Default::default();
+    let _pos = result.get::<Position>();
 
-    let context = context.apply_instructions(instructions);
-    assert_eq!(context, (Position(3.0), Velocity(1.0), Acc(5)));
+    assert_eq!(result, (Position(3.0), Velocity(1.0), Acc(1)));
 }

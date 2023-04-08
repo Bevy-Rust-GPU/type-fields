@@ -6,7 +6,7 @@ use crate::hlist::{
 use super::{Cons, TupleList};
 
 pub trait TupleSets<T, P>: TupleList {
-    fn tuple_sets(self, t: T) -> Self;
+    fn sets(self, t: T) -> Self;
 }
 
 impl<T, P, In> TupleSets<In, P> for T
@@ -16,7 +16,7 @@ where
     In: Cons,
     P: Paths,
 {
-    fn tuple_sets(self, t: In) -> Self {
+    fn sets(self, t: In) -> Self {
         self.cons().cons_sets(t.cons()).uncons()
     }
 }
@@ -25,7 +25,7 @@ impl<T> TupleSets<(), ()> for T
 where
     T: TupleList,
 {
-    fn tuple_sets(self, _: ()) -> Self {
+    fn sets(self, _: ()) -> Self {
         self
     }
 }
@@ -37,7 +37,7 @@ mod tests {
     #[test]
     fn test_tuple_sets() {
         let list = (1, 2.0, "three");
-        let list = TupleSets::<(&str, f32, usize), _>::tuple_sets(list, ("hello", 7.0, 5));
+        let list = TupleSets::<(&str, f32, usize), _>::sets(list, ("hello", 7.0, 5));
         //let list = list.tuple_sets(("hello", 7.0, 5));
         assert_eq!((5, 7.0, "hello"), list);
     }
