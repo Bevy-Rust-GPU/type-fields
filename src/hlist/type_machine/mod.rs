@@ -3,7 +3,6 @@ pub mod apply_instruction;
 pub mod apply_instructions;
 pub mod apply_instructions_cons;
 pub mod instruction;
-pub mod instruction_inputs;
 pub mod run_instruction;
 
 #[test]
