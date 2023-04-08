@@ -1,6 +1,4 @@
-use crate::hlist::{
-    cons::{ConsPushBack, Uncons},
-};
+use crate::hlist::cons::{ConsPushBack, Uncons};
 
 use super::{Cons, TupleList};
 

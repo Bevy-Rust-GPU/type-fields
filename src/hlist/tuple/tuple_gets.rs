@@ -3,13 +3,10 @@ use crate::hlist::{
     path::Paths,
 };
 
-use super::{Cons, TupleList};
+use super::TupleList;
 
 pub trait TupleGets<In, P>: TupleList {
-    type Input: Cons;
-    type Cons;
-
-    fn tuple_gets(self) -> Self::Input;
+    fn tuple_gets(self) -> In;
 }
 
 impl<T, P, In> TupleGets<In, P> for T
@@ -19,10 +16,7 @@ where
     T::Cons: ConsGets<In::Cons, P>,
     P: Paths,
 {
-    type Input = In;
-    type Cons = T::Cons;
-
-    fn tuple_gets(self) -> Self::Input {
+    fn tuple_gets(self) -> In {
         self.cons().cons_gets().uncons()
     }
 }
@@ -31,10 +25,7 @@ impl<T> TupleGets<(), ()> for T
 where
     T: TupleList,
 {
-    type Input = ();
-    type Cons = ();
-
-    fn tuple_gets(self) -> Self::Input {
+    fn tuple_gets(self) -> () {
         ()
     }
 }

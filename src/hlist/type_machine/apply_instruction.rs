@@ -1,23 +1,32 @@
-use crate::hlist::tuple::TupleSets;
-
-use super::run_instruction::RunInstruction;
+use super::{
+    instruction::{OutputMode, Instruction},
+    run_instruction::RunInstruction,
+};
 
 /// Given an instruction, run it, and apply the output to `Self`
-pub trait ApplyInstruction<Inst, PathGets, PathSets>:
-    RunInstruction<Inst, PathGets> + TupleSets<Self::Output, PathSets>
-{
+pub trait ApplyInstruction<Inst, PathGets, PathSets>: RunInstruction<Inst, PathGets> {
     type AppliedInstruction;
     fn apply_instruction(self, inst: Inst) -> Self::AppliedInstruction;
 }
 
 impl<T, Inst, PathGets, PathSets> ApplyInstruction<Inst, PathGets, PathSets> for T
 where
-    T: RunInstruction<Inst, PathGets> + TupleSets<Self::Output, PathSets>,
+    T: RunInstruction<Inst, PathGets>,
+    Inst: Instruction,
+    Inst::OutputMode: OutputMode<T, <T as RunInstruction<Inst, PathGets>>::Output, PathSets>,
 {
-    type AppliedInstruction = Self;
+    type AppliedInstruction = <Inst::OutputMode as OutputMode<
+        T,
+        <T as RunInstruction<Inst, PathGets>>::Output,
+        PathSets,
+    >>::Output;
 
     fn apply_instruction(self, inst: Inst) -> Self::AppliedInstruction {
         let output = self.run_instruction(inst);
-        self.tuple_sets(output)
+        <Inst::OutputMode as OutputMode<
+            T,
+            <T as RunInstruction<Inst, PathGets>>::Output,
+            PathSets,
+        >>::apply(self, output)
     }
 }

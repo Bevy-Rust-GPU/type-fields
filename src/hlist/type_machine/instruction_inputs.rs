@@ -11,7 +11,7 @@ pub trait InstructionInputs<'a, Inst, Path>: TupleRef {
 impl<'a, T, Inst, Path> InstructionInputs<'a, Inst, Path> for T
 where
     T: TupleRef + 'a,
-    T::TupleRef<'a>: TupleGets<Inst::Input<'a>, Path, Input = Inst::Input<'a>>,
+    T::TupleRef<'a>: TupleGets<Inst::Input<'a>, Path>,
     Inst: Instruction + 'a,
 {
     type Input = Inst::Input<'a>;
