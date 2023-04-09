@@ -7,3 +7,11 @@ pub trait ConsMut: ConsRef {
 
     fn cons_mut<'a>(&'a mut self) -> Self::ConsMut<'a>;
 }
+
+impl ConsMut for () {
+    type ConsMut<'a> = ();
+
+    fn cons_mut<'a>(&'a mut self) -> Self::ConsMut<'a> {
+        ()
+    }
+}

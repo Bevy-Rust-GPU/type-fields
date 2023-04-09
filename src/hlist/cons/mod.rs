@@ -1,5 +1,8 @@
 //! Traits implemented over cons list types.
 
+mod cons_as_mut;
+mod cons_as_ref;
+mod cons_clone;
 mod cons_get;
 mod cons_gets;
 mod cons_length;
@@ -15,6 +18,9 @@ mod cons_set;
 mod cons_sets;
 mod uncons;
 
+pub use cons_as_mut::*;
+pub use cons_as_ref::*;
+pub use cons_clone::*;
 pub use cons_get::*;
 pub use cons_gets::*;
 pub use cons_length::*;

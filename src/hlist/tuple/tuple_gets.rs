@@ -1,5 +1,5 @@
 use crate::hlist::{
-    cons::{ConsGets, Uncons},
+    cons::{ConsGetsImpl, Uncons},
     path::Paths,
 };
 
@@ -13,11 +13,11 @@ impl<T, P, In> TupleGetsImpl<In, P> for T
 where
     T: TupleList,
     In: TupleList,
-    T::Cons: ConsGets<In::Cons, P>,
+    T::Cons: ConsGetsImpl<In::Cons, P>,
     P: Paths,
 {
     fn gets_impl(self) -> In {
-        self.cons().cons_gets().uncons()
+        self.cons().cons_gets_impl().uncons()
     }
 }
 

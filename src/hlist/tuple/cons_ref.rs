@@ -7,3 +7,11 @@ pub trait ConsRef: TupleList {
 
     fn cons_ref<'a>(&'a self) -> Self::ConsRef<'a>;
 }
+
+impl ConsRef for () {
+    type ConsRef<'a> = ();
+
+    fn cons_ref<'a>(&'a self) -> Self::ConsRef<'a> {
+        ()
+    }
+}

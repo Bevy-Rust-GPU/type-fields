@@ -4,8 +4,7 @@
 pub mod cons;
 pub mod path;
 pub mod tuple;
-
-mod type_machine;
+pub mod type_machine;
 
 mod macros;
 mod tuple_impl;
