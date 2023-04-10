@@ -26,3 +26,11 @@ pub trait Instruction {
 
     fn exec<'a>(self, input: Self::Input<'a>) -> Self::Output;
 }
+
+pub trait InstructionInput {
+    type InputMode;
+}
+
+pub trait InstructionOutput {
+    type OutputMode;
+}

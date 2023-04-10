@@ -7,6 +7,15 @@ use super::{Applicative, Copointed, Functor, Monad, Pointed};
 /// distinct from other instances of the same type.
 pub struct Phantom<P, T>(T, PhantomData<P>);
 
+impl<P, T> core::fmt::Debug for Phantom<P, T>
+where
+    T: core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
 impl<P, T> Default for Phantom<P, T>
 where
     T: Default,
@@ -84,9 +93,9 @@ impl<P, T> Copointed for Phantom<P, T> {
 impl<P, A> Functor<A> for Phantom<P, A> {
     type Mapped<B> = Phantom<P, B>;
 
-    fn map<B, F>(self, f: F) -> Self::Mapped<B>
+    fn fmap<B, F>(self, f: F) -> Self::Mapped<B>
     where
-        F: Fn(A) -> B,
+        F: FnOnce(A) -> B,
     {
         Phantom::<P, B>::of(f(self.unwrap()))
     }
@@ -95,7 +104,7 @@ impl<P, A> Functor<A> for Phantom<P, A> {
 impl<P, T> Applicative<T> for Phantom<P, T> {
     fn apply<B, A>(self, a: A) -> B
     where
-        T: Fn(A) -> B,
+        T: FnOnce(A) -> B,
     {
         self.unwrap()(a)
     }
@@ -104,7 +113,7 @@ impl<P, T> Applicative<T> for Phantom<P, T> {
 impl<P, T> Monad<T> for Phantom<P, T> {
     fn chain<M, F>(self, f: F) -> M
     where
-        F: Fn(T) -> M,
+        F: FnOnce(T) -> M,
     {
         f(self.unwrap())
     }
@@ -112,23 +121,22 @@ impl<P, T> Monad<T> for Phantom<P, T> {
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{
-        phantom::Phantom, Applicative, Copointed, Functor, Monad, Pointed,
-    };
+    use crate::functional::{phantom::Phantom, Applicative, Copointed, Functor, Monad, Pointed};
 
     #[test]
     fn test_phantom() {
         enum Tag {}
 
         let id1 = Phantom::<Tag, _>::of(5);
-        let id2: Phantom<Tag, _> = id1.map(|x| x * 3);
+        let id2: Phantom<Tag, _> = id1.fmap(|x| x * 3);
         let id3: Phantom<Tag, _> =
-            Phantom::<Tag, _>::of(|x: Phantom<Tag, _>| x.map(|y| y - 3)).apply(id2);
+            Phantom::<Tag, _>::of(|x: Phantom<Tag, _>| x.fmap(|y| y - 3)).apply(id2);
         let id4 = id3.chain(|x| Phantom::<Tag, _>::of(x / 3));
+        let id5 = id4.then(|| Phantom::<Tag, _>::of(1234));
         assert_eq!(id1.unwrap(), 5);
         assert_eq!(id2.unwrap(), 15);
         assert_eq!(id3.unwrap(), 12);
         assert_eq!(id4.unwrap(), 4);
+        assert_eq!(id5.unwrap(), 1234);
     }
 }
-

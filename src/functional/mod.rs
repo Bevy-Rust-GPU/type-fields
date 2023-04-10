@@ -15,3 +15,8 @@ pub use pointed::*;
 
 pub use identity::*;
 pub use phantom::*;
+
+/// `const :: a -> b -> a`
+pub fn fconst<T, U>(t: T) -> impl FnOnce(U) -> T {
+    move |_| t
+}

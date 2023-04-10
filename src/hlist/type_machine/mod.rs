@@ -28,95 +28,111 @@ where
     }
 }
 
-#[test]
-fn test_type_machine() {
-    use crate::hlist::{
-        tuple::TupleGet,
-        type_machine::{
-            input_mode::{InputGet, InputNone, InputRefGets},
-            instruction::{Instruction, PushBack, Set},
-            output_mode::{OutputNone, OutputSet},
-        },
-    };
+#[cfg(test)]
+mod test {
+    use crate::hlist::type_machine::TypeMachine;
 
-    /// Integer accumulator
-    #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd)]
-    struct Acc(usize);
+    #[test]
+    fn test_type_machine() {
+        use crate::{
+            functional::{Copointed, Phantom, Pointed},
+            hlist::{
+                tuple::TupleGet,
+                type_machine::{
+                    input_mode::{InputGet, InputNone, InputRefGets},
+                    instruction::{Instruction, PushBack, Set},
+                    output_mode::{OutputNone, OutputSet},
+                },
+            },
+        };
 
-    /// Example position struct
-    #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd)]
-    struct Position(f32);
+        /// Integer accumulator
+        struct Accumulator;
 
-    /// Example velocity struct
-    #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd)]
-    struct Velocity(f32);
+        /// Example position struct
+        #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd)]
+        struct Position;
 
-    /// Unit instruction with no input or output
-    #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    struct NoOp;
+        /// Example velocity struct
+        #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd)]
+        struct Velocity;
 
-    impl Instruction for NoOp {
-        type Input<'a> = ();
-        type InputMode = InputNone;
+        /// Unit instruction with no input or output
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        struct NoOp;
 
-        type Output = ();
-        type OutputMode = OutputNone;
+        impl Instruction for NoOp {
+            type Input<'a> = ();
+            type InputMode = InputNone;
 
-        fn exec<'a>(self, _: Self::Input<'a>) -> Self::Output {}
-    }
+            type Output = ();
+            type OutputMode = OutputNone;
 
-    /// Accumulator increment
-    #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    struct Inc;
-
-    impl Instruction for Inc {
-        type Input<'a> = Acc;
-        type InputMode = InputGet;
-
-        type Output = Acc;
-        type OutputMode = OutputSet;
-
-        fn exec<'a>(self, Acc(input): Self::Input<'a>) -> Self::Output {
-            Acc(input + 1)
+            fn exec<'a>(self, _: Self::Input<'a>) -> Self::Output {}
         }
-    }
 
-    /// Force integration `Instruction`
-    #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    struct Integrate;
+        /// Accumulator increment
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        struct Inc;
 
-    impl Instruction for Integrate {
-        type Input<'a> = (&'a Position, &'a Velocity);
-        type InputMode = InputRefGets;
+        impl Instruction for Inc {
+            type Input<'a> = Phantom<Accumulator, usize>;
+            type InputMode = InputGet;
 
-        type Output = Position;
-        type OutputMode = OutputSet;
+            type Output = Phantom<Accumulator, usize>;
+            type OutputMode = OutputSet;
 
-        fn exec<'a>(self, (position, velocity): Self::Input<'a>) -> Self::Output {
-            Position(position.0 + velocity.0)
+            fn exec<'a>(self, input: Self::Input<'a>) -> Self::Output {
+                let acc = input.unwrap();
+                Phantom::<Accumulator, _>::of(acc + 1)
+            }
         }
+
+        /// Force integration `Instruction`
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        struct Integrate;
+
+        impl Instruction for Integrate {
+            type Input<'a> = (&'a Phantom<Position, f32>, &'a Phantom<Velocity, f32>);
+            type InputMode = InputRefGets;
+
+            type Output = Phantom<Position, f32>;
+            type OutputMode = OutputSet;
+
+            fn exec<'a>(self, (position, velocity): Self::Input<'a>) -> Self::Output {
+                let (position, velocity) = (position.unwrap(), velocity.unwrap());
+                Phantom::<Position, _>::of(position + velocity)
+            }
+        }
+
+        let result = (
+            PushBack(Phantom::<Position, _>::of(0.0)),
+            PushBack(Phantom::<Velocity, _>::of(1.0)),
+            PushBack(Phantom::<Accumulator, _>::of(0)),
+            Inc,
+            Integrate,
+            Inc,
+            NoOp,
+            Inc,
+            Integrate,
+            Inc,
+            NoOp,
+            Inc,
+            NoOp,
+            Integrate,
+            Set(Phantom::<Accumulator, _>::of(1)),
+        )
+            .run(());
+
+        let _pos = result.get::<Phantom<Position, _>>();
+
+        assert_eq!(
+            result,
+            (
+                Phantom::<Position, _>::of(3.0),
+                Phantom::<Velocity, _>::of(1.0),
+                Phantom::<Accumulator, _>::of(1)
+            )
+        );
     }
-
-    let result = (
-        PushBack(Position(0.0)),
-        PushBack(Velocity(1.0)),
-        PushBack(Acc(0)),
-        Inc,
-        Integrate,
-        Inc,
-        NoOp,
-        Inc,
-        Integrate,
-        Inc,
-        NoOp,
-        Inc,
-        NoOp,
-        Integrate,
-        Set(Acc(1)),
-    )
-        .run(());
-
-    let _pos = result.get::<Position>();
-
-    assert_eq!(result, (Position(3.0), Velocity(1.0), Acc(1)));
 }
