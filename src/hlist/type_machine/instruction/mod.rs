@@ -1,36 +1,36 @@
-mod pop_back;
-mod pop_front;
-mod push_back;
-mod push_front;
-mod remove;
-mod set;
-mod sets;
+mod constant;
+mod no_op;
 
-pub use pop_back::*;
-pub use pop_front::*;
-pub use push_back::*;
-pub use push_front::*;
-pub use remove::*;
-pub use set::*;
-pub use sets::*;
+pub use constant::*;
+pub use no_op::*;
+
+use crate::functional::{Copointed, Phantom};
 
 /// A single operation that takes input and produces output
 pub trait Instruction {
     type Input<'a>
     where
         Self: 'a;
-    type InputMode;
 
     type Output;
-    type OutputMode;
 
     fn exec<'a>(self, input: Self::Input<'a>) -> Self::Output;
 }
 
-pub trait InstructionInput {
-    type InputMode;
-}
+impl<P, T> Instruction for Phantom<P, T>
+where
+    Self: Copointed<Copointed = T>,
+    for<'a> P: 'a,
+    T: Instruction,
+{
+    type Input<'a> = T::Input<'a>
+    where
+        Self: 'a;
 
-pub trait InstructionOutput {
-    type OutputMode;
+    type Output = T::Output;
+
+    fn exec<'a>(self, input: Self::Input<'a>) -> Self::Output {
+        let this = self.unwrap();
+        this.exec(input)
+    }
 }

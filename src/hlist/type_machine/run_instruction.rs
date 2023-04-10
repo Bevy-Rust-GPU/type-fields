@@ -11,8 +11,7 @@ pub trait RunInstruction<Inst, Path> {
 
 impl<T, Inst, Path> RunInstruction<Inst, Path> for T
 where
-    Inst: Instruction,
-    Inst::InputMode: for<'a> InputMode<&'a T, Inst::Input<'a>, Path>,
+    Inst: Instruction + for<'a> InputMode<&'a T, Inst::Input<'a>, Path>,
 {
     type Output = Inst::Output;
 
@@ -20,7 +19,7 @@ where
     where
         Inst: 'a,
     {
-        let inputs = <Inst::InputMode as InputMode<&T, Inst::Input<'a>, Path>>::fetch(self);
+        let inputs = <Inst as InputMode<&T, Inst::Input<'a>, Path>>::fetch(self);
         instruction.exec(inputs)
     }
 }

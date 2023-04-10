@@ -1,11 +1,13 @@
+use core::marker::PhantomData;
+
 use crate::hlist::tuple::{TupleAsRef, TupleClone, TupleGetsImpl, TupleRef};
 
 use super::{input_ref_gets::InputRefGets, InputMode};
 
 /// Fetch a value and clone it
-pub struct InputGets;
+pub struct InputGets<T>(PhantomData<T>);
 
-impl<'a, C, I, P> InputMode<&'a C, I, P> for InputGets
+impl<'a, T, C, I, P> InputMode<&'a C, I, P> for InputGets<T>
 where
     C: TupleRef + 'a,
     C::TupleRef<'a>: TupleGetsImpl<I::TupleAsRef, P>,

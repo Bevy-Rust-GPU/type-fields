@@ -1,12 +1,28 @@
-use crate::hlist::type_machine::{input_mode::InputNone, output_mode::OutputSet};
+use crate::functional::{Copointed, Pointed};
 
 use super::Instruction;
 
 /// Instruction for pushing a value to the back of the context
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Set<T>(pub T);
+pub struct Const<T>(T);
 
-impl<T> Instruction for Set<T>
+impl<T> Pointed for Const<T> {
+    type Pointed = T;
+
+    fn of(unit: Self::Pointed) -> Self {
+        Const(unit)
+    }
+}
+
+impl<T> Copointed for Const<T> {
+    type Copointed = T;
+
+    fn unwrap(self) -> Self::Copointed {
+        self.0
+    }
+}
+
+impl<T> Instruction for Const<T>
 where
     for<'a> T: 'a,
 {
@@ -14,11 +30,7 @@ where
     where
         Self: 'a;
 
-    type InputMode = InputNone;
-
     type Output = T;
-
-    type OutputMode = OutputSet;
 
     fn exec<'a>(self, _: Self::Input<'a>) -> Self::Output {
         self.0

@@ -2,11 +2,14 @@ use self::apply_instructions::ApplyInstructions;
 
 use super::tuple::TupleList;
 
+pub mod action;
 pub mod apply_instruction;
 pub mod apply_instructions;
 pub mod apply_instructions_cons;
+pub mod input;
 pub mod input_mode;
 pub mod instruction;
+pub mod output;
 pub mod output_mode;
 pub mod run_instruction;
 
@@ -28,63 +31,42 @@ where
     }
 }
 
+#[allow(non_snake_case)]
+pub fn Do<Inst, PathGets, PathSets>(
+    inst: Inst,
+) -> <() as ApplyInstructions<Inst, PathGets, PathSets>>::AppliedInstructions
+where
+    Inst: TupleList,
+    (): ApplyInstructions<Inst, PathGets, PathSets>,
+{
+    ().apply_instructions(inst)
+}
+
 #[cfg(test)]
 mod test {
-    use crate::hlist::type_machine::TypeMachine;
+    use crate::{
+        functional::{Copointed, Phantom, Pointed},
+        hlist::type_machine::{
+            input::{GetOf, InputOf},
+            input_mode::InputGets,
+            instruction::{Const, Instruction, NoOp},
+            output::{DefOf, SetOf},
+            Do,
+        },
+    };
 
     #[test]
     fn test_type_machine() {
-        use crate::{
-            functional::{Copointed, Phantom, Pointed},
-            hlist::{
-                tuple::TupleGet,
-                type_machine::{
-                    input_mode::{InputGet, InputNone, InputRefGets},
-                    instruction::{Instruction, PushBack, Set},
-                    output_mode::{OutputNone, OutputSet},
-                },
-            },
-        };
-
-        /// Integer accumulator
-        struct Accumulator;
-
-        /// Example position struct
-        #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd)]
-        struct Position;
-
-        /// Example velocity struct
-        #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd)]
-        struct Velocity;
-
-        /// Unit instruction with no input or output
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        struct NoOp;
-
-        impl Instruction for NoOp {
-            type Input<'a> = ();
-            type InputMode = InputNone;
-
-            type Output = ();
-            type OutputMode = OutputNone;
-
-            fn exec<'a>(self, _: Self::Input<'a>) -> Self::Output {}
-        }
-
         /// Accumulator increment
         #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        struct Inc;
+        struct Increment;
 
-        impl Instruction for Inc {
-            type Input<'a> = Phantom<Accumulator, usize>;
-            type InputMode = InputGet;
-
-            type Output = Phantom<Accumulator, usize>;
-            type OutputMode = OutputSet;
+        impl Instruction for Increment {
+            type Input<'a> = usize;
+            type Output = usize;
 
             fn exec<'a>(self, input: Self::Input<'a>) -> Self::Output {
-                let acc = input.unwrap();
-                Phantom::<Accumulator, _>::of(acc + 1)
+                input + 1
             }
         }
 
@@ -93,46 +75,37 @@ mod test {
         struct Integrate;
 
         impl Instruction for Integrate {
-            type Input<'a> = (&'a Phantom<Position, f32>, &'a Phantom<Velocity, f32>);
-            type InputMode = InputRefGets;
-
-            type Output = Phantom<Position, f32>;
-            type OutputMode = OutputSet;
+            type Input<'a> = (Phantom<Pos, f32>, Phantom<Vel, f32>);
+            type Output = f32;
 
             fn exec<'a>(self, (position, velocity): Self::Input<'a>) -> Self::Output {
-                let (position, velocity) = (position.unwrap(), velocity.unwrap());
-                Phantom::<Position, _>::of(position + velocity)
+                position.unwrap() + velocity.unwrap()
             }
         }
 
-        let result = (
-            PushBack(Phantom::<Position, _>::of(0.0)),
-            PushBack(Phantom::<Velocity, _>::of(1.0)),
-            PushBack(Phantom::<Accumulator, _>::of(0)),
-            Inc,
-            Integrate,
-            Inc,
-            NoOp,
-            Inc,
-            Integrate,
-            Inc,
-            NoOp,
-            Inc,
-            NoOp,
-            Integrate,
-            Set(Phantom::<Accumulator, _>::of(1)),
-        )
-            .run(());
+        enum Acc {}
+        enum Pos {}
+        enum Vel {}
 
-        let _pos = result.get::<Phantom<Position, _>>();
+        let (pos, vel, acc) = Do((
+            Pos::def() << Const::of(0.0),
+            Vel::def() << Const::of(1.0),
+            Acc::def() << Const::of(0),
+            NoOp,
+            Acc::set() << Increment << Acc::get(),
+            Pos::set() << Integrate << InputGets::<(Pos, Vel)>::input(),
+            Acc::set() << Increment << Acc::get(),
+            NoOp,
+            Acc::set() << Increment << Acc::get(),
+            Pos::set() << Integrate << InputGets::<(Pos, Vel)>::input(),
+            Acc::set() << Increment << Acc::get(),
+            NoOp,
+            Acc::set() << Increment << Acc::get(),
+            Pos::set() << Integrate << InputGets::<(Pos, Vel)>::input(),
+            NoOp,
+            Acc::set() << Const::of(1),
+        ));
 
-        assert_eq!(
-            result,
-            (
-                Phantom::<Position, _>::of(3.0),
-                Phantom::<Velocity, _>::of(1.0),
-                Phantom::<Accumulator, _>::of(1)
-            )
-        );
+        assert_eq!((pos.unwrap(), vel.unwrap(), acc.unwrap()), (3.0, 1.0, 1));
     }
 }
