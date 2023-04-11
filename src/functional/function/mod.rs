@@ -20,6 +20,15 @@ pub trait Function<I> {
 
 pub struct FunctionFn<F, O>(F, PhantomData<O>);
 
+impl<F, O> Clone for FunctionFn<F, O>
+where
+    F: Clone,
+{
+    fn clone(&self) -> Self {
+        FunctionFn(self.0.clone(), PhantomData)
+    }
+}
+
 impl<F, O> Pointed for FunctionFn<F, O> {
     type Pointed = F;
 

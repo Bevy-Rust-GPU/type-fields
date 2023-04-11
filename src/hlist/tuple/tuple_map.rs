@@ -1,4 +1,4 @@
-use crate::hlist::cons::{ConsMap, Uncons};
+use crate::{functional::Functor, hlist::cons::Uncons};
 
 use super::TupleList;
 
@@ -11,13 +11,13 @@ pub trait TupleMap<F>: TupleList {
 impl<T, F> TupleMap<F> for T
 where
     T: TupleList,
-    T::Cons: ConsMap<F>,
-    <T::Cons as ConsMap<F>>::ConsMap: Uncons,
+    T::Cons: Functor<F>,
+    <T::Cons as Functor<F>>::Mapped: Uncons,
 {
-    type TupleMap = <<T::Cons as ConsMap<F>>::ConsMap as Uncons>::Uncons;
+    type TupleMap = <<T::Cons as Functor<F>>::Mapped as Uncons>::Uncons;
 
     fn map(self, f: F) -> Self::TupleMap {
-        self.cons().map(f).uncons()
+        self.cons().fmap(f).uncons()
     }
 }
 

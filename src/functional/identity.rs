@@ -20,31 +20,38 @@ impl<T> Copointed for Identity<T> {
     }
 }
 
-impl<A> Functor<A> for Identity<A> {
-    type Mapped<B> = Identity<B>;
+impl<T, F> Functor<F> for Identity<T>
+where
+    F: Function<T>,
+{
+    type Mapped = Identity<F::Output>;
 
-    fn fmap<B, F>(self, f: F) -> Self::Mapped<B>
-    where
-        F: Function<A, Output = B>,
-    {
-        Identity::point(f.call(self.copoint()))
+    fn fmap(self, f: F) -> Self::Mapped {
+        Pointed::point(f.call(self.copoint()))
     }
 }
 
-impl<T> Applicative<T> for Identity<T> {
-    fn apply<B, A>(self, a: A) -> B
+impl<T, U> Applicative<U> for Identity<T>
+where
+    T: Function<U>,
+{
+    type Applied = T::Output;
+
+    fn apply(self, a: U) -> Self::Applied
     where
-        T: Function<A, Output = B>,
+        T: Function<U>,
     {
         self.copoint().call(a)
     }
 }
 
-impl<T> Monad<T> for Identity<T> {
-    fn chain<M, F>(self, f: F) -> M
-    where
-        F: Function<T, Output = M>,
-    {
+impl<T, F> Monad<F> for Identity<T>
+where
+    F: Function<T>,
+{
+    type Chained = F::Output;
+
+    fn chain(self, f: F) -> Self::Chained {
         f.call(self.copoint())
     }
 }
@@ -52,7 +59,7 @@ impl<T> Monad<T> for Identity<T> {
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        Applicative, Copointed, FunctionFn, Functor, Identity, Monad, Pointed,
+        Applicative, Copointed, FunctionFn, Functor, Identity, Monad, Pointed, Then,
     };
 
     #[test]

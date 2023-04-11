@@ -6,6 +6,7 @@ mod monad;
 mod pointed;
 
 mod identity;
+mod pair;
 mod tagged;
 
 pub use applicative::*;

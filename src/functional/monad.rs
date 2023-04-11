@@ -1,60 +1,51 @@
 use core::marker::PhantomData;
 
-use super::{Applicative, Const, Function, Pointed};
+use super::{Const, Function, Pointed};
 
-/// An `Applicative` type that can flat-map a function over its wrapped value
-pub trait Monad<T>: Applicative<T> {
-    fn chain<M, F>(self, f: F) -> M
-    where
-        F: Function<T, Output = M>;
+/// A type that can flat-map a function over its wrapped value
+///
+/// To be definition-correct, `Monad` types must also implement `Applicative`,
+/// but this cannot be strongly modeled without higher-ranked type bounds.
+pub trait Monad<F> {
+    type Chained;
 
-    fn then<M, F>(self, f: F) -> M
-    where
-        Self: Sized,
-        F: Function<(), Output = M>,
-    {
-        self.chain(Const::point(f.call(())))
+    fn chain(self, f: F) -> Self::Chained;
+}
+
+impl<F> Monad<F> for () {
+    type Chained = ();
+
+    fn chain(self, _: F) -> Self::Chained {
+        self
     }
 }
 
 /// Monad::chain
-struct Chain<T, M>(PhantomData<(T, M)>);
+struct Chain<F>(PhantomData<F>);
 
-impl<T, M> Clone for Chain<T, M> {
-    fn clone(&self) -> Self {
-        Chain(self.0.clone())
-    }
-}
-
-impl<T, I, F, M> Function<(I, F)> for Chain<T, M>
+impl<F, A> Function<(A, F)> for Chain<F>
 where
-    I: Monad<T>,
-    F: Function<T, Output = M>,
+    A: Monad<F>,
 {
-    type Output = M;
+    type Output = A::Chained;
 
-    fn call(self, (i, f): (I, F)) -> M {
-        i.chain(f)
+    fn call(self, (a, f): (A, F)) -> Self::Output {
+        a.chain(f)
     }
 }
 
-/// Monad::then
-struct Then<T>(PhantomData<T>);
-
-impl<T> Clone for Then<T> {
-    fn clone(&self) -> Self {
-        Then(self.0.clone())
-    }
-}
-
-impl<T, I, F, M> Function<(I, F)> for Then<T>
+pub trait Then<F>: Sized + Monad<Const<F::Output>>
 where
-    I: Monad<T>,
-    F: Function<(), Output = M>,
+    F: Function<()>,
 {
-    type Output = M;
-
-    fn call(self, (i, f): (I, F)) -> M {
-        i.then(f)
+    fn then(self, f: F) -> Self::Chained {
+        self.chain(Const::point(f.call(())))
     }
+}
+
+impl<T, F> Then<F> for T
+where
+    T: Monad<Const<F::Output>>,
+    F: Function<()>,
+{
 }

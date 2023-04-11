@@ -21,7 +21,7 @@ where
 {
     type Output = I::Copointed;
 
-    fn call(self, input: I) -> Self::Output {
+    fn call(self, input: I) -> I::Copointed {
         input.copoint()
     }
 }

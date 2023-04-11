@@ -4,75 +4,67 @@ use crate::functional::{Const, Pointed};
 
 use super::Function;
 
-/// A type that can map a function over its wrapped value
-pub trait Functor<A> {
-    type Mapped<B>: Functor<B>;
+/// A type that can map a function over a wrapped value.
+pub trait Functor<F> {
+    type Mapped;
 
-    /// `<$>`
-    fn fmap<B, F>(self, f: F) -> <Self as Functor<A>>::Mapped<B>
-    where
-        F: Function<A, Output = B>;
+    fn fmap(self, f: F) -> Self::Mapped;
+}
 
-    /// `<$`
-    fn replace<B>(self, t: B) -> <Self as Functor<A>>::Mapped<B>
-    where
-        Self: Sized,
-        Const<B>: Function<A, Output = B>,
-    {
-        self.fmap(Const::point(t))
+impl<F> Functor<F> for () {
+    type Mapped = ();
+
+    fn fmap(self, _: F) -> Self::Mapped {
+        self
     }
 }
 
 /// Functor::fmap
-pub struct Fmap<A, B>(PhantomData<(A, B)>);
+pub struct Fmap<F>(PhantomData<F>);
 
-impl<A, B> Clone for Fmap<A, B> {
-    fn clone(&self) -> Self {
-        Fmap(self.0.clone())
-    }
-}
-
-impl<T, F, A, B, O> Function<(T, F)> for Fmap<A, B>
+impl<F, A> Function<(A, F)> for Fmap<F>
 where
-    T: Functor<A, Mapped<B> = O>,
-    F: Function<A, Output = B>,
+    A: Functor<F>,
+    F: Function<A>,
 {
-    type Output = O;
+    type Output = A::Mapped;
 
-    fn call(self, (t, f): (T, F)) -> Self::Output {
-        t.fmap(f)
+    fn call(self, (a, f): (A, F)) -> Self::Output {
+        a.fmap(f)
     }
 }
+
+pub trait FunctorReplace<T>: Sized + Functor<Const<T>> {
+    fn replace(self, t: T) -> Self::Mapped {
+        self.fmap(Const::point(t))
+    }
+}
+
+impl<T, U> FunctorReplace<U> for T where T: Functor<Const<U>> {}
 
 /// Functor::replace
-pub struct Replace<A>(PhantomData<A>);
+pub struct Replace<T>(PhantomData<T>);
 
-impl<A> Clone for Replace<A> {
-    fn clone(&self) -> Self {
-        Replace(self.0)
-    }
-}
-
-impl<T, I, A, O> Function<(T, I)> for Replace<A>
+impl<A, T> Function<(A, T)> for Replace<T>
 where
-    T: Functor<A, Mapped<I> = O>,
+    A: Functor<Const<T>>,
 {
-    type Output = O;
+    type Output = A::Mapped;
 
-    fn call(self, (t, i): (T, I)) -> O {
-        t.replace(i)
+    fn call(self, (a, t): (A, T)) -> Self::Output {
+        a.fmap(Const::point(t))
     }
 }
 
 /// A type that can emplace itself within a functor
-pub trait FunctorEmplace: Sized {
+pub trait FunctorEmplace<F>: Sized {
     /// `$>`
-    fn emplace<A, F>(self, f: F) -> <F as Functor<A>>::Mapped<Self>
+    fn emplace(self, f: F) -> F::Mapped
     where
-        F: Functor<A>,
+        F: Functor<Const<Self>>,
     {
-        f.fmap(Const::point(self))
+        f.replace(self)
     }
 }
 
-impl<T> FunctorEmplace for T {}
+impl<T, F> FunctorEmplace<F> for T {}

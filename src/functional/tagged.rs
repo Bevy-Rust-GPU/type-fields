@@ -90,38 +90,47 @@ impl<P, T> Copointed for Tagged<P, T> {
     }
 }
 
-impl<P, A> Functor<A> for Tagged<P, A> {
-    type Mapped<B> = Tagged<P, B>;
+impl<P, A, F> Functor<F> for Tagged<P, A>
+where
+    F: Function<A>,
+{
+    type Mapped = Tagged<P, F::Output>;
 
-    fn fmap<B, F>(self, f: F) -> Self::Mapped<B>
-    where
-        F: Function<A, Output = B>,
-    {
-        Tagged::<P, B>::point(f.call(self.copoint()))
+    fn fmap(self, f: F) -> Self::Mapped {
+        Tagged::point(f.call(self.copoint()))
     }
 }
 
-impl<P, T> Applicative<T> for Tagged<P, T> {
-    fn apply<B, A>(self, a: A) -> B
+impl<P, T, U> Applicative<U> for Tagged<P, T>
+where
+    T: Function<U>,
+{
+    type Applied = T::Output;
+
+    fn apply(self, a: U) -> Self::Applied
     where
-        T: Function<A, Output = B>,
+        T: Function<U>,
     {
         self.copoint().call(a)
     }
 }
 
-impl<P, T> Monad<T> for Tagged<P, T> {
-    fn chain<M, F>(self, f: F) -> M
-    where
-        F: Function<T, Output = M>,
-    {
+impl<P, T, F> Monad<F> for Tagged<P, T>
+where
+    F: Function<T>,
+{
+    type Chained = F::Output;
+
+    fn chain(self, f: F) -> Self::Chained {
         f.call(self.copoint())
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Applicative, Copointed, FunctionFn, Functor, Monad, Pointed, Tagged};
+    use crate::functional::{
+        Applicative, Copointed, FunctionFn, Functor, Monad, Pointed, Tagged, Then,
+    };
 
     #[test]
     fn test_phantom() {
