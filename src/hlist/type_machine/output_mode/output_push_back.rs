@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    functional::{Phantom, Pointed},
+    functional::{Tagged, Pointed},
     hlist::{tuple::TuplePushBack, type_machine::input_mode::InputMode},
 };
 
@@ -17,11 +17,11 @@ impl<T, C> InputMode<C, (), ()> for OutputPushBack<T> {
 
 impl<T, C, O, P> OutputMode<C, O, P> for OutputPushBack<T>
 where
-    C: TuplePushBack<Phantom<T, O>, P>,
+    C: TuplePushBack<Tagged<T, O>, P>,
 {
     type Output = C::TuplePushBack;
 
     fn apply(context: C, output: O) -> Self::Output {
-        context.push_back(Pointed::of(output))
+        context.push_back(Pointed::point(output))
     }
 }

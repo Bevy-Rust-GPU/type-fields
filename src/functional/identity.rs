@@ -1,4 +1,4 @@
-use super::{Applicative, Copointed, Functor, Monad, Pointed};
+use super::{Applicative, Copointed, Function, Functor, Monad, Pointed};
 
 /// Identity monad, used to lift values into a monadic context.
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -7,7 +7,7 @@ pub struct Identity<T>(T);
 impl<T> Pointed for Identity<T> {
     type Pointed = T;
 
-    fn of(unit: Self::Pointed) -> Self {
+    fn point(unit: Self::Pointed) -> Self {
         Identity(unit)
     }
 }
@@ -15,7 +15,7 @@ impl<T> Pointed for Identity<T> {
 impl<T> Copointed for Identity<T> {
     type Copointed = T;
 
-    fn unwrap(self) -> Self::Copointed {
+    fn copoint(self) -> Self::Copointed {
         self.0
     }
 }
@@ -25,45 +25,50 @@ impl<A> Functor<A> for Identity<A> {
 
     fn fmap<B, F>(self, f: F) -> Self::Mapped<B>
     where
-        F: FnOnce(A) -> B,
+        F: Function<A, Output = B>,
     {
-        Identity::of(f(self.unwrap()))
+        Identity::point(f.call(self.copoint()))
     }
 }
 
 impl<T> Applicative<T> for Identity<T> {
     fn apply<B, A>(self, a: A) -> B
     where
-        T: FnOnce(A) -> B,
+        T: Function<A, Output = B>,
     {
-        self.unwrap()(a)
+        self.copoint().call(a)
     }
 }
 
 impl<T> Monad<T> for Identity<T> {
     fn chain<M, F>(self, f: F) -> M
     where
-        F: FnOnce(T) -> M,
+        F: Function<T, Output = M>,
     {
-        f(self.unwrap())
+        f.call(self.copoint())
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Applicative, Copointed, Functor, Identity, Monad, Pointed};
+    use crate::functional::{
+        Applicative, Copointed, FunctionFn, Functor, Identity, Monad, Pointed,
+    };
 
     #[test]
     fn test_identity() {
-        let id1 = Identity::of(5);
-        let id2: Identity<i32> = id1.fmap(|x| x * 3);
-        let id3: Identity<i32> = Identity::of(|x: Identity<i32>| x.fmap(|y| y - 3)).apply(id2);
-        let id4 = id3.chain(|x| Identity::of(x / 3));
-        let id5 = id4.then(|| Identity::of(1234));
-        assert_eq!(id1.unwrap(), 5);
-        assert_eq!(id2.unwrap(), 15);
-        assert_eq!(id3.unwrap(), 12);
-        assert_eq!(id4.unwrap(), 4);
-        assert_eq!(id5.unwrap(), 1234);
+        let id1 = Identity::point(5);
+        let id2: Identity<i32> = id1.fmap(FunctionFn::point(|x| x * 3));
+        let id3: Identity<i32> = Identity::point(FunctionFn::point(|x: Identity<i32>| {
+            x.fmap(FunctionFn::point(|y| y - 3))
+        }))
+        .apply(id2);
+        let id4 = id3.chain(FunctionFn::point(|x| Identity::point(x / 3)));
+        let id5 = id4.then(FunctionFn::point(|_| Identity::point(1234)));
+        assert_eq!(id1.copoint(), 5);
+        assert_eq!(id2.copoint(), 15);
+        assert_eq!(id3.copoint(), 12);
+        assert_eq!(id4.copoint(), 4);
+        assert_eq!(id5.copoint(), 1234);
     }
 }

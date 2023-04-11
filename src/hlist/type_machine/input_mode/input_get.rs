@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    functional::{Copointed, Phantom},
+    functional::{Copointed, Tagged},
     hlist::{
         tuple::{TupleGetImpl, TupleRef},
     },
@@ -16,10 +16,10 @@ impl<'a, T, C, I, P> InputMode<&'a C, I, P> for InputGet<T>
 where
     T: 'a,
     C: TupleRef + 'a,
-    C::TupleRef<'a>: TupleGetImpl<&'a Phantom<T, I>, P>,
+    C::TupleRef<'a>: TupleGetImpl<&'a Tagged<T, I>, P>,
     I: Clone + 'a,
 {
     fn fetch(context: &'a C) -> I {
-        InputRefGet::fetch(context).clone().unwrap()
+        InputRefGet::fetch(context).clone().copoint()
     }
 }

@@ -3,7 +3,7 @@ use core::{
     ops::{Shl, Shr},
 };
 
-use crate::functional::{Phantom, Pointed};
+use crate::functional::{Tagged, Pointed};
 
 use super::{
     action::Action,
@@ -24,26 +24,26 @@ impl<T, Rhs> Shl<Rhs> for Output<T>
 where
     Rhs: Instruction,
 {
-    type Output = Phantom<Output<T>, Action<Rhs>>;
+    type Output = Tagged<Output<T>, Action<Rhs>>;
 
     fn shl(self, rhs: Rhs) -> Self::Output {
-        Pointed::of(Pointed::of(rhs))
+        Pointed::point(Pointed::point(rhs))
     }
 }
 
-impl<P, T, Rhs> Shr<Output<Rhs>> for Phantom<P, T> {
-    type Output = Phantom<Output<Rhs>, Self>;
+impl<P, T, Rhs> Shr<Output<Rhs>> for Tagged<P, T> {
+    type Output = Tagged<Output<Rhs>, Self>;
 
     fn shr(self, _: Output<Rhs>) -> Self::Output {
-        Pointed::of(self)
+        Pointed::point(self)
     }
 }
 
-impl<P, T, Rhs> Shl<Output<Rhs>> for Phantom<P, T> {
-    type Output = Phantom<Output<Rhs>, Self>;
+impl<P, T, Rhs> Shl<Output<Rhs>> for Tagged<P, T> {
+    type Output = Tagged<Output<Rhs>, Self>;
 
     fn shl(self, _: Output<Rhs>) -> Self::Output {
-        Pointed::of(self)
+        Pointed::point(self)
     }
 }
 
@@ -71,7 +71,7 @@ pub trait DefOf: Sized {
 
 impl<T> DefOf for T {}
 
-impl<M, T, C, I, P> InputMode<C, I, P> for Phantom<Output<M>, T>
+impl<M, T, C, I, P> InputMode<C, I, P> for Tagged<Output<M>, T>
 where
     T: InputMode<C, I, P>,
 {
@@ -80,7 +80,7 @@ where
     }
 }
 
-impl<M, T, C, O, P> OutputMode<C, O, P> for Phantom<Output<M>, T>
+impl<M, T, C, O, P> OutputMode<C, O, P> for Tagged<Output<M>, T>
 where
     M: OutputMode<C, O, P>,
 {

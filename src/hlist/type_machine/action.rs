@@ -1,6 +1,6 @@
 use core::ops::{Shl, Shr};
 
-use crate::functional::{Copointed, Phantom, Pointed};
+use crate::functional::{Copointed, Tagged, Pointed};
 
 use super::{
     input::Input, input_mode::InputMode, instruction::Instruction, output_mode::OutputMode, output::Output,
@@ -12,7 +12,7 @@ pub struct Action<T>(T);
 impl<T> Pointed for Action<T> {
     type Pointed = T;
 
-    fn of(unit: Self::Pointed) -> Self {
+    fn point(unit: Self::Pointed) -> Self {
         Action(unit)
     }
 }
@@ -20,7 +20,7 @@ impl<T> Pointed for Action<T> {
 impl<T> Copointed for Action<T> {
     type Copointed = T;
 
-    fn unwrap(self) -> Self::Copointed {
+    fn copoint(self) -> Self::Copointed {
         self.0
     }
 }
@@ -55,24 +55,24 @@ impl<T, C> OutputMode<C, (), ()> for Action<T> {
 }
 
 impl<T, Rhs> Shr<Output<Rhs>> for Action<T> {
-    type Output = Phantom<Output<Rhs>, Action<T>>;
+    type Output = Tagged<Output<Rhs>, Action<T>>;
 
     fn shr(self, _: Output<Rhs>) -> Self::Output {
-        Pointed::of(self)
+        Pointed::point(self)
     }
 }
 
 impl<T, Rhs> Shl<Input<Rhs>> for Action<T> {
-    type Output = Phantom<Input<Rhs>, Action<T>>;
+    type Output = Tagged<Input<Rhs>, Action<T>>;
 
     fn shl(self, _: Input<Rhs>) -> Self::Output {
-        Pointed::of(self)
+        Pointed::point(self)
     }
 }
 
 pub trait ActionOf: Sized {
     fn action(self) -> Action<Self> {
-        Action::of(self)
+        Action::point(self)
     }
 }
 

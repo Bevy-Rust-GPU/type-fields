@@ -1,22 +1,19 @@
 mod applicative;
 mod copointed;
+mod function;
 mod functor;
 mod monad;
 mod pointed;
 
 mod identity;
-mod phantom;
+mod tagged;
 
 pub use applicative::*;
 pub use copointed::*;
+pub use function::*;
 pub use functor::*;
 pub use monad::*;
 pub use pointed::*;
 
 pub use identity::*;
-pub use phantom::*;
-
-/// `const :: a -> b -> a`
-pub fn fconst<T, U>(t: T) -> impl FnOnce(U) -> T {
-    move |_| t
-}
+pub use tagged::*;

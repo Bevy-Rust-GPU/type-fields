@@ -1,9 +1,7 @@
 use crate::functional::{Copointed, Pointed};
 
-use super::Instruction;
+use super::Function;
 
-/// Instruction for pushing a value to the back of the context
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Const<T>(T);
 
 impl<T> Pointed for Const<T> {
@@ -22,17 +20,19 @@ impl<T> Copointed for Const<T> {
     }
 }
 
-impl<T> Instruction for Const<T>
+impl<T> Clone for Const<T>
 where
-    for<'a> T: 'a,
+    T: Clone,
 {
-    type Input<'a> = ()
-    where
-        Self: 'a;
+    fn clone(&self) -> Self {
+        Pointed::point(self.0.clone())
+    }
+}
 
+impl<A, T> Function<A> for Const<T> {
     type Output = T;
 
-    fn exec<'a>(self, _: Self::Input<'a>) -> Self::Output {
+    fn call(self, _: A) -> Self::Output {
         self.0
     }
 }

@@ -1,3 +1,5 @@
+use super::Function;
+
 /// A type that can unwrap a value
 pub trait Copointed
 where
@@ -6,6 +8,20 @@ where
     type Copointed;
 
     /// Unwrap `Unit` from `Self`
-    fn unwrap(self) -> Self::Copointed;
+    fn copoint(self) -> Self::Copointed;
 }
 
+/// Copointed::copoint
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Copoint;
+
+impl<I> Function<I> for Copoint
+where
+    I: Copointed,
+{
+    type Output = I::Copointed;
+
+    fn call(self, input: I) -> Self::Output {
+        input.copoint()
+    }
+}

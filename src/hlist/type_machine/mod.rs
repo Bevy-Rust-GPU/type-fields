@@ -45,13 +45,16 @@ where
 #[cfg(test)]
 mod test {
     use crate::{
-        functional::{Copointed, Phantom, Pointed},
-        hlist::type_machine::{
-            input::{GetOf, InputOf},
-            input_mode::InputGets,
-            instruction::{Const, Instruction, NoOp},
-            output::{DefOf, SetOf},
-            Do,
+        functional::{Copoint, Copointed, Pointed, Tagged},
+        hlist::{
+            tuple::TupleMap,
+            type_machine::{
+                input::{GetOf, InputOf},
+                input_mode::InputGets,
+                instruction::{Const, Instruction, NoOp},
+                output::{DefOf, SetOf},
+                Do,
+            },
         },
     };
 
@@ -75,11 +78,11 @@ mod test {
         struct Integrate;
 
         impl Instruction for Integrate {
-            type Input<'a> = (Phantom<Pos, f32>, Phantom<Vel, f32>);
+            type Input<'a> = (Tagged<Pos, f32>, Tagged<Vel, f32>);
             type Output = f32;
 
             fn exec<'a>(self, (position, velocity): Self::Input<'a>) -> Self::Output {
-                position.unwrap() + velocity.unwrap()
+                position.copoint() + velocity.copoint()
             }
         }
 
@@ -87,10 +90,10 @@ mod test {
         enum Pos {}
         enum Vel {}
 
-        let (pos, vel, acc) = Do((
-            Pos::def() << Const::of(0.0),
-            Vel::def() << Const::of(1.0),
-            Acc::def() << Const::of(0),
+        let ctx = Do((
+            Pos::def() << Const::point(0.0),
+            Vel::def() << Const::point(1.0),
+            Acc::def() << Const::point(0),
             NoOp,
             Acc::set() << Increment << Acc::get(),
             Pos::set() << Integrate << InputGets::<(Pos, Vel)>::input(),
@@ -103,9 +106,9 @@ mod test {
             Acc::set() << Increment << Acc::get(),
             Pos::set() << Integrate << InputGets::<(Pos, Vel)>::input(),
             NoOp,
-            Acc::set() << Const::of(1),
+            Acc::set() << Const::point(1),
         ));
 
-        assert_eq!((pos.unwrap(), vel.unwrap(), acc.unwrap()), (3.0, 1.0, 1));
+        assert_eq!(ctx.map(Copoint), (3.0, 1.0, 1));
     }
 }

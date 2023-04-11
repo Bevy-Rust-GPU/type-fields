@@ -1,3 +1,7 @@
+use core::marker::PhantomData;
+
+use super::Function;
+
 /// A type that can wrap a value
 pub trait Pointed
 where
@@ -7,5 +11,25 @@ where
     type Pointed;
 
     /// Wrap `Pointed` into `Self`
-    fn of(unit: Self::Pointed) -> Self;
+    fn point(unit: Self::Pointed) -> Self;
+}
+
+/// Pointed::point
+pub struct Point<I>(PhantomData<I>);
+
+impl<T> Default for Point<T> {
+    fn default() -> Self {
+        Point(PhantomData)
+    }
+}
+
+impl<I> Function<I::Pointed> for Point<I>
+where
+    I: Pointed,
+{
+    type Output = I;
+
+    fn call(self, input: I::Pointed) -> I {
+        I::point(input)
+    }
 }

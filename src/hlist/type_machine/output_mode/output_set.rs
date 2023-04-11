@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    functional::{Phantom, Pointed},
+    functional::{Tagged, Pointed},
     hlist::{tuple::TupleSet, type_machine::input_mode::InputMode},
 };
 
@@ -17,11 +17,11 @@ impl<T, C> InputMode<C, (), ()> for OutputSet<T> {
 
 impl<T, C, O, P> OutputMode<C, O, P> for OutputSet<T>
 where
-    C: TupleSet<Phantom<T, O>, P>,
+    C: TupleSet<Tagged<T, O>, P>,
 {
     type Output = C;
 
     fn apply(context: C, output: O) -> Self::Output {
-        context.set(Pointed::of(output))
+        context.set(Pointed::point(output))
     }
 }

@@ -3,7 +3,7 @@ use core::{
     ops::{Shl, Shr},
 };
 
-use crate::functional::{Phantom, Pointed};
+use crate::functional::{Copointed, Pointed, Tagged};
 
 use super::{
     action::Action,
@@ -21,34 +21,42 @@ impl<T> Default for Input<T> {
 }
 
 impl<T, Rhs> Shr<Action<Rhs>> for Input<T> {
-    type Output = Phantom<Input<T>, Action<Rhs>>;
+    type Output = Tagged<Input<T>, Action<Rhs>>;
 
     fn shr(self, rhs: Action<Rhs>) -> Self::Output {
-        Pointed::of(rhs)
+        Pointed::point(rhs)
+    }
+}
+
+impl<T, Rhs> Shl<Input<Rhs>> for Input<T> {
+    type Output = Tagged<Input<T>, Input<Rhs>>;
+
+    fn shl(self, rhs: Input<Rhs>) -> Self::Output {
+        Pointed::point(rhs)
     }
 }
 
 impl<T, Rhs> Shl<Action<Rhs>> for Input<T> {
-    type Output = Phantom<Input<T>, Action<Rhs>>;
+    type Output = Tagged<Input<T>, Action<Rhs>>;
 
     fn shl(self, rhs: Action<Rhs>) -> Self::Output {
-        Pointed::of(rhs)
+        Pointed::point(rhs)
     }
 }
 
-impl<P, T, Rhs> Shr<Input<Rhs>> for Phantom<P, T> {
-    type Output = Phantom<Input<Rhs>, Self>;
+impl<P, T, Rhs> Shr<Input<Rhs>> for Tagged<P, T> {
+    type Output = Tagged<Input<Rhs>, Self>;
 
     fn shr(self, _: Input<Rhs>) -> Self::Output {
-        Pointed::of(self)
+        Pointed::point(self)
     }
 }
 
-impl<P, T, Rhs> Shl<Input<Rhs>> for Phantom<P, T> {
-    type Output = Phantom<Input<Rhs>, Self>;
+impl<P, T, Rhs> Shl<Input<Rhs>> for Tagged<P, T> {
+    type Output = Tagged<P, Tagged<Input<Rhs>, T>>;
 
     fn shl(self, _: Input<Rhs>) -> Self::Output {
-        Pointed::of(self)
+        Pointed::point(Pointed::point(self.copoint()))
     }
 }
 
@@ -68,7 +76,7 @@ pub trait GetOf: Sized {
 
 impl<T> GetOf for T {}
 
-impl<M, T, C, I, P> InputMode<C, I, P> for Phantom<Input<M>, T>
+impl<M, T, C, I, P> InputMode<C, I, P> for Tagged<Input<M>, T>
 where
     M: InputMode<C, I, P>,
 {
@@ -77,7 +85,7 @@ where
     }
 }
 
-impl<M, T, C, O, P> OutputMode<C, O, P> for Phantom<Input<M>, T>
+impl<M, T, C, O, P> OutputMode<C, O, P> for Tagged<Input<M>, T>
 where
     T: OutputMode<C, O, P>,
 {
