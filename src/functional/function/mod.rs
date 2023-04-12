@@ -1,8 +1,12 @@
+mod compose;
 mod constant;
+mod id;
 
 use core::marker::PhantomData;
 
+pub use compose::*;
 pub use constant::*;
+pub use id::*;
 
 use super::{Copointed, Pointed};
 

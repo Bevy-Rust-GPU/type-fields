@@ -1,7 +1,7 @@
 use super::{Copointed, Function, Functor, Pointed};
 
 /// Identity monad, used to lift values into a monadic context.
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Pair<A, B>(A, B);
 
 impl<A, B> Pointed for Pair<A, B> {

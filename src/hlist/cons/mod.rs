@@ -1,5 +1,6 @@
 //! Traits implemented over cons list types.
 
+mod cons_append;
 mod cons_applicative;
 mod cons_as_mut;
 mod cons_as_ref;
@@ -14,15 +15,18 @@ mod cons_list;
 mod cons_list_mut;
 mod cons_list_ref;
 mod cons_monad;
+mod cons_monoid;
 mod cons_pop_back;
 mod cons_pop_front;
 mod cons_push_back;
 mod cons_push_front;
 mod cons_remove;
+mod cons_semigroup;
 mod cons_set;
 mod cons_sets;
 mod uncons;
 
+pub use cons_append::*;
 pub use cons_applicative::*;
 pub use cons_as_mut::*;
 pub use cons_as_ref::*;
@@ -41,6 +45,7 @@ pub use cons_pop_front::*;
 pub use cons_push_back::*;
 pub use cons_push_front::*;
 pub use cons_remove::*;
+pub use cons_semigroup::*;
 pub use cons_set::*;
 pub use cons_sets::*;
 pub use uncons::*;
@@ -50,11 +55,10 @@ mod test {
     use core::marker::PhantomData;
 
     use crate::{
-        functional::{Applicative, Function},
+        functional::{Applicative, Copointed, Function, Pointed, Tagged},
         hlist::{
-            cons::{ConsFoldLeft, ConsFoldRight, ConsGet, ConsList, Uncons},
-            path::Path,
-            tuple::{Cons, TupleGet, TupleGetImpl, TupleList},
+            cons::{ConsFoldRight, Uncons},
+            tuple::{Cons, TupleGetImpl},
         },
     };
 
@@ -123,7 +127,10 @@ mod test {
         #[derive(Clone)]
         struct Panic;
 
-        impl<T> Function<(T,)> for Panic where T: core::fmt::Display {
+        impl<T> Function<(T,)> for Panic
+        where
+            T: core::fmt::Display,
+        {
             type Output = ();
 
             fn call(self, input: (T,)) -> Self::Output {
@@ -134,56 +141,73 @@ mod test {
         let ctx = ("three", 2.0, 1);
 
         let list = (
-            Panic,
-            Sub,
-            Get::<i32, _>::default(),
-            Sub,
-            Get::<i32, _>::default(),
-            Get::<f32, _>::default(),
+            Action::point(Panic),
+            Action::point(Sub),
+            Context::point(Get::<i32, _>::default()),
+            Action::point(Sub),
+            Context::point(Get::<i32, _>::default()),
+            Context::point(Get::<f32, _>::default()),
         )
             .cons();
 
+        /// Wrapper denoting an action that should collapse an existing call stack
+        type Action<T> = Tagged<TagAction, T>;
+        enum TagAction {}
+
+        /// Wrapper denoting an action that modifies context
+        enum TagContext {}
+        type Context<T> = Tagged<TagContext, T>;
+
+        trait DoTrait {
+            type Output;
+
+            fn r#do(self) -> Self::Output;
+        }
+
+        impl<C, A, T> DoTrait for ((C, A), Action<T>)
+        where
+            C: Clone,
+            T: Function<A::Uncons>,
+            A: Uncons,
+        {
+            type Output = (C, (<T as Function<A::Uncons>>::Output, ()));
+
+            fn r#do(self) -> Self::Output {
+                let ((c, a), n) = self;
+                (c, (n.apply(a.uncons()), ()))
+            }
+        }
+
+        impl<C, A, T> DoTrait for ((C, A), Context<T>)
+        where
+            C: Clone,
+            T: Function<C>,
+        {
+            type Output = (C, (<T as Function<C>>::Output, A));
+
+            fn r#do(self) -> Self::Output {
+                let ((c, a), n) = self;
+                (c.clone(), (n.copoint().call(c), a))
+            }
+        }
+
+        /// DoTrait::do
         #[derive(Clone)]
         struct Do;
 
-        impl<C, A, T, P> Function<((C, A), Get<T, P>)> for Do
+        impl<T> Function<T> for Do
         where
-            C: Clone + TupleGetImpl<T, P>,
-            P: Path,
+            T: DoTrait,
         {
-            type Output = (C, (<Get<T, P> as Function<C>>::Output, A));
+            type Output = T::Output;
 
-            fn call(self, ((c, a), n): ((C, A), Get<T, P>)) -> Self::Output {
-                (c.clone(), (n.call(c), a))
-            }
-        }
-
-        impl<C, A> Function<((C, A), Sub)> for Do
-        where
-            A: Uncons,
-            Sub: Function<A::Uncons>,
-        {
-            type Output = (C, (<Sub as Function<A::Uncons>>::Output, ()));
-
-            fn call(self, ((c, a), n): ((C, A), Sub)) -> Self::Output {
-                (c, (n.call(a.uncons()), ()))
-            }
-        }
-
-        impl<C, A> Function<((C, A), Panic)> for Do
-        where
-            A: Uncons,
-            Panic: Function<A::Uncons>,
-        {
-            type Output = (C, (<Panic as Function<A::Uncons>>::Output, ()));
-
-            fn call(self, ((c, a), n): ((C, A), Panic)) -> Self::Output {
-                (c, (n.call(a.uncons()), ()))
+            fn call(self, input: T) -> Self::Output {
+                input.r#do()
             }
         }
 
         let (c, res) = list.cons_fold_right((ctx, ()), Do);
         assert_eq!(c, ctx);
-        //assert_eq!(res, (2.0, ()));
+        assert_eq!(res, ((), ()));
     }
 }

@@ -23,6 +23,12 @@ impl<T> Default for Point<T> {
     }
 }
 
+impl<T> Clone for Point<T> {
+    fn clone(&self) -> Self {
+        Point(PhantomData)
+    }
+}
+
 impl<I> Function<I::Pointed> for Point<I>
 where
     I: Pointed,

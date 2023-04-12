@@ -4,7 +4,7 @@ use crate::functional::{Const, Pointed};
 
 use super::Function;
 
-/// A type that can map a function over a wrapped value.
+/// A type that can map a function over a contained value.
 pub trait Functor<F> {
     type Mapped;
 
@@ -14,7 +14,7 @@ pub trait Functor<F> {
 impl<F> Functor<F> for () {
     type Mapped = ();
 
-    fn fmap(self, _: F) -> Self::Mapped {
+    fn fmap(self, f: F) -> Self::Mapped {
         self
     }
 }
