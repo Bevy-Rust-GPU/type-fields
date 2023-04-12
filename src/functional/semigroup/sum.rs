@@ -1,9 +1,19 @@
-use crate::functional::{Copointed, Pointed, Semigroup, Tagged};
+use crate::{
+    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
+    derive_pointed,
+    functional::{Copointed, Pointed, Semigroup},
+};
 use core::ops::Add;
 
 /// A `Semigroup` wrapper that can append additively.
-pub type Sum<T> = Tagged<TagSum, T>;
-pub enum TagSum {}
+pub struct Sum<T>(T);
+
+derive_pointed!(Sum<T>);
+derive_copointed!(Sum<T>);
+derive_functor!(Sum<T>);
+derive_applicative!(Sum<T>);
+derive_monad!(Sum<T>);
+derive_monoid!(Sum<T>);
 
 impl<T> Semigroup<Sum<T>> for Sum<T>
 where

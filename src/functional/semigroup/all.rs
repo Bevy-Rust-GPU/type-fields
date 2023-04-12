@@ -1,8 +1,18 @@
-use crate::functional::{Copointed, Pointed, Semigroup, Tagged};
+use crate::{
+    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
+    derive_pointed,
+    functional::{Copointed, Pointed, Semigroup},
+};
 
 /// A `Semigroup` wrapper that can append with AND semantics.
-pub type All<T> = Tagged<TagAll, T>;
-pub enum TagAll {}
+pub struct All<T>(T);
+
+derive_pointed!(All<T>);
+derive_copointed!(All<T>);
+derive_functor!(All<T>);
+derive_applicative!(All<T>);
+derive_monad!(All<T>);
+derive_monoid!(All<T>);
 
 impl<T> Semigroup<All<T>> for All<T>
 where

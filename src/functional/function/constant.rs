@@ -1,38 +1,12 @@
-use crate::functional::{Copointed, Pointed};
-
 use super::Function;
 
-pub struct Const<T>(T);
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Const;
 
-impl<T> Pointed for Const<T> {
-    type Pointed = T;
+impl<A, B> Function<(A, B)> for Const {
+    type Output = A;
 
-    fn point(unit: Self::Pointed) -> Self {
-        Const(unit)
-    }
-}
-
-impl<T> Copointed for Const<T> {
-    type Copointed = T;
-
-    fn copoint(self) -> Self::Copointed {
-        self.0
-    }
-}
-
-impl<T> Clone for Const<T>
-where
-    T: Clone,
-{
-    fn clone(&self) -> Self {
-        Pointed::point(self.0.clone())
-    }
-}
-
-impl<A, T> Function<A> for Const<T> {
-    type Output = T;
-
-    fn call(self, _: A) -> Self::Output {
-        self.0
+    fn call(self, (a, _): (A, B)) -> Self::Output {
+        a
     }
 }

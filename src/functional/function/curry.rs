@@ -1,83 +1,35 @@
-use core::marker::PhantomData;
-
 use crate::functional::{Copointed, Pointed};
 
 use super::Function;
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
-pub trait Curry<A, B>: Function<(A, B)> {
+pub trait Curry {
     type Curried;
 
     fn curry(self) -> Self::Curried;
 }
 
-impl<T, A, B> Curry<A, B> for T
-where
-    T: Function<(A, B)>,
-{
-    type Curried = CurryA<T, A, B>;
+impl<T> Curry for T {
+    type Curried = Curried<T>;
 
     fn curry(self) -> Self::Curried {
-        CurryA::point(self)
-    }
-}
-
-/// Base curry function
-pub struct CurryF<F, A, B>(PhantomData<(F, A, B)>);
-
-impl<F, A, B> Default for CurryF<F, A, B> {
-    fn default() -> Self {
-        CurryF(PhantomData)
-    }
-}
-
-impl<F, A, B> Clone for CurryF<F, A, B> {
-    fn clone(&self) -> Self {
-        CurryF(PhantomData)
-    }
-}
-
-impl<F, A, B> Function<F> for CurryF<F, A, B>
-where
-    F: Function<(A, B)>,
-{
-    type Output = CurryA<F, A, B>;
-
-    fn call(self, input: F) -> Self::Output {
-        CurryA::point(input)
+        Curried::point(self)
     }
 }
 
 /// Curry function with F stored
-pub struct CurryA<F, A, B>(F, PhantomData<(A, B)>);
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Curried<F>(F);
 
-impl<F, A, B> Default for CurryA<F, A, B>
-where
-    F: Default,
-{
-    fn default() -> Self {
-        CurryA(F::default(), PhantomData)
-    }
-}
-
-impl<F, A, B> Clone for CurryA<F, A, B>
-where
-    F: Clone,
-{
-    fn clone(&self) -> Self {
-        CurryA(self.0.clone(), PhantomData)
-    }
-}
-
-impl<F, A, B> Pointed for CurryA<F, A, B> {
+impl<F> Pointed for Curried<F> {
     type Pointed = F;
 
     fn point(unit: Self::Pointed) -> Self {
-        CurryA(unit, PhantomData)
+        Curried(unit)
     }
 }
 
-impl<F, A, B> Copointed for CurryA<F, A, B> {
+impl<F> Copointed for Curried<F> {
     type Copointed = F;
 
     fn copoint(self) -> Self::Copointed {
@@ -85,26 +37,26 @@ impl<F, A, B> Copointed for CurryA<F, A, B> {
     }
 }
 
-impl<F, A, B> Function<A> for CurryA<F, A, B> {
-    type Output = CurryB<F, A, B>;
+impl<F, A> Function<A> for Curried<F> {
+    type Output = CurriedA<F, A>;
 
     fn call(self, input: A) -> Self::Output {
-        CurryB::point((self.0, input))
+        CurriedA::point((self.0, input))
     }
 }
 
 /// Curry function with F, A stored
-pub struct CurryB<F, A, B>(F, A, PhantomData<B>);
+pub struct CurriedA<F, A>(F, A);
 
-impl<F, A, B> Pointed for CurryB<F, A, B> {
+impl<F, A> Pointed for CurriedA<F, A> {
     type Pointed = (F, A);
 
     fn point((f, a): Self::Pointed) -> Self {
-        CurryB(f, a, PhantomData)
+        CurriedA(f, a)
     }
 }
 
-impl<F, A, B> Copointed for CurryB<F, A, B> {
+impl<F, A> Copointed for CurriedA<F, A> {
     type Copointed = (F, A);
 
     fn copoint(self) -> Self::Copointed {
@@ -112,7 +64,7 @@ impl<F, A, B> Copointed for CurryB<F, A, B> {
     }
 }
 
-impl<F, A, B> Function<B> for CurryB<F, A, B>
+impl<F, A, B> Function<B> for CurriedA<F, A>
 where
     F: Function<(A, B)>,
 {
@@ -125,13 +77,11 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Add, Function};
-
-    use super::Curry;
+    use crate::functional::{Add, Curried, Function, Pointed};
 
     #[test]
     fn test_curry() {
-        let curried = Add.curry();
+        let curried = Curried::point(Add);
         let curried = curried.call(1);
         let curried = curried.call(1);
         assert_eq!(curried, 2);

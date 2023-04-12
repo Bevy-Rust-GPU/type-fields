@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{Applicative, Copointed, Function, Functor, Monad, Pointed};
+use super::{Applicative, Copointed, Function, Functor, Monad, Monoid, Pointed, Semigroup};
 
 /// Phantom monad, used to lift values into a monadic context
 /// alongside some additional type parameter to make them
@@ -114,6 +114,28 @@ where
 
     fn chain(self, f: F) -> Self::Chained {
         f.call(self.copoint())
+    }
+}
+
+impl<P, T> Monoid for Tagged<P, T>
+where
+    T: Monoid,
+{
+    type Identity = T::Identity;
+
+    fn mempty() -> Self::Identity {
+        T::mempty()
+    }
+}
+
+impl<P, T, U> Semigroup<Tagged<P, U>> for Tagged<P, T>
+where
+    T: Semigroup<U>,
+{
+    type Appended = Tagged<P, T::Appended>;
+
+    fn mappend(self, t: Tagged<P, U>) -> Self::Appended {
+        Pointed::point(self.1.mappend(t.copoint()))
     }
 }
 

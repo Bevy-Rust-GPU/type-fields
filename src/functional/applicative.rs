@@ -26,7 +26,7 @@ impl<T> Applicative<T> for () {
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Apply<T>(PhantomData<T>);
 
-impl<T, U> Function<(U, T)> for Apply<T>
+impl<U, T> Function<(U, T)> for Apply<T>
 where
     U: Applicative<T>,
 {

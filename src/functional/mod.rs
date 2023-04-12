@@ -3,6 +3,7 @@ mod copointed;
 mod foldable;
 mod function;
 mod functor;
+mod macros;
 mod monad;
 mod monoid;
 mod pointed;

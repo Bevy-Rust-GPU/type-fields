@@ -1,10 +1,18 @@
-use crate::functional::{Composed, Copointed, Id, Pointed, Semigroup, Tagged};
+use crate::{
+    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_pointed,
+    functional::{Composed, Copointed, Id, Pointed, Semigroup},
+};
 
 use super::Monoid;
 
 /// The monoid of endomorphisms under composition.
-pub type Endo<T> = Tagged<TagEndo, T>;
-pub enum TagEndo {}
+pub struct Endo<T>(T);
+
+derive_pointed!(Endo<T>);
+derive_copointed!(Endo<T>);
+derive_functor!(Endo<T>);
+derive_applicative!(Endo<T>);
+derive_monad!(Endo<T>);
 
 impl<T> Monoid for Endo<T>
 where
@@ -29,8 +37,8 @@ impl<T, U> Semigroup<Endo<U>> for Endo<T> {
 mod test {
     use crate::{
         functional::{
-            Add, Compose, Composed, Copointed, Curry, CurryA, CurryB, Foldr, Function, Point,
-            Pointed, Semigroup, TagEndo, Tagged,
+            Add, Compose, Composed, Copointed, Curry, Curried, CurriedA, Foldr, Function, Point,
+            Pointed, Semigroup,
         },
         hlist::tuple::Cons,
     };
@@ -63,21 +71,21 @@ mod test {
         let endo = Point::default();
         let _endo_result: Endo<Add> = endo.call(add);
 
-        let add_endo: Composed<Add, Point<Tagged<TagEndo, i32>>> =
+        let add_endo: Composed<Add, Point<Endo<i32>>> =
             Compose.call((add, Point::<Endo<i32>>::default()));
         let add_endo_result: Endo<i32> = add_endo.call((1, 2));
         assert_eq!(add_endo_result.copoint(), 3);
 
-        let add_curry_a: CurryA<Add, i32, i32> = Add.curry();
-        let add_curry_b: CurryB<Add, i32, i32> = add_curry_a.call(1);
+        let add_curry_a: Curried<Add> = Add.curry();
+        let add_curry_b: CurriedA<Add, i32> = add_curry_a.call(1);
         let add_curry_result: i32 = add_curry_b.call(1);
         assert_eq!(add_curry_result, 2);
 
         let add_curry_endo_a: Composed<
-            CurryA<Add, i32, i32>,
-            Point<Endo<<CurryA<Add, i32, i32> as Function<i32>>::Output>>,
+            Curried<Add>,
+            Point<Endo<<Curried<Add> as Function<i32>>::Output>>,
         > = Compose.call((Add.curry(), Point::default()));
-        let add_curry_endo_b: Tagged<TagEndo, CurryB<Add, i32, i32>> = add_curry_endo_a.call(1);
+        let add_curry_endo_b: Endo<CurriedA<Add, i32>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.copoint().call(2);
         assert_eq!(add_curry_endo_result, 3);
     }

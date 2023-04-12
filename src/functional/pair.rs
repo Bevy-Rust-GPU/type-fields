@@ -1,24 +1,13 @@
+use crate::{derive_copointed, derive_pointed};
+
 use super::{Copointed, Function, Functor, Pointed};
 
 /// Identity monad, used to lift values into a monadic context.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Pair<A, B>(A, B);
 
-impl<A, B> Pointed for Pair<A, B> {
-    type Pointed = (A, B);
-
-    fn point((a, b): Self::Pointed) -> Self {
-        Pair(a, b)
-    }
-}
-
-impl<A, B> Copointed for Pair<A, B> {
-    type Copointed = (A, B);
-
-    fn copoint(self) -> Self::Copointed {
-        (self.0, self.1)
-    }
-}
+derive_pointed!(Pair<A, B>);
+derive_copointed!(Pair<A, B>);
 
 impl<A, B, F> Functor<F> for Pair<A, B>
 where

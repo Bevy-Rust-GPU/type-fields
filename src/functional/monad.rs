@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{Const, Function, Pointed};
+use super::{Const, Curry, CurriedA, Function};
 
 /// A type that can flat-map a function over its wrapped value
 ///
@@ -34,18 +34,19 @@ where
     }
 }
 
-pub trait Then<F>: Sized + Monad<Const<F::Output>>
+pub trait Then<F>: Sized + Monad<CurriedA<Const, F::Output>>
 where
     F: Function<()>,
 {
-    fn then(self, f: F) -> Self::Chained {
-        self.chain(Const::point(f.call(())))
-    }
+    fn then(self, f: F) -> Self::Chained;
 }
 
 impl<T, F> Then<F> for T
 where
-    T: Monad<Const<F::Output>>,
+    T: Monad<CurriedA<Const, F::Output>>,
     F: Function<()>,
 {
+    fn then(self, f: F) -> Self::Chained {
+        self.chain(Const.curry().call(f.call(())))
+    }
 }

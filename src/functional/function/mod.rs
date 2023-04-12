@@ -22,7 +22,7 @@ use super::{Copointed, Pointed};
 /// unlike Fn* whose present implementation encodes a 1:1 coupling.
 ///
 /// This allowing mapping over heterogenous lists.
-pub trait Function<Inputs, Generics = ()> {
+pub trait Function<Inputs> {
     type Output;
 
     fn call(self, input: Inputs) -> Self::Output;
