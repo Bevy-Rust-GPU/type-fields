@@ -63,7 +63,7 @@ mod test {
     };
 
     #[test]
-    fn test_const_functor() {
+    fn test_do_notation() {
         struct Get<T, P>(PhantomData<(T, P)>);
 
         impl<T, P> Default for Get<T, P> {

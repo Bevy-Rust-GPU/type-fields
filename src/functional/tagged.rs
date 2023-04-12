@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{monoid::Monoid, Applicative, Copointed, Function, Functor, Monad, Pointed};
+use super::{Applicative, Copointed, Function, Functor, Monad, Pointed};
 
 /// Phantom monad, used to lift values into a monadic context
 /// alongside some additional type parameter to make them
@@ -114,17 +114,6 @@ where
 
     fn chain(self, f: F) -> Self::Chained {
         f.call(self.copoint())
-    }
-}
-
-impl<P, T> Monoid for Tagged<P, T>
-where
-    T: Monoid,
-{
-    type Identity = Tagged<P, T::Identity>;
-
-    fn mempty() -> Self::Identity {
-        Pointed::point(T::mempty())
     }
 }
 

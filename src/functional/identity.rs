@@ -1,4 +1,4 @@
-use super::{monoid::Monoid, Applicative, Copointed, Function, Functor, Monad, Pointed, Semigroup};
+use super::{Applicative, Copointed, Function, Functor, Monad, Pointed};
 
 /// Identity monad, used to lift values into a monadic context.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -17,6 +17,14 @@ impl<T> Copointed for Identity<T> {
 
     fn copoint(self) -> Self::Copointed {
         self.0
+    }
+}
+
+impl<T> Function<T> for Identity<T> {
+    type Output = Self;
+
+    fn call(self, input: T) -> Self::Output {
+        Identity(input)
     }
 }
 
@@ -56,6 +64,7 @@ where
     }
 }
 
+/*
 impl<T> Monoid for Identity<T>
 where
     T: Monoid,
@@ -77,13 +86,14 @@ where
         Pointed::point(self.0.mappend(t.copoint()))
     }
 }
+*/
 
 #[cfg(test)]
 mod test {
     use crate::{
         functional::{
-            Applicative, Copoint, Copointed, Foldable, FunctionFn, Functor, Identity, Monad, Point,
-            Pointed, Semigroup, Sum, Then, Endo,
+            Applicative, Copointed, Foldable, FunctionFn, Functor, Identity, Monad, Point, Pointed,
+            Sum, Then,
         },
         hlist::tuple::Cons,
     };
@@ -98,10 +108,7 @@ mod test {
         .apply(id2);
         let id4 = id3.chain(FunctionFn::point(|x| Identity::point(x / 3)));
         let id5 = id4.then(FunctionFn::point(|_| Identity::point(1234)));
-        let id6 = Identity::point(Sum::point(3))
-            .mappend(Identity::point(Sum::point(6)))
-            .fmap(Copoint);
-        let id7 = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        let id6 = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
             .cons()
             .fold_map(Point::<Sum<i32>>::default());
 
@@ -110,7 +117,6 @@ mod test {
         assert_eq!(id3.copoint(), 12);
         assert_eq!(id4.copoint(), 4);
         assert_eq!(id5.copoint(), 1234);
-        assert_eq!(id6.copoint(), 9);
-        assert_eq!(id7.copoint(), 55);
+        assert_eq!(id6.copoint(), 55);
     }
 }
