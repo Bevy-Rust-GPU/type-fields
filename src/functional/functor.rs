@@ -18,12 +18,11 @@ impl<F> Functor<F> for () {
 }
 
 /// Functor::fmap
-pub struct Fmap<F>(PhantomData<F>);
+pub struct Fmap;
 
-impl<F, A> Function<(A, F)> for Fmap<F>
+impl<F, A> Function<(A, F)> for Fmap
 where
     A: Functor<F>,
-    F: Function<A>,
 {
     type Output = A::Mapped;
 

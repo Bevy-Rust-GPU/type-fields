@@ -46,9 +46,10 @@ mod test {
             }
         }
 
-        let id1 = Pair::point((5, 6.0));
-        let id2: Pair<i32, f32> = id1.fmap(Mul3);
+        let id1: Pair<i32, f32> = Pair::point((5, 6.0));
         assert_eq!(id1.copoint(), (5, 6.0));
+
+        let id2: Pair<i32, f32> = id1.fmap(Mul3);
         assert_eq!(id2.copoint(), (15, 18.0));
     }
 }
