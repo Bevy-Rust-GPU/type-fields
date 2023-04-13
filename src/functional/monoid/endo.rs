@@ -37,7 +37,7 @@ impl<T, U> Semigroup<Endo<U>> for Endo<T> {
 mod test {
     use crate::{
         functional::{
-            Add, Compose, Composed, Copointed, Curry, Curried, CurriedA, Foldr, Function, Point,
+            Add, Compose, Composed, Copointed, Curried, CurriedA, Curry, Foldr, Function, Point,
             Pointed, Semigroup,
         },
         hlist::tuple::Cons,

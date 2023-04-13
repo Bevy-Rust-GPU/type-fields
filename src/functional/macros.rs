@@ -49,13 +49,13 @@ macro_rules! derive_copointed {
 #[macro_export]
 macro_rules! derive_functor {
     ($ident:ident < $ty:ident >) => {
-        impl<$ty, F> crate::functional::Functor<F> for $ident<$ty>
+        impl<$ty, _Function> crate::functional::Functor<_Function> for $ident<$ty>
         where
-            F: crate::functional::Function<$ty>,
+            _Function: crate::functional::Function<$ty>,
         {
-            type Mapped = $ident<F::Output>;
+            type Mapped = $ident<_Function::Output>;
 
-            fn fmap(self, f: F) -> Self::Mapped {
+            fn fmap(self, f: _Function) -> Self::Mapped {
                 crate::functional::Pointed::point(
                     f.call(crate::functional::Copointed::copoint(self)),
                 )

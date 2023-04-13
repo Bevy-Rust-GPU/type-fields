@@ -11,6 +11,7 @@ mod semigroup;
 
 mod identity;
 mod pair;
+mod state;
 mod tagged;
 
 pub use applicative::*;
@@ -25,4 +26,6 @@ pub use pointed::*;
 pub use semigroup::*;
 
 pub use identity::*;
+pub use pair::*;
+pub use state::*;
 pub use tagged::*;

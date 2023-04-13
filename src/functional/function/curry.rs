@@ -1,18 +1,14 @@
-use crate::functional::{Copointed, Pointed};
+use crate::{derive_copointed, derive_pointed, functional::Pointed};
 
 use super::Function;
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
-pub trait Curry {
-    type Curried;
-
-    fn curry(self) -> Self::Curried;
+pub trait Curry: Sized {
+    fn curry(self) -> Curried<Self>;
 }
 
 impl<T> Curry for T {
-    type Curried = Curried<T>;
-
-    fn curry(self) -> Self::Curried {
+    fn curry(self) -> Curried<Self> {
         Curried::point(self)
     }
 }
@@ -21,21 +17,8 @@ impl<T> Curry for T {
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Curried<F>(F);
 
-impl<F> Pointed for Curried<F> {
-    type Pointed = F;
-
-    fn point(unit: Self::Pointed) -> Self {
-        Curried(unit)
-    }
-}
-
-impl<F> Copointed for Curried<F> {
-    type Copointed = F;
-
-    fn copoint(self) -> Self::Copointed {
-        self.0
-    }
-}
+derive_pointed!(Curried<F>);
+derive_copointed!(Curried<F>);
 
 impl<F, A> Function<A> for Curried<F> {
     type Output = CurriedA<F, A>;
@@ -48,21 +31,8 @@ impl<F, A> Function<A> for Curried<F> {
 /// Curry function with F, A stored
 pub struct CurriedA<F, A>(F, A);
 
-impl<F, A> Pointed for CurriedA<F, A> {
-    type Pointed = (F, A);
-
-    fn point((f, a): Self::Pointed) -> Self {
-        CurriedA(f, a)
-    }
-}
-
-impl<F, A> Copointed for CurriedA<F, A> {
-    type Copointed = (F, A);
-
-    fn copoint(self) -> Self::Copointed {
-        (self.0, self.1)
-    }
-}
+derive_pointed!(CurriedA<F, A>);
+derive_copointed!(CurriedA<F, A>);
 
 impl<F, A, B> Function<B> for CurriedA<F, A>
 where
@@ -77,11 +47,11 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Add, Curried, Function, Pointed};
+    use crate::functional::{Add, Curry, Function};
 
     #[test]
     fn test_curry() {
-        let curried = Curried::point(Add);
+        let curried = Add.curry();
         let curried = curried.call(1);
         let curried = curried.call(1);
         assert_eq!(curried, 2);
