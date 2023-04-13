@@ -71,8 +71,7 @@ mod test {
         let endo = Point::default();
         let _endo_result: Endo<Add> = endo.call(add);
 
-        let add_endo: Composed<Add, Point<Endo<i32>>> =
-            Compose.call((add, Point::<Endo<i32>>::default()));
+        let add_endo: Composed<Add, Point<Endo<i32>>> = add.compose(Point::<Endo<i32>>::default());
         let add_endo_result: Endo<i32> = add_endo.call((1, 2));
         assert_eq!(add_endo_result.copoint(), 3);
 
@@ -84,7 +83,7 @@ mod test {
         let add_curry_endo_a: Composed<
             Curried<Add>,
             Point<Endo<<Curried<Add> as Function<i32>>::Output>>,
-        > = Compose.call((Add.curry(), Point::default()));
+        > = Add.curry().compose(Point::default());
         let add_curry_endo_b: Endo<CurriedA<Add, i32>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.copoint().call(2);
         assert_eq!(add_curry_endo_result, 3);

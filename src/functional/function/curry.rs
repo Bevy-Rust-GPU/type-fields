@@ -1,5 +1,3 @@
-use crate::{derive_copointed, derive_pointed, functional::Pointed};
-
 use super::Function;
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
@@ -9,7 +7,7 @@ pub trait Curry: Sized {
 
 impl<T> Curry for T {
     fn curry(self) -> Curried<Self> {
-        Curried::point(self)
+        Curried(self)
     }
 }
 
@@ -17,22 +15,16 @@ impl<T> Curry for T {
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Curried<F>(F);
 
-derive_pointed!(Curried<F>);
-derive_copointed!(Curried<F>);
-
 impl<F, A> Function<A> for Curried<F> {
     type Output = CurriedA<F, A>;
 
     fn call(self, input: A) -> Self::Output {
-        CurriedA::point((self.0, input))
+        CurriedA(self.0, input)
     }
 }
 
 /// Curry function with F, A stored
 pub struct CurriedA<F, A>(F, A);
-
-derive_pointed!(CurriedA<F, A>);
-derive_copointed!(CurriedA<F, A>);
 
 impl<F, A, B> Function<B> for CurriedA<F, A>
 where

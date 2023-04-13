@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use crate::functional::{Const, Curried, CurriedA, Function, Pointed};
+use crate::functional::{Const, CurriedA, Curry, Function};
 
 /// A type that can map a function over a wrapped value.
 pub trait Functor<F> {
@@ -33,7 +33,7 @@ where
 
 pub trait FunctorReplace<T>: Sized + Functor<CurriedA<Const, T>> {
     fn replace(self, t: T) -> Self::Mapped {
-        self.fmap(Curried::point(Const).call(t))
+        self.fmap(Const.curry().call(t))
     }
 }
 
@@ -49,7 +49,7 @@ where
     type Output = A::Mapped;
 
     fn call(self, (a, t): (A, T)) -> Self::Output {
-        a.fmap(Curried::point(Const).call(t))
+        a.fmap(Const.curry().call(t))
     }
 }
 

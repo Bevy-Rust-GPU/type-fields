@@ -1,6 +1,6 @@
 use crate::{derive_applicative, derive_copointed, derive_functor, derive_pointed};
 
-use super::{Const, Copointed, Curried, CurriedA, Flipped, Function, Monad, Pointed};
+use super::{Const, Copointed, CurriedA, Curry, Flip, Flipped, Function, Monad, Pointed};
 
 /// 2-tuple constructor
 pub struct Tuple;
@@ -25,7 +25,7 @@ impl<T, F> Monad<F> for State<T> {
     type Chained = State<CurriedA<Flipped<StateChain<T>>, F>>;
 
     fn chain(self, f: F) -> Self::Chained {
-        State(Curried::point(Flipped::point(StateChain(self))).call(f))
+        State(StateChain(self).flip().curry().call(f))
     }
 }
 
@@ -35,7 +35,7 @@ impl<I> Function<I> for MakeState {
     type Output = State<CurriedA<Tuple, I>>;
 
     fn call(self, input: I) -> Self::Output {
-        State::point(Curried::point(Tuple).call(input))
+        State::point(Tuple.curry().call(input))
     }
 }
 
@@ -62,7 +62,7 @@ impl<I> Function<I> for Put {
     type Output = State<CurriedA<Const, ((), I)>>;
 
     fn call(self, input: I) -> Self::Output {
-        State::point(Curried::point(Const).call(((), input)))
+        State::point(Const.curry().call(((), input)))
     }
 }
 
@@ -75,7 +75,7 @@ where
     type Output = State<CurriedA<Const, (I, I)>>;
 
     fn call(self, input: I) -> Self::Output {
-        State::point(Curried::point(Const).call((input.clone(), input)))
+        State::point(Const.curry().call((input.clone(), input)))
     }
 }
 
@@ -83,7 +83,7 @@ where
 mod test {
     use crate::functional::{
         state::{Get, MakeState, State},
-        Applicative, Const, Copointed, Curried, Function, Monad, Pointed,
+        Applicative, Const, Copointed, Curry, Function, Monad,
     };
 
     #[test]
@@ -155,14 +155,12 @@ mod test {
         let arr = coin_s.apply(Locked);
         assert_eq!(arr, (Thank, Unlocked));
 
-        let arr = coin_s
-            .chain(Curried::point(Const).call(push_s))
-            .apply(Locked);
+        let arr = coin_s.chain(Const.curry().call(push_s)).apply(Locked);
         assert_eq!(arr, (Open, Locked));
 
         let arr = coin_s
-            .chain(Curried::point(Const).call(push_s))
-            .chain(Curried::point(Const).call(push_s))
+            .chain(Const.curry().call(push_s))
+            .chain(Const.curry().call(push_s))
             .apply(Locked);
         assert_eq!(arr, (Tut, Locked));
     }

@@ -2,13 +2,13 @@ use crate::functional::{Copointed, Pointed};
 
 use super::Function;
 
-pub struct Compose;
+pub trait Compose<F>: Sized {
+    fn compose(self, f: F) -> Composed<Self, F>;
+}
 
-impl<F1, F2> Function<(F1, F2)> for Compose {
-    type Output = Composed<F1, F2>;
-
-    fn call(self, input: (F1, F2)) -> Self::Output {
-        Composed::point(input)
+impl<T, F> Compose<F> for T {
+    fn compose(self, f: F) -> Composed<Self, F> {
+        Composed(self, f)
     }
 }
 

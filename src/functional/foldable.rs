@@ -34,9 +34,7 @@ where
     type Foldr = <<T::Folded as Copointed>::Copointed as Function<I2>>::Output;
 
     fn foldr(self, f: F, z: I2) -> Self::Foldr {
-        self.fold_map(Compose.call((f, Point::<Endo<F::Output>>::default())))
-            .copoint()
-            .call(z)
+        self.fold_map(f.compose(Point::default())).copoint().call(z)
     }
 }
 
