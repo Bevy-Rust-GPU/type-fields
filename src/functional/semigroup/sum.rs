@@ -6,6 +6,7 @@ use crate::{
 use core::ops::Add;
 
 /// A `Semigroup` wrapper that can append additively.
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Sum<T>(T);
 
 derive_pointed!(Sum<T>);

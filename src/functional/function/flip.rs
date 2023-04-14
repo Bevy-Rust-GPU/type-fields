@@ -1,4 +1,7 @@
-use crate::{derive_copointed, derive_pointed, functional::Pointed, derive_monad, derive_applicative, derive_functor};
+use crate::{
+    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_pointed,
+    functional::Pointed,
+};
 
 use super::Function;
 
@@ -12,6 +15,7 @@ impl<T> Flip for T {
     }
 }
 
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Flipped<F>(F);
 
 derive_pointed!(Flipped<F>);

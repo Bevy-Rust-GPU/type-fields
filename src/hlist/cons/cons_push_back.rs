@@ -1,22 +1,21 @@
-use crate::hlist::{
-    cons::ConsList,
-    path::{Here, Next, Path},
-};
+use crate::hlist::{cons::ConsList, path::Next};
 
 /// A `ConsList` that can push a new element to its back.
-pub trait ConsPushBack<T, P> {
+pub trait ConsPushBack<T> {
+    type Path;
     type ConsPushBack: ConsList;
 
     fn cons_push_back(self, tail: T) -> Self::ConsPushBack;
 }
 
-impl<Head, Tail, PathTail, T> ConsPushBack<T, (Next, PathTail)> for (Head, Tail)
+impl<Head, Tail, PathTail, T> ConsPushBack<T> for (Head, Tail)
 where
     Self: ConsList,
     (Head, Tail::ConsPushBack): ConsList,
-    Tail: ConsPushBack<T, PathTail>,
-    PathTail: Path,
+    Tail: ConsPushBack<T, Path = PathTail>,
+    //PathTail: Path,
 {
+    type Path = (Next, PathTail);
     type ConsPushBack = (Head, Tail::ConsPushBack);
 
     fn cons_push_back(self, tail: T) -> Self::ConsPushBack {
@@ -24,15 +23,8 @@ where
     }
 }
 
-impl<T, Head> ConsPushBack<T, (Here, ())> for (Head, ()) {
-    type ConsPushBack = (Head, (T, ()));
-
-    fn cons_push_back(self, tail: T) -> Self::ConsPushBack {
-        (self.0, (tail, ()))
-    }
-}
-
-impl<T> ConsPushBack<T, ()> for () {
+impl<T> ConsPushBack<T> for () {
+    type Path = ();
     type ConsPushBack = (T, ());
 
     fn cons_push_back(self, tail: T) -> Self::ConsPushBack {

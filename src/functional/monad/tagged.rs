@@ -1,6 +1,8 @@
 use core::marker::PhantomData;
 
-use super::{Applicative, Copointed, Function, Functor, Monad, Monoid, Pointed, Semigroup};
+use crate::functional::{
+    Applicative, Copointed, Function, Functor, Monad, Monoid, Pointed, Semigroup,
+};
 
 /// Phantom monad, used to lift values into a monadic context
 /// alongside some additional type parameter to make them
@@ -142,7 +144,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        Applicative, Composed, Const, Copointed, Curry, Div, Flip, Fmap, Function, Functor, Monad,
+        Applicative, Composed, Const, Copointed, CurryN, Div, Flip, Fmap, Function, Functor, Monad,
         Mul, Point, Pointed, Sub, Tagged, Then,
     };
 
@@ -153,22 +155,22 @@ mod test {
         let id1: Tagged<Tag, i32> = Tagged::<Tag, _>::point(5);
         assert_eq!(id1.copoint(), 5);
 
-        let id2: Tagged<Tag, i32> = id1.fmap(Mul.curry().call(3));
+        let id2: Tagged<Tag, i32> = id1.fmap(Mul.curry_n().call(3));
         assert_eq!(id2.copoint(), 15);
 
         let id3: Tagged<Tag, i32> =
-            Tagged::<Tag, _>::point(Fmap.flip().curry().call(Sub.flip().curry().call(3)))
+            Tagged::<Tag, _>::point(Fmap.flip().curry_n().call(Sub.flip().curry_n().call(3)))
                 .apply(id2);
         assert_eq!(id3.copoint(), 12);
 
         let id4: Tagged<Tag, i32> = id3.chain(
             Composed::point((Div.flip(), Point::<Tagged<Tag, _>>::default()))
-                .curry()
+                .curry_n()
                 .call(3),
         );
         assert_eq!(id4.copoint(), 4);
 
-        let id5: Tagged<Tag, i32> = id4.then(Const.curry().call(Tagged::<Tag, _>::point(1234)));
+        let id5: Tagged<Tag, i32> = id4.then(Const.curry_n().call(Tagged::<Tag, _>::point(1234)));
         assert_eq!(id5.copoint(), 1234);
     }
 }

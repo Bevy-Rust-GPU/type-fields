@@ -18,6 +18,7 @@ impl<F> Functor<F> for () {
 }
 
 /// Functor::fmap
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Fmap;
 
 impl<F, A> Function<(A, F)> for Fmap

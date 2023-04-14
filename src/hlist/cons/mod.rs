@@ -24,6 +24,7 @@ mod cons_remove;
 mod cons_semigroup;
 mod cons_set;
 mod cons_sets;
+mod cons_traversable;
 mod uncons;
 
 pub use cons_append::*;
@@ -48,6 +49,7 @@ pub use cons_remove::*;
 pub use cons_semigroup::*;
 pub use cons_set::*;
 pub use cons_sets::*;
+pub use cons_traversable::*;
 pub use uncons::*;
 
 #[cfg(test)]

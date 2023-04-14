@@ -8,11 +8,7 @@ mod monad;
 mod monoid;
 mod pointed;
 mod semigroup;
-
-mod identity;
-mod pair;
-mod state;
-mod tagged;
+mod traversable;
 
 pub use applicative::*;
 pub use copointed::*;
@@ -24,8 +20,4 @@ pub use monad::*;
 pub use monoid::*;
 pub use pointed::*;
 pub use semigroup::*;
-
-pub use identity::*;
-pub use pair::*;
-pub use state::*;
-pub use tagged::*;
+pub use traversable::*;

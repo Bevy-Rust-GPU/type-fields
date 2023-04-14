@@ -1,6 +1,7 @@
-use crate::{derive_copointed, derive_pointed};
-
-use super::{Copointed, Function, Functor, Pointed};
+use crate::{
+    derive_copointed, derive_pointed,
+    functional::{Copointed, Function, Functor, Pointed},
+};
 
 /// Identity monad, used to lift values into a monadic context.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -23,7 +24,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{pair::Pair, Copointed, Function, Functor, Pointed};
+    use crate::functional::{monad::Pair, Copointed, Function, Functor, Pointed};
 
     #[test]
     fn test_pair() {

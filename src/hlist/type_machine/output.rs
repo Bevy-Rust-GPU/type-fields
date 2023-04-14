@@ -3,12 +3,13 @@ use core::{
     ops::{Shl, Shr},
 };
 
-use crate::functional::{Tagged, Pointed};
+use crate::functional::{Pointed, Tagged};
 
 use super::{
     action::Action,
+    input_mode::InputMode,
     instruction::Instruction,
-    output_mode::{OutputPushBack, OutputSet, OutputMode}, input_mode::InputMode,
+    output_mode::{OutputMode, OutputPushBack, OutputSet},
 };
 
 /// An output in a do block

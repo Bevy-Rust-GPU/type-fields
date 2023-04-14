@@ -2,18 +2,20 @@ use crate::hlist::cons::{ConsPushBack, Uncons};
 
 use super::{Cons, TupleList};
 
-pub trait TuplePushBack<Tail, P> {
+pub trait TuplePushBack<Tail> {
+    type Path;
     type TuplePushBack: TupleList;
 
     fn push_back(self, tail: Tail) -> Self::TuplePushBack;
 }
 
-impl<T, P, Head> TuplePushBack<Head, P> for T
+impl<T, Head> TuplePushBack<Head> for T
 where
     T: Cons,
-    T::Cons: ConsPushBack<Head, P>,
+    T::Cons: ConsPushBack<Head>,
 {
-    type TuplePushBack = <<T::Cons as ConsPushBack<Head, P>>::ConsPushBack as Uncons>::Uncons;
+    type Path = <T::Cons as ConsPushBack<Head>>::Path;
+    type TuplePushBack = <<T::Cons as ConsPushBack<Head>>::ConsPushBack as Uncons>::Uncons;
 
     fn push_back(self, tail: Head) -> Self::TuplePushBack {
         self.cons().cons_push_back(tail).uncons()

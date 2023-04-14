@@ -15,9 +15,9 @@ impl<T, C> InputMode<C, (), ()> for OutputPushBack<T> {
     fn fetch(_: C) -> () {}
 }
 
-impl<T, C, O, P> OutputMode<C, O, P> for OutputPushBack<T>
+impl<T, C, O> OutputMode<C, O, ()> for OutputPushBack<T>
 where
-    C: TuplePushBack<Tagged<T, O>, P>,
+    C: TuplePushBack<Tagged<T, O>>,
 {
     type Output = C::TuplePushBack;
 

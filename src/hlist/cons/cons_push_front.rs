@@ -1,4 +1,4 @@
-use crate::hlist::cons::ConsList;
+use crate::{functional::Function, hlist::cons::ConsList};
 
 /// A `ConsList` that can push a new element to its front.
 pub trait ConsPushFront<Head> {
@@ -15,6 +15,20 @@ where
 
     fn cons_push_front(self, head: Head) -> Self::ConsPushFront {
         (head, self)
+    }
+}
+
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct PushFront;
+
+impl<L, I> Function<(L, I)> for PushFront
+where
+    L: ConsPushFront<I>,
+{
+    type Output = <L as ConsPushFront<I>>::ConsPushFront;
+
+    fn call(self, (l, i): (L, I)) -> Self::Output {
+        l.cons_push_front(i)
     }
 }
 

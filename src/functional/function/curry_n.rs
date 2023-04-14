@@ -10,8 +10,6 @@ use crate::{
 
 use super::Function;
 
-// TODO: Test, formalize, replace regular Curry when finished
-
 pub trait CurryN<I> {
     type Curried;
 
@@ -51,6 +49,13 @@ where
     }
 }
 
+impl<F, AO, AI> Copy for CurriedN<F, AO, AI>
+where
+    F: Copy,
+    AO: Copy,
+{
+}
+
 impl<F, AI> Pointed for CurriedN<F, (), AI>
 where
     F: Function<AI::Uncons>,
@@ -63,9 +68,9 @@ where
     }
 }
 
-impl<F, AO, I, P> Function<I, P> for CurriedN<F, AO, (I, ())>
+impl<F, AO, I> Function<I> for CurriedN<F, AO, (I, ())>
 where
-    AO: ConsPushBack<I, P>,
+    AO: ConsPushBack<I>,
     F: Function<<AO::ConsPushBack as Uncons>::Uncons>,
 {
     type Output = F::Output;
@@ -75,9 +80,9 @@ where
     }
 }
 
-impl<F, AO, Tail, Tail2, I, P> Function<I, P> for CurriedN<F, AO, (I, (Tail, Tail2))>
+impl<F, AO, Tail, Tail2, I> Function<I> for CurriedN<F, AO, (I, (Tail, Tail2))>
 where
-    AO: ConsPushBack<I, P>,
+    AO: ConsPushBack<I>,
 {
     type Output = CurriedN<F, AO::ConsPushBack, (Tail, Tail2)>;
 

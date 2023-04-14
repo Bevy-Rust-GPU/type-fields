@@ -1,6 +1,18 @@
+mod identity;
+mod maybe;
+mod pair;
+mod state;
+mod tagged;
+
+pub use identity::*;
+pub use maybe::*;
+pub use pair::*;
+pub use state::*;
+pub use tagged::*;
+
 use core::marker::PhantomData;
 
-use super::{Const, Curry, CurriedA, Function};
+use super::{Const, CurriedA, Curry, Function};
 
 /// A type that can flat-map a function over its wrapped value
 ///

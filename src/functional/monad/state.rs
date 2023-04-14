@@ -1,8 +1,12 @@
-use crate::{derive_applicative, derive_copointed, derive_functor, derive_pointed};
+use crate::{
+    derive_applicative, derive_copointed, derive_functor, derive_pointed,
+    functional::{Applicative, Const, CurriedA, Curry, Flip, Flipped, Function, Pointed},
+};
 
-use super::{Const, Copointed, CurriedA, Curry, Flip, Flipped, Function, Monad, Pointed};
+use super::Monad;
 
 /// 2-tuple constructor
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Tuple;
 
 impl<A, B> Function<(A, B)> for Tuple {
@@ -29,6 +33,7 @@ impl<T, F> Monad<F> for State<T> {
     }
 }
 
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct MakeState;
 
 impl<I> Function<I> for MakeState {
@@ -40,6 +45,7 @@ impl<I> Function<I> for MakeState {
 }
 
 /// TODO: This should be replaced with three-argument currying
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct StateChain<T>(State<T>);
 
 impl<T, F, S, A, S2, F2> Function<(S, F)> for StateChain<T>
@@ -51,12 +57,13 @@ where
     type Output = F2::Output;
 
     fn call(self, (s, f): (S, F)) -> Self::Output {
-        let (a, _s) = self.0.copoint().call(s);
-        f.call(a).copoint().call(_s)
+        let (a, _s) = self.0.apply(s);
+        f.call(a).apply(_s)
     }
 }
 
-struct Put;
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Put;
 
 impl<I> Function<I> for Put {
     type Output = State<CurriedA<Const, ((), I)>>;
@@ -66,7 +73,8 @@ impl<I> Function<I> for Put {
     }
 }
 
-struct Get;
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Get;
 
 impl<I> Function<I> for Get
 where
@@ -81,10 +89,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{
-        state::{Get, MakeState, State},
-        Applicative, Const, Copointed, Curry, Function, Monad,
-    };
+    use crate::functional::{Applicative, Const, CurryN, Function, Monad, Pointed, Put, State};
 
     #[test]
     fn test_state() {
@@ -145,23 +150,32 @@ mod test {
             }
         }
 
-        let foo = MakeState.call(1234).chain(Get);
-        let bar = foo.copoint().call(5678);
-        assert_eq!(bar, (1234, 1234));
-
-        let coin_s = State(Coin);
-        let push_s = State(Push);
+        let coin_s = State::point(Coin);
+        let push_s = State::point(Push);
 
         let arr = coin_s.apply(Locked);
         assert_eq!(arr, (Thank, Unlocked));
 
-        let arr = coin_s.chain(Const.curry().call(push_s)).apply(Locked);
+        let arr = coin_s.chain(Const.curry_n().call(push_s)).apply(Locked);
         assert_eq!(arr, (Open, Locked));
 
+        // Chaining
         let arr = coin_s
-            .chain(Const.curry().call(push_s))
-            .chain(Const.curry().call(push_s))
+            .chain(Const.curry_n().call(push_s))
+            .chain(Const.curry_n().call(push_s))
+            .chain(Const.curry_n().call(coin_s))
+            .chain(Const.curry_n().call(push_s))
             .apply(Locked);
-        assert_eq!(arr, (Tut, Locked));
+        assert_eq!(arr, (Open, Locked));
+
+        // Put
+        let test = Put.call(Locked).chain(Const.curry_n().call(push_s));
+        let check1 = test.apply(Unlocked);
+        assert_eq!(check1, (Tut, Locked));
+        let test = test
+            .chain(Const.curry_n().call(Put.call(Unlocked)))
+            .chain(Const.curry_n().call(push_s));
+        let check2 = test.apply(Unlocked);
+        assert_eq!(check2, (Open, Locked));
     }
 }

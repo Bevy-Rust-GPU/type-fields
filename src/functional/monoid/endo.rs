@@ -37,8 +37,8 @@ impl<T, U> Semigroup<Endo<U>> for Endo<T> {
 mod test {
     use crate::{
         functional::{
-            Add, Compose, Composed, Copointed, Curried, CurriedA, Curry, Foldr, Function, Point,
-            Pointed, Semigroup,
+            Add, Compose, Composed, Copointed, CurriedN, CurryN, Foldr, Function, Point, Pointed,
+            Semigroup,
         },
         hlist::tuple::Cons,
     };
@@ -47,9 +47,9 @@ mod test {
 
     #[test]
     fn test_endo() {
-        let foo = Endo::point(Add.curry().call(1));
-        let foo = foo.mappend(Endo::point(Add.curry().call(2)));
-        let foo = foo.mappend(Endo::point(Add.curry().call(3)));
+        let foo = Endo::point(Add.curry_n().call(1));
+        let foo = foo.mappend(Endo::point(Add.curry_n().call(2)));
+        let foo = foo.mappend(Endo::point(Add.curry_n().call(3)));
         let bar = foo.copoint();
         let baz = bar.call(4);
         assert_eq!(baz, 10);
@@ -58,7 +58,7 @@ mod test {
     #[test]
     fn test_foldr() {
         let list = (1, 2, 3).cons();
-        let folded = list.foldr(Add.curry(), 0);
+        let folded = list.foldr(Add.curry_n(), 0);
         assert_eq!(folded, 6);
     }
 
@@ -75,16 +75,16 @@ mod test {
         let add_endo_result: Endo<i32> = add_endo.call((1, 2));
         assert_eq!(add_endo_result.copoint(), 3);
 
-        let add_curry_a: Curried<Add> = Add.curry();
-        let add_curry_b: CurriedA<Add, i32> = add_curry_a.call(1);
+        let add_curry_a: CurriedN<Add, (), _> = Add.curry_n();
+        let add_curry_b: CurriedN<Add, (i32, ()), _> = add_curry_a.call(1);
         let add_curry_result: i32 = add_curry_b.call(1);
         assert_eq!(add_curry_result, 2);
 
         let add_curry_endo_a: Composed<
-            Curried<Add>,
-            Point<Endo<<Curried<Add> as Function<i32>>::Output>>,
-        > = Add.curry().compose(Point::default());
-        let add_curry_endo_b: Endo<CurriedA<Add, i32>> = add_curry_endo_a.call(1);
+            CurriedN<Add, (), _>,
+            Point<Endo<<CurriedN<Add, (), _> as Function<i32>>::Output>>,
+        > = Add.curry_n().compose(Point::default());
+        let add_curry_endo_b: Endo<CurriedN<Add, (i32, ()), _>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.copoint().call(2);
         assert_eq!(add_curry_endo_result, 3);
     }
