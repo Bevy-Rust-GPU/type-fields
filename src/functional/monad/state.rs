@@ -89,7 +89,10 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Applicative, Const, CurryN, Function, Monad, Pointed, Put, State};
+    use crate::{
+        functional::{Applicative, Const, CurryN, Function, Monad, Pointed, Put, SequenceA, State},
+        hlist::tuple::Cons,
+    };
 
     #[test]
     fn test_state() {
@@ -167,6 +170,12 @@ mod test {
             .chain(Const.curry_n().call(push_s))
             .apply(Locked);
         assert_eq!(arr, (Open, Locked));
+
+        // FIXME:
+        // Terminating element is ((), ()) due to Applicative impl for (),
+        // which presumably prevents State applicative from bubbling up the list,
+        // resulting in an uneven unwrap and incorrect output
+        let monday_s = (coin_s, push_s, push_s, coin_s, push_s).cons().sequence_a();
 
         // Put
         let test = Put.call(Locked).chain(Const.curry_n().call(push_s));

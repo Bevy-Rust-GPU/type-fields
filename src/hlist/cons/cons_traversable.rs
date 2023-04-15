@@ -1,61 +1,87 @@
 use crate::functional::{
-    Applicative, Curried, Curry, Flip, Flipped, Functor, SequenceA, Traversable,
+    Applicative, Curried, Curry, Flip, Flipped, Function, Functor, Id, Pure, SequenceA, Traversable,
 };
 
 use super::PushFront;
 
 impl<Head, Tail, F> Traversable<F> for (Head, Tail)
 where
-    (Head, Tail): Functor<F>,
-    <(Head, Tail) as Functor<F>>::Mapped: SequenceA,
+    F: Clone + Function<Head>,
+    F::Output: Functor<Curried<Flipped<PushFront>>>,
+    <F::Output as Functor<Curried<Flipped<PushFront>>>>::Mapped: Applicative<Tail::Traversed>,
+    Tail: Traversable<F>,
 {
-    type Traversed = <<(Head, Tail) as Functor<F>>::Mapped as SequenceA>::Sequenced;
+    type Traversed = <<F::Output as Functor<Curried<Flipped<PushFront>>>>::Mapped as Applicative<
+        Tail::Traversed,
+    >>::Applied;
 
     fn traverse(self, f: F) -> Self::Traversed {
-        self.fmap(f).sequence_a()
+        f.clone()
+            .call(self.0)
+            .fmap(PushFront.flip().curry())
+            .apply(self.1.traverse(f))
     }
 }
 
-impl<Head, Tail> SequenceA for (Head, Tail)
+impl<F> Traversable<F> for () {
+    type Traversed = <Self as Pure>::Pure<()>;
+
+    fn traverse(self, _: F) -> Self::Traversed {
+        Self::pure(())
+    }
+}
+
+impl<T> SequenceA for T
 where
-    Self: Functor<Curried<Flipped<PushFront>>>,
-    <Self as Functor<Curried<Flipped<PushFront>>>>::Mapped: Applicative<()>,
+    Self: Traversable<Id>,
 {
-    type Sequenced =
-        <<Self as Functor<Curried<Flipped<PushFront>>>>::Mapped as Applicative<()>>::Applied;
+    type Sequenced = <Self as Traversable<Id>>::Traversed;
 
     fn sequence_a(self) -> Self::Sequenced {
-        self.fmap(PushFront.flip().curry()).apply(())
+        self.traverse(Id)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::Traversable;
-    use crate::{functional::Function, hlist::tuple::Cons};
+    use crate::{
+        functional::{Id, SequenceA, Traversable},
+        hlist::tuple::Cons,
+    };
 
     #[test]
-    fn test_traversable() {
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        struct Test;
-
-
-        impl Function<i32> for Test {
-            type Output = (i32, (i32, ()));
-
-            fn call(self, input: i32) -> Self::Output {
-                (input + 1, (input + 2, ()))
-            }
-        }
-
-        let foo = (0, 1, 2).cons();
-        let bar = foo.traverse(Test);
+    fn test_sequence_a() {
+        let list = ((0,).cons(), (0, 1).cons(), (0, 1, 2).cons()).cons();
+        let decafisbad = list.sequence_a();
         assert_eq!(
-            bar,
+            decafisbad,
             (
-                ((1, (2, ())), ()),
-                (((2, (3, ())), ()), (((3, (4, ())), ()), ()))
+                (0, 0, 0).cons(),
+                (0, 0, 1).cons(),
+                (0, 0, 2).cons(),
+                (0, 1, 0).cons(),
+                (0, 1, 1).cons(),
+                (0, 1, 2).cons()
             )
+                .cons()
+        );
+    }
+
+    #[test]
+    fn test_traverse() {
+        let list = ((0,).cons(), (0, 1).cons(), (0, 1, 2).cons()).cons();
+        let decafisbad = list.traverse(Id);
+        assert_eq!(
+            decafisbad,
+            (
+                (0, 0, 0).cons(),
+                (0, 0, 1).cons(),
+                (0, 0, 2).cons(),
+                (0, 1, 0).cons(),
+                (0, 1, 1).cons(),
+                (0, 1, 2).cons()
+            )
+                .cons()
         );
     }
 }

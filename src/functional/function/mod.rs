@@ -31,3 +31,4 @@ pub trait Function<Inputs> {
 
     fn call(self, input: Inputs) -> Self::Output;
 }
+

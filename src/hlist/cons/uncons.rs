@@ -1,4 +1,4 @@
-use crate::hlist::tuple::TupleList;
+use crate::{hlist::tuple::TupleList, functional::Function};
 
 /// A cons list that can be converted into a flat tuple,
 /// ex. `(1, (2, (3, (4, ())))) -> (1, 2, 3, 4)`
@@ -27,5 +27,19 @@ mod tests {
     fn test_uncons() {
         let consable = (1, 2, 3);
         assert_eq!(consable, consable.cons().uncons());
+    }
+}
+
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+struct UnconsF;
+
+impl<I> Function<I> for UnconsF
+where
+    I: Uncons,
+{
+    type Output = I::Uncons;
+
+    fn call(self, input: I) -> Self::Output {
+        input.uncons()
     }
 }

@@ -36,3 +36,16 @@ where
         u.apply(t)
     }
 }
+
+pub trait Pure {
+    type Pure<T>;
+    fn pure<T>(t: T) -> Self::Pure<T>;
+}
+
+impl Pure for () {
+    type Pure<T> = (T, ());
+
+    fn pure<T>(t: T) -> Self::Pure<T> {
+        (t, ())
+    }
+}
