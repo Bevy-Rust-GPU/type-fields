@@ -1,3 +1,5 @@
+use crate::derive_closure;
+
 use super::Function;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -9,7 +11,9 @@ where
 {
     type Output = A::Output;
 
-    fn call(self, (a, b): (A, B)) -> Self::Output {
+    fn call((a, b): (A, B)) -> Self::Output {
         a + b
     }
 }
+
+derive_closure!(Add);

@@ -23,31 +23,33 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::{functional::Function, hlist::tuple::TupleMap};
+    use crate::{derive_closure, functional::Function, hlist::tuple::TupleMap};
 
     #[test]
     fn test_tuple_map() {
         #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        struct Mul;
+        struct Mul2;
 
-        impl Function<u32> for Mul {
+        impl Function<u32> for Mul2 {
             type Output = u32;
 
-            fn call(self, input: u32) -> u32 {
+            fn call(input: u32) -> u32 {
                 input * 2
             }
         }
 
-        impl Function<f32> for Mul {
+        impl Function<f32> for Mul2 {
             type Output = f32;
 
-            fn call(self, input: f32) -> Self::Output {
+            fn call(input: f32) -> Self::Output {
                 input * 2.0
             }
         }
 
+        derive_closure!(Mul2);
+
         let list = (1, 2.0, 3);
-        let list = list.map(Mul);
+        let list = list.map(Mul2);
         assert_eq!(list, (2, 4.0, 6))
     }
 }

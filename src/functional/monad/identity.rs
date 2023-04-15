@@ -19,8 +19,9 @@ derive_semigroup!(Identity<T>);
 mod test {
     use crate::{
         functional::{
-            Applicative, Composed, Const, Copointed, CurryN, Div, Flip, Fmap, Foldable,
-            Function, Functor, Identity, Monad, Mul, Point, Pointed, Sub, Sum, Then,
+            test_functor_laws, Add, Applicative, Closure, Composed, Const, Copointed, Curry,
+            CurryN, Div, Flip, Fmap, Foldable, Functor, Identity, Monad, Mul, Point, Pointed, Sub,
+            Sum, Then,
         },
         hlist::tuple::Cons,
     };
@@ -51,5 +52,10 @@ mod test {
             .cons()
             .fold_map(Point::<Sum<i32>>::default());
         assert_eq!(id6.copoint(), 55);
+    }
+
+    #[test]
+    fn test_functor_laws_identity() {
+        test_functor_laws(Identity::point(4), Add.curry_a(2), Mul.curry_a(2))
     }
 }

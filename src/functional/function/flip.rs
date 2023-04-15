@@ -3,7 +3,7 @@ use crate::{
     functional::Pointed,
 };
 
-use super::Function;
+use super::Closure;
 
 pub trait Flip: Sized {
     fn flip(self) -> Flipped<Self>;
@@ -24,9 +24,9 @@ derive_functor!(Flipped<F>);
 derive_applicative!(Flipped<F>);
 derive_monad!(Flipped<F>);
 
-impl<F, A, B> Function<(B, A)> for Flipped<F>
+impl<F, A, B> Closure<(B, A)> for Flipped<F>
 where
-    F: Function<(A, B)>,
+    F: Closure<(A, B)>,
 {
     type Output = F::Output;
 

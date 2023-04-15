@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use crate::derive_closure;
+
 use super::Function;
 
 /// A type that can wrap a value
@@ -35,7 +37,9 @@ where
 {
     type Output = I;
 
-    fn call(self, input: I::Pointed) -> I {
+    fn call(input: I::Pointed) -> I {
         I::point(input)
     }
 }
+
+derive_closure!(Point<I>);

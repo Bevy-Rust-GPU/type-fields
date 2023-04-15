@@ -1,6 +1,6 @@
 use crate::functional::{Copointed, Pointed};
 
-use super::Function;
+use super::Closure;
 
 pub trait Compose<F>: Sized {
     fn compose(self, f: F) -> Composed<Self, F>;
@@ -31,10 +31,10 @@ impl<F1, F2> Copointed for Composed<F1, F2> {
     }
 }
 
-impl<F1, F2, A> Function<A> for Composed<F1, F2>
+impl<F1, F2, A> Closure<A> for Composed<F1, F2>
 where
-    F1: Function<A>,
-    F2: Function<F1::Output>,
+    F1: Closure<A>,
+    F2: Closure<F1::Output>,
 {
     type Output = F2::Output;
 

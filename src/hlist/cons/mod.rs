@@ -57,7 +57,8 @@ mod test {
     use core::marker::PhantomData;
 
     use crate::{
-        functional::{Applicative, Copointed, Function, Pointed, Tagged},
+        derive_closure,
+        functional::{Applicative, Closure, Copointed, Function, Pointed, Tagged},
         hlist::{
             cons::{ConsFoldRight, Uncons},
             tuple::{Cons, TupleGetImpl},
@@ -86,10 +87,12 @@ mod test {
         {
             type Output = T;
 
-            fn call(self, input: I) -> Self::Output {
+            fn call(input: I) -> Self::Output {
                 input.get_impl()
             }
         }
+
+        derive_closure!(Get<T, P>);
 
         #[derive(Clone)]
         struct Sub;
@@ -97,7 +100,7 @@ mod test {
         impl Function<(i32, i32)> for Sub {
             type Output = i32;
 
-            fn call(self, (a, b): (i32, i32)) -> Self::Output {
+            fn call((a, b): (i32, i32)) -> Self::Output {
                 a - b
             }
         }
@@ -105,7 +108,7 @@ mod test {
         impl Function<(i32, f32)> for Sub {
             type Output = f32;
 
-            fn call(self, (a, b): (i32, f32)) -> Self::Output {
+            fn call((a, b): (i32, f32)) -> Self::Output {
                 a as f32 - b
             }
         }
@@ -113,7 +116,7 @@ mod test {
         impl Function<(f32, i32)> for Sub {
             type Output = f32;
 
-            fn call(self, (a, b): (f32, i32)) -> Self::Output {
+            fn call((a, b): (f32, i32)) -> Self::Output {
                 a - b as f32
             }
         }
@@ -121,10 +124,12 @@ mod test {
         impl Function<(f32, f32)> for Sub {
             type Output = f32;
 
-            fn call(self, (a, b): (f32, f32)) -> Self::Output {
+            fn call((a, b): (f32, f32)) -> Self::Output {
                 a - b
             }
         }
+
+        derive_closure!(Sub);
 
         #[derive(Clone)]
         struct Panic;
@@ -135,10 +140,12 @@ mod test {
         {
             type Output = ();
 
-            fn call(self, input: (T,)) -> Self::Output {
+            fn call(input: (T,)) -> Self::Output {
                 panic!("{}", input.0);
             }
         }
+
+        derive_closure!(Panic);
 
         let ctx = ("three", 2.0, 1);
 
@@ -169,10 +176,10 @@ mod test {
         impl<C, A, T> DoTrait for ((C, A), Action<T>)
         where
             C: Clone,
-            T: Function<A::Uncons>,
+            T: Closure<A::Uncons>,
             A: Uncons,
         {
-            type Output = (C, (<T as Function<A::Uncons>>::Output, ()));
+            type Output = (C, (<T as Closure<A::Uncons>>::Output, ()));
 
             fn r#do(self) -> Self::Output {
                 let ((c, a), n) = self;
@@ -183,9 +190,9 @@ mod test {
         impl<C, A, T> DoTrait for ((C, A), Context<T>)
         where
             C: Clone,
-            T: Function<C>,
+            T: Closure<C>,
         {
-            type Output = (C, (<T as Function<C>>::Output, A));
+            type Output = (C, (<T as Closure<C>>::Output, A));
 
             fn r#do(self) -> Self::Output {
                 let ((c, a), n) = self;
@@ -203,10 +210,12 @@ mod test {
         {
             type Output = T::Output;
 
-            fn call(self, input: T) -> Self::Output {
+            fn call(input: T) -> Self::Output {
                 input.r#do()
             }
         }
+
+        derive_closure!(Do);
 
         let (c, res) = list.cons_fold_right((ctx, ()), Do);
         assert_eq!(c, ctx);

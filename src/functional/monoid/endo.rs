@@ -37,8 +37,8 @@ impl<T, U> Semigroup<Endo<U>> for Endo<T> {
 mod test {
     use crate::{
         functional::{
-            Add, Compose, Composed, Copointed, CurriedN, CurryN, Foldr, Function, Point, Pointed,
-            Semigroup,
+            Add, Compose, Composed, Copointed, CurriedN, CurryN, Foldr, Point, Pointed,
+            Semigroup, Closure,
         },
         hlist::tuple::Cons,
     };
@@ -82,7 +82,7 @@ mod test {
 
         let add_curry_endo_a: Composed<
             CurriedN<Add, (), _>,
-            Point<Endo<<CurriedN<Add, (), _> as Function<i32>>::Output>>,
+            Point<Endo<<CurriedN<Add, (), _> as Closure<i32>>::Output>>,
         > = Add.curry_n().compose(Point::default());
         let add_curry_endo_b: Endo<CurriedN<Add, (i32, ()), _>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.copoint().call(2);

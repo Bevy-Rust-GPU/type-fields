@@ -1,8 +1,12 @@
-use super::Function;
+use super::Closure;
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
 pub trait Curry: Sized {
     fn curry(self) -> Curried<Self>;
+
+    fn curry_a<A>(self, a: A) -> CurriedA<Self, A> {
+        self.curry().call(a)
+    }
 }
 
 impl<T> Curry for T {
@@ -15,7 +19,7 @@ impl<T> Curry for T {
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Curried<F>(F);
 
-impl<F, A> Function<A> for Curried<F> {
+impl<F, A> Closure<A> for Curried<F> {
     type Output = CurriedA<F, A>;
 
     fn call(self, input: A) -> Self::Output {
@@ -27,9 +31,9 @@ impl<F, A> Function<A> for Curried<F> {
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CurriedA<F, A>(F, A);
 
-impl<F, A, B> Function<B> for CurriedA<F, A>
+impl<F, A, B> Closure<B> for CurriedA<F, A>
 where
-    F: Function<(A, B)>,
+    F: Closure<(A, B)>,
 {
     type Output = F::Output;
 
@@ -40,7 +44,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Add, Curry, Function};
+    use crate::functional::{Add, Closure, Curry};
 
     #[test]
     fn test_curry() {

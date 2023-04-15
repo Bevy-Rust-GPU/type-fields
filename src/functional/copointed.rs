@@ -1,3 +1,5 @@
+use crate::derive_closure;
+
 use super::Function;
 
 /// A type that can unwrap a value
@@ -21,7 +23,9 @@ where
 {
     type Output = I::Copointed;
 
-    fn call(self, input: I) -> I::Copointed {
+    fn call(input: I) -> I::Copointed {
         input.copoint()
     }
 }
+
+derive_closure!(Copoint);

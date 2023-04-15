@@ -1,12 +1,12 @@
 use crate::functional::{
-    Applicative, Curried, Curry, Flip, Flipped, Function, Functor, Id, Pure, SequenceA, Traversable,
+    Applicative, Closure, Curried, Curry, Flip, Flipped, Functor, Id, SequenceA, Traversable,
 };
 
 use super::PushFront;
 
 impl<Head, Tail, F> Traversable<F> for (Head, Tail)
 where
-    F: Clone + Function<Head>,
+    F: Clone + Closure<Head>,
     F::Output: Functor<Curried<Flipped<PushFront>>>,
     <F::Output as Functor<Curried<Flipped<PushFront>>>>::Mapped: Applicative<Tail::Traversed>,
     Tail: Traversable<F>,
@@ -24,10 +24,10 @@ where
 }
 
 impl<F> Traversable<F> for () {
-    type Traversed = <Self as Pure>::Pure<()>;
+    type Traversed = ((), ());
 
     fn traverse(self, _: F) -> Self::Traversed {
-        Self::pure(())
+        ((), ())
     }
 }
 

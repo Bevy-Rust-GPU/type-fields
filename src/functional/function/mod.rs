@@ -9,6 +9,8 @@ mod id;
 mod mul;
 mod sub;
 
+
+
 pub use add::*;
 pub use compose::*;
 pub use constant::*;
@@ -20,15 +22,19 @@ pub use id::*;
 pub use mul::*;
 pub use sub::*;
 
-/// Abstract function trait.
+/// Abstract function interface.
 ///
 /// Allows many signatures to be implemented on a single type,
 /// unlike Fn* whose present implementation encodes a 1:1 coupling.
-///
-/// This allowing mapping over heterogenous lists.
+pub trait Closure<Input>: Sized {
+    type Output;
+
+    fn call(self, input: Input) -> Self::Output;
+}
+
+/// A pure function that takes input and returns output.
 pub trait Function<Inputs> {
     type Output;
 
-    fn call(self, input: Inputs) -> Self::Output;
+    fn call(input: Inputs) -> Self::Output;
 }
-

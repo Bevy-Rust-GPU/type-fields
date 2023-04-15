@@ -1,8 +1,8 @@
-use crate::functional::{Function, Functor};
+use crate::functional::{Closure, Functor};
 
 impl<Head, Tail, F> Functor<F> for (Head, Tail)
 where
-    F: Clone + Function<Head>,
+    F: Clone + Closure<Head>,
     Tail: Functor<F>,
 {
     type Mapped = (F::Output, Tail::Mapped);
@@ -15,6 +15,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::{
+        derive_closure,
         functional::{Function, Functor},
         hlist::{cons::Uncons, tuple::Cons},
     };
@@ -22,26 +23,28 @@ mod test {
     #[test]
     fn test_cons_functor() {
         #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        struct Mul;
+        struct Mul2;
 
-        impl Function<u32> for Mul {
+        impl Function<u32> for Mul2 {
             type Output = u32;
 
-            fn call(self, input: u32) -> Self::Output {
+            fn call(input: u32) -> Self::Output {
                 input * 2
             }
         }
 
-        impl Function<f32> for Mul {
+        impl Function<f32> for Mul2 {
             type Output = f32;
 
-            fn call(self, input: f32) -> Self::Output {
+            fn call(input: f32) -> Self::Output {
                 input * 2.0
             }
         }
 
+        derive_closure!(Mul2);
+
         let list = (1u32, 2.0f32, 3u32).cons();
-        let list = list.fmap(Mul);
+        let list = list.fmap(Mul2);
         assert_eq!(list.uncons(), (2, 4.0, 6))
     }
 }

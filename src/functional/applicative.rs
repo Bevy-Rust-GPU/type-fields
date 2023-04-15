@@ -32,7 +32,7 @@ where
 {
     type Output = U::Applied;
 
-    fn call(self, (u, t): (U, T)) -> Self::Output {
+    fn call((u, t): (U, T)) -> Self::Output {
         u.apply(t)
     }
 }

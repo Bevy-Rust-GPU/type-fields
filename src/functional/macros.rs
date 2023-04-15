@@ -1,3 +1,26 @@
+/// Derive `Closure<T>` for a type that implements `Function<T>`
+#[macro_export]
+macro_rules! derive_closure {
+    ($ident:ident) => {
+        impl<_Input> crate::functional::Closure<_Input> for $ident where $ident: Function<_Input> {
+            type Output = <$ident as Function<_Input>>::Output;
+
+            fn call(self, input: _Input) -> Self::Output {
+                <$ident as Function<_Input>>::call(input)
+            }
+        }
+    };
+    ($ident:ident < $($tys:ident),+ >) => {
+        impl<_Input, $($tys),+> crate::functional::Closure<_Input> for $ident < $($tys),+ > where $ident < $($tys),+ >: Function<_Input> {
+            type Output = <$ident < $($tys),+ > as Function<_Input>>::Output;
+
+            fn call(self, input: _Input) -> Self::Output {
+                <$ident < $($tys),+ > as Function<_Input>>::call(input)
+            }
+        }
+    };
+}
+
 #[macro_export]
 macro_rules! derive_pointed {
     ($ident:ident < $ty:ident >) => {
@@ -51,7 +74,7 @@ macro_rules! derive_functor {
     ($ident:ident < $ty:ident >) => {
         impl<$ty, _Function> crate::functional::Functor<_Function> for $ident<$ty>
         where
-            _Function: crate::functional::Function<$ty>,
+            _Function: crate::functional::Closure<$ty>,
         {
             type Mapped = $ident<_Function::Output>;
 
@@ -69,13 +92,13 @@ macro_rules! derive_applicative {
     ($ident:ident < $ty:ident >) => {
         impl<$ty, _Value> crate::functional::Applicative<_Value> for $ident<$ty>
         where
-            $ty: crate::functional::Function<_Value>,
+            $ty: crate::functional::Closure<_Value>,
         {
             type Applied = $ty::Output;
 
             fn apply(self, a: _Value) -> Self::Applied
             where
-                $ty: crate::functional::Function<_Value>,
+                $ty: crate::functional::Closure<_Value>,
             {
                 crate::functional::Copointed::copoint(self).call(a)
             }
@@ -88,7 +111,7 @@ macro_rules! derive_monad {
     ($ident:ident < $ty:ident >) => {
         impl<$ty, _Function> crate::functional::Monad<_Function> for $ident<$ty>
         where
-            _Function: crate::functional::Function<$ty>,
+            _Function: crate::functional::Closure<$ty>,
         {
             type Chained = _Function::Output;
 

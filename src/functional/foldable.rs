@@ -1,4 +1,6 @@
-use super::{Compose, Composed, Copointed, Endo, Function, Functor, Id, Point, SemigroupConcat};
+use super::{
+    Closure, Compose, Composed, Copointed, Endo, Functor, Id, Point, SemigroupConcat,
+};
 
 pub trait Foldable<F> {
     type Folded;
@@ -27,11 +29,11 @@ pub trait Foldr<F, I1, I2> {
 impl<T, F, I1, I2> Foldr<F, I1, I2> for T
 where
     T: Foldable<Composed<F, Point<Endo<F::Output>>>>,
-    F: Function<I1>,
+    F: Closure<I1>,
     T::Folded: Copointed,
-    <T::Folded as Copointed>::Copointed: Function<I2>,
+    <T::Folded as Copointed>::Copointed: Closure<I2>,
 {
-    type Foldr = <<T::Folded as Copointed>::Copointed as Function<I2>>::Output;
+    type Foldr = <<T::Folded as Copointed>::Copointed as Closure<I2>>::Output;
 
     fn foldr(self, f: F, z: I2) -> Self::Foldr {
         self.fold_map(f.compose(Point::default())).copoint().call(z)

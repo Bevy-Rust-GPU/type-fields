@@ -17,20 +17,20 @@ impl<Head, Tail> Pure for (Head, Tail)
 where
     Tail: Pure,
 {
-    type Pure<T> = (T, ());
+    type Pure<T> = ();
 
-    fn pure<T>(t: T) -> Self::Pure<T> {
-        (t, ())
+    fn pure<T>(_: T) -> Self::Pure<T> {
+        ()
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Add, Applicative, Curry, Flip, Function, Mul};
+    use crate::functional::{Add, Applicative, Curry, Flip, Mul};
 
     #[test]
     fn test_cons_applicative() {
-        let funcs = (Add.flip().curry().call(2), (Mul.flip().curry().call(2), ()));
+        let funcs = (Add.flip().curry_a(2), (Mul.flip().curry_a(2), ()));
         let nums = (1, (2, (3, ())));
         let res = funcs.apply(nums);
         assert_eq!(res, (3, (4, (5, (2, (4, (6, ())))))));

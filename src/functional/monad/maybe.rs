@@ -61,7 +61,9 @@ impl<T> Maybe for Just<T> {}
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Add, CurryN, Function, Functor, Pointed};
+    use crate::functional::{
+        test_functor_laws, Add, Closure, Curry, CurryN, Functor, Mul, Pointed,
+    };
 
     use super::{Just, Nothing};
 
@@ -74,5 +76,11 @@ mod test {
         let just = Just::point(2);
         let mapped = just.fmap(Add.curry_n().call(1));
         assert_eq!(mapped, Just(3));
+    }
+
+    #[test]
+    fn test_functor_laws_maybe() {
+        test_functor_laws(Nothing, Add.curry_a(2), Mul.curry_a(2));
+        test_functor_laws(Just::point(1), Add.curry_a(2), Mul.curry_a(2));
     }
 }

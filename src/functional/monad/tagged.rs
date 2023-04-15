@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::functional::{
-    Applicative, Copointed, Function, Functor, Monad, Monoid, Pointed, Semigroup,
+    Applicative, Closure, Copointed, Functor, Monad, Monoid, Pointed, Semigroup,
 };
 
 /// Phantom monad, used to lift values into a monadic context
@@ -85,7 +85,7 @@ impl<P, T> Copointed for Tagged<P, T> {
 
 impl<P, A, F> Functor<F> for Tagged<P, A>
 where
-    F: Function<A>,
+    F: Closure<A>,
 {
     type Mapped = Tagged<P, F::Output>;
 
@@ -96,13 +96,13 @@ where
 
 impl<P, T, U> Applicative<U> for Tagged<P, T>
 where
-    T: Function<U>,
+    T: Closure<U>,
 {
     type Applied = T::Output;
 
     fn apply(self, a: U) -> Self::Applied
     where
-        T: Function<U>,
+        T: Closure<U>,
     {
         self.copoint().call(a)
     }
@@ -110,7 +110,7 @@ where
 
 impl<P, T, F> Monad<F> for Tagged<P, T>
 where
-    F: Function<T>,
+    F: Closure<T>,
 {
     type Chained = F::Output;
 
@@ -144,12 +144,12 @@ where
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        Applicative, Composed, Const, Copointed, CurryN, Div, Flip, Fmap, Function, Functor, Monad,
-        Mul, Point, Pointed, Sub, Tagged, Then,
+        test_functor_laws, Add, Applicative, Closure, Composed, Const, Copointed, Curry, CurryN,
+        Div, Flip, Fmap, Functor, Monad, Mul, Point, Pointed, Sub, Tagged, Then,
     };
 
     #[test]
-    fn test_phantom() {
+    fn test_tagged() {
         enum Tag {}
 
         let id1: Tagged<Tag, i32> = Tagged::<Tag, _>::point(5);
@@ -172,5 +172,11 @@ mod test {
 
         let id5: Tagged<Tag, i32> = id4.then(Const.curry_n().call(Tagged::<Tag, _>::point(1234)));
         assert_eq!(id5.copoint(), 1234);
+    }
+
+    #[test]
+    fn test_functor_laws_tagged() {
+        enum Tag {}
+        test_functor_laws(Tagged::<Tag, _>::point(1), Add.curry_a(2), Mul.curry_a(2));
     }
 }

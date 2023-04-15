@@ -8,6 +8,8 @@ pub use any::*;
 pub use product::*;
 pub use sum::*;
 
+use crate::derive_closure;
+
 use super::Function;
 
 /// A type with a binary associative function.
@@ -26,10 +28,12 @@ where
 {
     type Output = A::Appended;
 
-    fn call(self, (a, b): (A, B)) -> Self::Output {
+    fn call((a, b): (A, B)) -> Self::Output {
         a.mappend(b)
     }
 }
+
+derive_closure!(Mappend);
 
 pub trait SemigroupConcat: Sized {
     type Concatenated;

@@ -8,7 +8,7 @@ use crate::{
     },
 };
 
-use super::Function;
+use super::Closure;
 
 pub trait CurryN<I> {
     type Curried;
@@ -18,7 +18,7 @@ pub trait CurryN<I> {
 
 impl<T, I> CurryN<I> for T
 where
-    T: Function<I>,
+    T: Closure<I>,
     I: Cons,
 {
     type Curried = CurriedN<T, (), I::Cons>;
@@ -58,7 +58,7 @@ where
 
 impl<F, AI> Pointed for CurriedN<F, (), AI>
 where
-    F: Function<AI::Uncons>,
+    F: Closure<AI::Uncons>,
     AI: ConsList,
 {
     type Pointed = F;
@@ -68,10 +68,10 @@ where
     }
 }
 
-impl<F, AO, I> Function<I> for CurriedN<F, AO, (I, ())>
+impl<F, AO, I> Closure<I> for CurriedN<F, AO, (I, ())>
 where
     AO: ConsPushBack<I>,
-    F: Function<<AO::ConsPushBack as Uncons>::Uncons>,
+    F: Closure<<AO::ConsPushBack as Uncons>::Uncons>,
 {
     type Output = F::Output;
 
@@ -80,7 +80,7 @@ where
     }
 }
 
-impl<F, AO, Tail, Tail2, I> Function<I> for CurriedN<F, AO, (I, (Tail, Tail2))>
+impl<F, AO, Tail, Tail2, I> Closure<I> for CurriedN<F, AO, (I, (Tail, Tail2))>
 where
     AO: ConsPushBack<I>,
 {
@@ -93,7 +93,10 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{function::curry_n::CurryN, Function};
+    use crate::{
+        derive_closure,
+        functional::{function::curry_n::CurryN, Closure, Function},
+    };
 
     #[test]
     fn test_curry_n() {
@@ -102,10 +105,12 @@ mod test {
         impl<A, B, C, D, E, F, G> Function<(A, B, C, D, E, F, G)> for ManyArgs {
             type Output = (A, B, C, D, E, F, G);
 
-            fn call(self, input: (A, B, C, D, E, F, G)) -> Self::Output {
+            fn call(input: (A, B, C, D, E, F, G)) -> Self::Output {
                 input
             }
         }
+
+        derive_closure!(ManyArgs);
 
         let curried = ManyArgs.curry_n();
         let curried = curried.call(1);

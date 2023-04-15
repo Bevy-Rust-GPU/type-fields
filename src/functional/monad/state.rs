@@ -1,6 +1,6 @@
 use crate::{
     derive_applicative, derive_copointed, derive_functor, derive_pointed,
-    functional::{Applicative, Const, CurriedA, Curry, Flip, Flipped, Function, Pointed},
+    functional::{Applicative, Closure, Const, CurriedA, Curry, Flip, Flipped, Function, Pointed}, derive_closure,
 };
 
 use super::Monad;
@@ -12,7 +12,7 @@ pub struct Tuple;
 impl<A, B> Function<(A, B)> for Tuple {
     type Output = (A, B);
 
-    fn call(self, input: (A, B)) -> Self::Output {
+    fn call(input: (A, B)) -> Self::Output {
         input
     }
 }
@@ -29,7 +29,7 @@ impl<T, F> Monad<F> for State<T> {
     type Chained = State<CurriedA<Flipped<StateChain<T>>, F>>;
 
     fn chain(self, f: F) -> Self::Chained {
-        State(StateChain(self).flip().curry().call(f))
+        State(StateChain(self).flip().curry_a(f))
     }
 }
 
@@ -39,8 +39,8 @@ struct MakeState;
 impl<I> Function<I> for MakeState {
     type Output = State<CurriedA<Tuple, I>>;
 
-    fn call(self, input: I) -> Self::Output {
-        State::point(Tuple.curry().call(input))
+    fn call(input: I) -> Self::Output {
+        State::point(Tuple.curry_a(input))
     }
 }
 
@@ -48,11 +48,11 @@ impl<I> Function<I> for MakeState {
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct StateChain<T>(State<T>);
 
-impl<T, F, S, A, S2, F2> Function<(S, F)> for StateChain<T>
+impl<T, F, S, A, S2, F2> Closure<(S, F)> for StateChain<T>
 where
-    T: Function<S, Output = (A, S2)>,
-    F: Function<A, Output = State<F2>>,
-    F2: Function<S2>,
+    T: Closure<S, Output = (A, S2)>,
+    F: Closure<A, Output = State<F2>>,
+    F2: Closure<S2>,
 {
     type Output = F2::Output;
 
@@ -68,10 +68,12 @@ pub struct Put;
 impl<I> Function<I> for Put {
     type Output = State<CurriedA<Const, ((), I)>>;
 
-    fn call(self, input: I) -> Self::Output {
-        State::point(Const.curry().call(((), input)))
+    fn call(input: I) -> Self::Output {
+        State::point(Const.curry_a(((), input)))
     }
 }
+
+derive_closure!(Put);
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Get;
@@ -82,16 +84,22 @@ where
 {
     type Output = State<CurriedA<Const, (I, I)>>;
 
-    fn call(self, input: I) -> Self::Output {
-        State::point(Const.curry().call((input.clone(), input)))
+    fn call(input: I) -> Self::Output {
+        State::point(Const.curry_a((input.clone(), input)))
     }
 }
+
+derive_closure!(Get);
 
 #[cfg(test)]
 mod test {
     use crate::{
-        functional::{Applicative, Const, CurryN, Function, Monad, Pointed, Put, SequenceA, State},
-        hlist::tuple::Cons,
+        derive_closure,
+        functional::{
+            Applicative, Closure, Const, Curry, CurryN, Flip, Function, Functor, Id, Monad,
+            Pointed, Put, State,
+        },
+        hlist::{cons::PushFront, tuple::Cons},
     };
 
     #[test]
@@ -101,7 +109,7 @@ mod test {
         impl Function<i32> for Random {
             type Output = (i32, i32);
 
-            fn call(self, input: i32) -> Self::Output {
+            fn call(input: i32) -> Self::Output {
                 let next_seed =
                     (1839567234_i32.wrapping_mul(input).wrapping_add(972348567)) % 823945102;
                 (next_seed, next_seed)
@@ -132,15 +140,17 @@ mod test {
         impl<I> Function<I> for Coin {
             type Output = (Thank, Unlocked);
 
-            fn call(self, _: I) -> Self::Output {
+            fn call(_: I) -> Self::Output {
                 (Thank, Unlocked)
             }
         }
 
+        derive_closure!(Coin);
+
         impl Function<Locked> for Push {
             type Output = (Tut, Locked);
 
-            fn call(self, _: Locked) -> Self::Output {
+            fn call(_: Locked) -> Self::Output {
                 (Tut, Locked)
             }
         }
@@ -148,10 +158,12 @@ mod test {
         impl Function<Unlocked> for Push {
             type Output = (Open, Locked);
 
-            fn call(self, _: Unlocked) -> Self::Output {
+            fn call(_: Unlocked) -> Self::Output {
                 (Open, Locked)
             }
         }
+
+        derive_closure!(Push);
 
         let coin_s = State::point(Coin);
         let push_s = State::point(Push);
@@ -172,10 +184,29 @@ mod test {
         assert_eq!(arr, (Open, Locked));
 
         // FIXME:
-        // Terminating element is ((), ()) due to Applicative impl for (),
-        // which presumably prevents State applicative from bubbling up the list,
-        // resulting in an uneven unwrap and incorrect output
-        let monday_s = (coin_s, push_s, push_s, coin_s, push_s).cons().sequence_a();
+        // Inlined sequence_a() call is using list semantics instead of State ones
+        let monday_s = (coin_s, push_s, push_s, coin_s, push_s).cons();
+        let _monday_s: (Coin, (Push, (Push, (Coin, (Push, ((), ())))))) = Id
+            .clone()
+            .call(monday_s.0)
+            .fmap(PushFront.flip().curry())
+            .apply({
+                let this = monday_s.1;
+                Id.call(this.0).fmap(PushFront.flip().curry()).apply({
+                    let this = this.1;
+                    Id.call(this.0).fmap(PushFront.flip().curry()).apply({
+                        let this = this.1;
+                        Id.call(this.0).fmap(PushFront.flip().curry()).apply({
+                            let this = this.1;
+                            let foo = Id
+                                .call(this.0)
+                                .fmap(PushFront.flip().curry())
+                                .apply(((), ()));
+                            foo
+                        })
+                    })
+                })
+            });
 
         // Put
         let test = Put.call(Locked).chain(Const.curry_n().call(push_s));

@@ -1,8 +1,8 @@
-use crate::functional::{Function, Monad};
+use crate::functional::{Closure, Monad};
 
 impl<Head, Tail, F> Monad<F> for (Head, Tail)
 where
-    F: Clone + Function<Head>,
+    F: Clone + Closure<Head>,
     Tail: Monad<F>,
 {
     type Chained = (F::Output, Tail::Chained);

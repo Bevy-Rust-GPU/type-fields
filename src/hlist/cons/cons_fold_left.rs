@@ -1,4 +1,4 @@
-use crate::functional::Function;
+use crate::functional::Closure;
 
 use super::ConsList;
 
@@ -12,7 +12,7 @@ impl<Head, Tail, T, F> ConsFoldLeft<T, F> for (Head, Tail)
 where
     Self: ConsList,
     Tail: ConsFoldLeft<F::Output, F>,
-    F: Clone + Function<(T, Head)>,
+    F: Clone + Closure<(T, Head)>,
 {
     type Folded = Tail::Folded;
 
@@ -32,24 +32,12 @@ impl<T, F> ConsFoldLeft<T, F> for () {
 #[cfg(test)]
 mod test {
     use super::ConsFoldLeft;
-    use crate::{functional::Function, hlist::tuple::Cons};
-
-    #[derive(Clone)]
-    struct Sub;
-
-    impl Function<(i32, i32)> for Sub {
-        type Output = i32;
-
-        fn call(self, (lhs, rhs): (i32, i32)) -> Self::Output {
-            lhs - rhs
-        }
-    }
+    use crate::{functional::Sub, hlist::tuple::Cons};
 
     #[test]
     fn test_cons_fold() {
         let list = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10).cons();
         let res = list.cons_fold_left(0, Sub);
-        assert_eq!(res, - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8 - 9 - 10);
+        assert_eq!(res, -1 - 2 - 3 - 4 - 5 - 6 - 7 - 8 - 9 - 10);
     }
 }
-

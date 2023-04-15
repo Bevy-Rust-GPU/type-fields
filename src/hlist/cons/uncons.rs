@@ -1,4 +1,4 @@
-use crate::{hlist::tuple::TupleList, functional::Function};
+use crate::{functional::Function, hlist::tuple::TupleList};
 
 /// A cons list that can be converted into a flat tuple,
 /// ex. `(1, (2, (3, (4, ())))) -> (1, 2, 3, 4)`
@@ -39,7 +39,7 @@ where
 {
     type Output = I::Uncons;
 
-    fn call(self, input: I) -> Self::Output {
+    fn call(input: I) -> Self::Output {
         input.uncons()
     }
 }
