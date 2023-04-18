@@ -1,15 +1,15 @@
 use crate::functional::{
-    Applicative, Closure, Curried, Curry, Flip, Flipped, Functor, Id, SequenceA, Traversable,
+    Applicative, Closure, Curried, Curry, Flip, Flipped, Functor, Id, Pure, SequenceA, Traversable,
 };
 
 use super::PushFront;
 
-impl<Head, Tail, F> Traversable<F> for (Head, Tail)
+impl<Head, Tail, F, P> Traversable<F, P> for (Head, Tail)
 where
     F: Clone + Closure<Head>,
     F::Output: Functor<Curried<Flipped<PushFront>>>,
     <F::Output as Functor<Curried<Flipped<PushFront>>>>::Mapped: Applicative<Tail::Traversed>,
-    Tail: Traversable<F>,
+    Tail: Traversable<F, P>,
 {
     type Traversed = <<F::Output as Functor<Curried<Flipped<PushFront>>>>::Mapped as Applicative<
         Tail::Traversed,
@@ -23,19 +23,22 @@ where
     }
 }
 
-impl<F> Traversable<F> for () {
-    type Traversed = ((), ());
+impl<F, P> Traversable<F, P> for ()
+where
+    P: Pure,
+{
+    type Traversed = P::Pure<Self>;
 
     fn traverse(self, _: F) -> Self::Traversed {
-        ((), ())
+        P::pure::<()>(self)
     }
 }
 
-impl<T> SequenceA for T
+impl<T, P> SequenceA<P> for T
 where
-    Self: Traversable<Id>,
+    Self: Traversable<Id, P>,
 {
-    type Sequenced = <Self as Traversable<Id>>::Traversed;
+    type Sequenced = <Self as Traversable<Id, P>>::Traversed;
 
     fn sequence_a(self) -> Self::Sequenced {
         self.traverse(Id)
@@ -52,7 +55,7 @@ mod test {
     #[test]
     fn test_sequence_a() {
         let list = ((0,).cons(), (0, 1).cons(), (0, 1, 2).cons()).cons();
-        let decafisbad = list.sequence_a();
+        let decafisbad = SequenceA::<()>::sequence_a(list);
         assert_eq!(
             decafisbad,
             (
@@ -70,7 +73,7 @@ mod test {
     #[test]
     fn test_traverse() {
         let list = ((0,).cons(), (0, 1).cons(), (0, 1, 2).cons()).cons();
-        let decafisbad = list.traverse(Id);
+        let decafisbad = Traversable::<Id, ()>::traverse(list, Id);
         assert_eq!(
             decafisbad,
             (

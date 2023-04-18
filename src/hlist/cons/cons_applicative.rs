@@ -17,10 +17,18 @@ impl<Head, Tail> Pure for (Head, Tail)
 where
     Tail: Pure,
 {
-    type Pure<T> = ();
+    type Pure<T> = (T, ());
 
-    fn pure<T>(_: T) -> Self::Pure<T> {
-        ()
+    fn pure<T>(unit: T) -> Self::Pure<T> {
+        (unit, ())
+    }
+}
+
+impl Pure for () {
+    type Pure<T> = (T, ());
+
+    fn pure<T>(unit: T) -> Self::Pure<T> {
+        (unit, ())
     }
 }
 

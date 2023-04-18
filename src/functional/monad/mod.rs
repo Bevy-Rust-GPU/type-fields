@@ -12,7 +12,7 @@ pub use tagged::*;
 
 use core::marker::PhantomData;
 
-use super::{Const, CurriedA, Curry, Function, Closure};
+use super::{Applicative, Const, CurriedA, Function, Functor, FunctorReplace, Id};
 
 /// A type that can flat-map a function over its wrapped value
 ///
@@ -46,19 +46,20 @@ where
     }
 }
 
-pub trait Then<F>: Sized + Monad<CurriedA<Const, F::Output>>
-where
-    F: Closure<()>,
-{
-    fn then(self, f: F) -> Self::Chained;
+pub trait Then<F> {
+    type Then;
+
+    fn then(self, f: F) -> Self::Then;
 }
 
 impl<T, F> Then<F> for T
 where
-    T: Monad<CurriedA<Const, F::Output>>,
-    F: Closure<()>,
+    T: FunctorReplace<Id>,
+    T::Mapped: Applicative<F>,
 {
-    fn then(self, f: F) -> Self::Chained {
-        self.chain(Const.curry_a(f.call(())))
+    type Then = <<T as Functor<CurriedA<Const, Id>>>::Mapped as Applicative<F>>::Applied;
+
+    fn then(self, f: F) -> Self::Then {
+        self.replace(Id).apply(f)
     }
 }

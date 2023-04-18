@@ -1,4 +1,6 @@
 mod applicative;
+mod bifunctor;
+mod category;
 mod copointed;
 mod foldable;
 mod function;
@@ -9,8 +11,12 @@ mod monoid;
 mod pointed;
 mod semigroup;
 mod traversable;
+mod closure;
 
 pub use applicative::*;
+pub use bifunctor::*;
+pub use category::*;
+pub use closure::*;
 pub use copointed::*;
 pub use foldable::*;
 pub use foldable::*;

@@ -90,17 +90,20 @@ macro_rules! derive_functor {
 #[macro_export]
 macro_rules! derive_applicative {
     ($ident:ident < $ty:ident >) => {
-        impl<$ty, _Value> crate::functional::Applicative<_Value> for $ident<$ty>
+        impl<$ty, _Value> crate::functional::Applicative<$ident<_Value>> for $ident<$ty>
         where
             $ty: crate::functional::Closure<_Value>,
         {
-            type Applied = $ty::Output;
+            type Applied = $ident<$ty::Output>;
 
-            fn apply(self, a: _Value) -> Self::Applied
+            fn apply(self, a: $ident<_Value>) -> Self::Applied
             where
                 $ty: crate::functional::Closure<_Value>,
             {
-                crate::functional::Copointed::copoint(self).call(a)
+                crate::functional::Pointed::point(
+                    crate::functional::Copointed::copoint(self)
+                        .call(crate::functional::Copointed::copoint(a)),
+                )
             }
         }
     };

@@ -1,8 +1,6 @@
-use super::{
-    Closure, Compose, Composed, Copointed, Endo, Functor, Id, Point, SemigroupConcat,
-};
+use super::{Closure, Compose, Composed, Copointed, Endo, Functor, Id, Point, SemigroupConcat};
 
-pub trait Foldable<F> {
+pub trait Foldable<F>: Functor<F> {
     type Folded;
 
     fn fold_map(self, f: F) -> Self::Folded;

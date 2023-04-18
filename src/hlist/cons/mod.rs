@@ -53,172 +53,274 @@ pub use cons_traversable::*;
 pub use uncons::*;
 
 #[cfg(test)]
-mod test {
-    use core::marker::PhantomData;
+mod do_notation_monadic {
+    use core::{
+        marker::PhantomData,
+        ops::{BitAnd, Shr},
+    };
 
     use crate::{
         derive_closure,
-        functional::{Applicative, Closure, Copointed, Function, Pointed, Tagged},
+        functional::{
+            Closure, Compose, Composed, Copointed, CurriedA, Curry, FirstF, Flip, Flipped,
+            Function, Monad, Pointed, Pure, Spread, Spreaded, State, Tagged, Then, Tuple,
+        },
         hlist::{
-            cons::{ConsFoldRight, Uncons},
-            tuple::{Cons, TupleGetImpl},
+            cons::{ConsGet, ConsSet, Uncons},
+            tuple::Cons,
         },
     };
 
     #[test]
-    fn test_do_notation() {
-        struct Get<T, P>(PhantomData<(T, P)>);
+    fn test_monadic_do() {
+        struct StateGet<M, T, P>(PhantomData<(M, T, P)>);
 
-        impl<T, P> Default for Get<T, P> {
+        impl<M, T, P> Default for StateGet<M, T, P> {
             fn default() -> Self {
-                Get(PhantomData)
+                StateGet(PhantomData)
             }
         }
 
-        impl<T, P> Clone for Get<T, P> {
+        impl<M, T, P> Clone for StateGet<M, T, P> {
             fn clone(&self) -> Self {
-                Get(PhantomData)
+                StateGet(PhantomData)
             }
         }
 
-        impl<T, P, I> Function<I> for Get<T, P>
+        impl<M, T, P> Copy for StateGet<M, T, P> {}
+
+        impl<C, M, T, P> Function<C> for StateGet<M, T, P>
         where
-            I: TupleGetImpl<T, P>,
+            C: ConsGet<Tagged<M, T>, P>,
         {
             type Output = T;
 
-            fn call(input: I) -> Self::Output {
-                input.get_impl()
+            fn call(ctx: C) -> Self::Output {
+                ctx.cons_get().copoint()
             }
         }
 
-        derive_closure!(Get<T, P>);
+        derive_closure!(StateGet<M, T, P>);
 
-        #[derive(Clone)]
-        struct Sub;
+        struct StateSet<U, P>(PhantomData<(U, P)>);
 
-        impl Function<(i32, i32)> for Sub {
-            type Output = i32;
-
-            fn call((a, b): (i32, i32)) -> Self::Output {
-                a - b
+        impl<U, P> Default for StateSet<U, P> {
+            fn default() -> Self {
+                StateSet(PhantomData)
             }
         }
 
-        impl Function<(i32, f32)> for Sub {
-            type Output = f32;
-
-            fn call((a, b): (i32, f32)) -> Self::Output {
-                a as f32 - b
+        impl<U, P> Clone for StateSet<U, P> {
+            fn clone(&self) -> Self {
+                StateSet(PhantomData)
             }
         }
 
-        impl Function<(f32, i32)> for Sub {
-            type Output = f32;
+        impl<U, P> Copy for StateSet<U, P> {}
 
-            fn call((a, b): (f32, i32)) -> Self::Output {
-                a - b as f32
-            }
-        }
-
-        impl Function<(f32, f32)> for Sub {
-            type Output = f32;
-
-            fn call((a, b): (f32, f32)) -> Self::Output {
-                a - b
-            }
-        }
-
-        derive_closure!(Sub);
-
-        #[derive(Clone)]
-        struct Panic;
-
-        impl<T> Function<(T,)> for Panic
+        impl<U, P, C, T> Function<(T, C)> for StateSet<U, P>
         where
-            T: core::fmt::Display,
+            C: ConsSet<Tagged<U, T>, P>,
         {
-            type Output = ();
+            type Output = ((), C);
 
-            fn call(input: (T,)) -> Self::Output {
-                panic!("{}", input.0);
+            fn call((t, ctx): (T, C)) -> Self::Output {
+                ((), ctx.cons_set(Tagged::point(t)))
             }
         }
 
-        derive_closure!(Panic);
+        derive_closure!(StateSet<U, P>);
 
-        let ctx = ("three", 2.0, 1);
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        struct Test;
 
-        let list = (
-            Action::point(Panic),
-            Action::point(Sub),
-            Context::point(Get::<i32, _>::default()),
-            Action::point(Sub),
-            Context::point(Get::<i32, _>::default()),
-            Context::point(Get::<f32, _>::default()),
+        impl Function<(i32, f32, &str)> for Test {
+            type Output = f32;
+
+            fn call((a, b, _): (i32, f32, &str)) -> Self::Output {
+                a as f32 + b
+            }
+        }
+
+        derive_closure!(Test);
+
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        struct Push;
+
+        impl<F, I> Function<(F, I)> for Push {
+            type Output = State<
+                Composed<
+                    Spreaded<Flipped<Tuple>>,
+                    CurriedA<Flipped<FirstF>, Composed<F, CurriedA<Flipped<Tuple>, I>>>,
+                >,
+            >;
+
+            fn call((f, i): (F, I)) -> Self::Output {
+                State::point(
+                    Tuple
+                        .flip()
+                        .spread()
+                        .compose(FirstF.flip().curry_a(f.compose(Tuple.flip().curry_a(i)))),
+                )
+            }
+        }
+
+        derive_closure!(Push);
+
+        struct Run;
+
+        impl<F, I> Function<(F, I)> for Run
+        where
+            F: Closure<I::Uncons>,
+            I: Uncons,
+        {
+            type Output = State<CurriedA<Tuple, F::Output>>;
+
+            fn call((f, i): (F, I)) -> Self::Output {
+                State::point(Tuple.curry_a(f.call(i.uncons())))
+            }
+        }
+
+        derive_closure!(Run);
+
+        struct Set<M, P>(PhantomData<(M, P)>);
+
+        impl<M, P> Default for Set<M, P> {
+            fn default() -> Self {
+                Set(PhantomData)
+            }
+        }
+
+        impl<M, P> Clone for Set<M, P> {
+            fn clone(&self) -> Self {
+                Set(PhantomData)
+            }
+        }
+
+        impl<M, P, I> Function<I> for Set<M, P> {
+            type Output = State<CurriedA<StateSet<Float, P>, I>>;
+
+            fn call(input: I) -> Self::Output {
+                State::point(StateSet::<Float, P>::default().curry_a(input))
+            }
+        }
+
+        derive_closure!(Set<M, P>);
+
+        struct Take<M, T, P>(PhantomData<(M, T, P)>);
+
+        impl<M, T, P> Default for Take<M, T, P> {
+            fn default() -> Self {
+                Take(PhantomData)
+            }
+        }
+
+        impl<M, T, P> Clone for Take<M, T, P> {
+            fn clone(&self) -> Self {
+                Take(PhantomData)
+            }
+        }
+
+        derive_closure!(Take<M, T, P>);
+
+        impl<M, T, P, I> Function<I> for Take<M, T, P> {
+            type Output = State<CurriedA<StateGet<M, T, P>, I>>;
+
+            fn call(input: I) -> Self::Output {
+                State::point(StateGet::<M, T, P>::default().curry_a(input))
+            }
+        }
+
+        impl<F, Rhs> Shr<Rhs> for State<F>
+        where
+            State<F>: Monad<Rhs>,
+        {
+            type Output = <State<F> as Monad<Rhs>>::Chained;
+
+            fn shr(self, rhs: Rhs) -> Self::Output {
+                self.chain(rhs)
+            }
+        }
+
+        impl<F, Rhs> BitAnd<Rhs> for State<F>
+        where
+            State<F>: Then<Rhs>,
+        {
+            type Output = <State<F> as Then<Rhs>>::Then;
+
+            fn bitand(self, rhs: Rhs) -> Self::Output {
+                self.then(rhs)
+            }
+        }
+
+        trait ContextPush<T, P> {
+            type StateGet<M>
+            where
+                Self: ConsGet<Tagged<M, T>, P>;
+
+            fn get<M>(&self) -> Self::StateGet<M>
+            where
+                Self: ConsGet<Tagged<M, T>, P>;
+        }
+
+        impl<T, U, P> ContextPush<U, P> for T {
+            type StateGet<M> = CurriedA<Push, StateGet<M, U, P>>
+
+            where
+                T: ConsGet<Tagged<M, U>, P>;
+
+            fn get<M>(&self) -> Self::StateGet<M>
+            where
+                T: ConsGet<Tagged<M, U>, P>,
+            {
+                Push.curry_a(StateGet::<M, U, P>::default())
+            }
+        }
+
+        trait ContextRun<F> {
+            fn run(&self, f: F) -> CurriedA<Run, F> {
+                Run.curry_a(f)
+            }
+        }
+
+        impl<T, F> ContextRun<F> for T {}
+
+        trait ContextSet<P> {
+            fn set<M>(&self) -> Set<M, P> {
+                Default::default()
+            }
+        }
+
+        impl<T, P> ContextSet<P> for T {}
+
+        trait ContextTake<I, P> {
+            fn take<M>(&self) -> Take<M, I, P> {
+                Default::default()
+            }
+        }
+
+        impl<T, I, P> ContextTake<I, P> for T {}
+
+        enum Int {}
+        enum Float {}
+        enum Str {}
+
+        let ctx = (
+            Tagged::<Int, i32>::point(1),
+            Tagged::<Float, f32>::point(2.0),
+            Tagged::<Str, &str>::point("three"),
         )
             .cons();
 
-        /// Wrapper denoting an action that should collapse an existing call stack
-        type Action<T> = Tagged<TagAction, T>;
-        enum TagAction {}
+        let chained = State::<()>::pure(())
+            >> ctx.get::<Str>()
+            >> ctx.get::<Float>()
+            >> ctx.get::<Int>()
+            >> ctx.run(Test)
+            >> ctx.set::<Float>()
+            >> ctx.take::<Float>();
 
-        /// Wrapper denoting an action that modifies context
-        enum TagContext {}
-        type Context<T> = Tagged<TagContext, T>;
-
-        trait DoTrait {
-            type Output;
-
-            fn r#do(self) -> Self::Output;
-        }
-
-        impl<C, A, T> DoTrait for ((C, A), Action<T>)
-        where
-            C: Clone,
-            T: Closure<A::Uncons>,
-            A: Uncons,
-        {
-            type Output = (C, (<T as Closure<A::Uncons>>::Output, ()));
-
-            fn r#do(self) -> Self::Output {
-                let ((c, a), n) = self;
-                (c, (n.apply(a.uncons()), ()))
-            }
-        }
-
-        impl<C, A, T> DoTrait for ((C, A), Context<T>)
-        where
-            C: Clone,
-            T: Closure<C>,
-        {
-            type Output = (C, (<T as Closure<C>>::Output, A));
-
-            fn r#do(self) -> Self::Output {
-                let ((c, a), n) = self;
-                (c.clone(), (n.copoint().call(c), a))
-            }
-        }
-
-        /// DoTrait::do
-        #[derive(Clone)]
-        struct Do;
-
-        impl<T> Function<T> for Do
-        where
-            T: DoTrait,
-        {
-            type Output = T::Output;
-
-            fn call(input: T) -> Self::Output {
-                input.r#do()
-            }
-        }
-
-        derive_closure!(Do);
-
-        let (c, res) = list.cons_fold_right((ctx, ()), Do);
-        assert_eq!(c, ctx);
-        assert_eq!(res, ((), ()));
+        let chained = chained.copoint().call(ctx);
+        assert_eq!(chained, 3.0);
     }
 }

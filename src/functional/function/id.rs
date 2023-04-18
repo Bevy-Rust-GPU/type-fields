@@ -1,6 +1,6 @@
 use crate::derive_closure;
 
-use super::{Function};
+use super::Function;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Id;

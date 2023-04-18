@@ -1,4 +1,4 @@
-use super::Closure;
+use crate::functional::Closure;
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
 pub trait Curry: Sized {

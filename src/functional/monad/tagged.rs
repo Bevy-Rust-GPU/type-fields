@@ -144,8 +144,8 @@ where
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        test_functor_laws, Add, Applicative, Closure, Composed, Const, Copointed, Curry, CurryN,
-        Div, Flip, Fmap, Functor, Monad, Mul, Point, Pointed, Sub, Tagged, Then,
+        test_functor_laws, Add, Applicative, Closure, Composed, Copointed, Curry, CurryN, Div,
+        Flip, Fmap, Functor, Monad, Mul, Point, Pointed, Sub, Tagged, Then,
     };
 
     #[test]
@@ -170,7 +170,7 @@ mod test {
         );
         assert_eq!(id4.copoint(), 4);
 
-        let id5: Tagged<Tag, i32> = id4.then(Const.curry_n().call(Tagged::<Tag, _>::point(1234)));
+        let id5: Tagged<Tag, i32> = id4.then(Tagged::<Tag, _>::point(1234));
         assert_eq!(id5.copoint(), 1234);
     }
 

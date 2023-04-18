@@ -1,18 +1,61 @@
 use crate::{
-    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_pointed,
-    functional::{Composed, Copointed, Id, Pointed, Semigroup},
+    derive_copointed, derive_pointed,
+    functional::{
+        Applicative, Closure, Compose, Composed, Copointed, Functor, Id, Pointed, Pure, Semigroup,
+    },
 };
 
 use super::Monoid;
 
 /// The monoid of endomorphisms under composition.
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Endo<T>(T);
 
 derive_pointed!(Endo<T>);
 derive_copointed!(Endo<T>);
-derive_functor!(Endo<T>);
-derive_applicative!(Endo<T>);
-derive_monad!(Endo<T>);
+
+impl<F1, F2> Functor<F2> for Endo<F1> {
+    type Mapped = Endo<Composed<F1, F2>>;
+
+    fn fmap(self, f: F2) -> Self::Mapped {
+        Endo(self.copoint().compose(f))
+    }
+}
+
+impl<F1, F2> Applicative<Endo<F2>> for Endo<F1> {
+    type Applied = Endo<EndoApplicative<F1, F2>>;
+
+    fn apply(self, f: Endo<F2>) -> Self::Applied {
+        Endo(EndoApplicative(self, f))
+    }
+}
+
+impl<T> Pure for Endo<T> {
+    type Pure<U> = Endo<U>;
+
+    fn pure<U>(t: U) -> Self::Pure<U> {
+        Endo::point(t)
+    }
+}
+
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct EndoApplicative<F1, F2>(Endo<F1>, Endo<F2>);
+
+impl<F1, F2, T> Closure<T> for EndoApplicative<F1, F2>
+where
+    F1: Closure<T>,
+    F2: Closure<T>,
+    F1::Output: Closure<F2::Output>,
+    T: Clone,
+{
+    type Output = <F1::Output as Closure<F2::Output>>::Output;
+
+    fn call(self, input: T) -> Self::Output {
+        let a = self.0.copoint().call(input.clone());
+        let b = self.1.copoint().call(input);
+        a.call(b)
+    }
+}
 
 impl<T> Monoid for Endo<T>
 where
@@ -37,8 +80,8 @@ impl<T, U> Semigroup<Endo<U>> for Endo<T> {
 mod test {
     use crate::{
         functional::{
-            Add, Compose, Composed, Copointed, CurriedN, CurryN, Foldr, Point, Pointed,
-            Semigroup, Closure,
+            Add, Closure, Compose, Composed, Copointed, CurriedN, CurryN, Foldr, Point, Pointed,
+            Semigroup,
         },
         hlist::tuple::Cons,
     };

@@ -1,14 +1,12 @@
 use core::marker::PhantomData;
 
 use crate::{
-    functional::Pointed,
+    functional::{Closure, Pointed},
     hlist::{
         cons::{ConsList, ConsPushBack, Uncons},
         tuple::Cons,
     },
 };
-
-use super::Closure;
 
 pub trait CurryN<I> {
     type Curried;

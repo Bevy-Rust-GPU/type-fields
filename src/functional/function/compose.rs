@@ -1,6 +1,4 @@
-use crate::functional::{Copointed, Pointed};
-
-use super::Closure;
+use crate::functional::{Closure, Copointed, Pointed};
 
 pub trait Compose<F>: Sized {
     fn compose(self, f: F) -> Composed<Self, F>;

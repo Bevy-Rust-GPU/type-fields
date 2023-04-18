@@ -1,10 +1,9 @@
 use crate::{
     derive_applicative, derive_copointed, derive_functor, derive_monad, derive_pointed,
-    functional::Pointed,
+    functional::{Closure, Pointed},
 };
 
-use super::Closure;
-
+/// Flip the arguments of an arity 2 function
 pub trait Flip: Sized {
     fn flip(self) -> Flipped<Self>;
 }
