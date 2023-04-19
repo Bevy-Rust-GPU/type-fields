@@ -1,11 +1,7 @@
-use type_fields_macros::Closure;
+use type_fields_macros::{Closure, Copointed, Pointed};
 
-use crate::{
-    derive_copointed, derive_pointed,
-    t_funk::{
-        Apply, Chain, Closure, Const, CurriedA, Curry, Fmap, Function, Pointed, Pure, Spread,
-        Spreaded,
-    },
+use crate::t_funk::{
+    Apply, Chain, Closure, Const, CurriedA, Curry, Fmap, Function, Pointed, Pure, Spread, Spreaded,
 };
 
 /// 2-tuple constructor
@@ -22,7 +18,7 @@ impl<A, B> Function<(A, B)> for Tuple {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct State<F>(F);
 
 impl<F> Pure for State<F> {
@@ -32,9 +28,6 @@ impl<F> Pure for State<F> {
         State(Tuple.curry_a(t))
     }
 }
-
-derive_pointed!(State<F>);
-derive_copointed!(State<F>);
 
 impl<F1, F2> Fmap<F2> for State<F1> {
     type Fmap = State<StateFunctor<F1, F2>>;

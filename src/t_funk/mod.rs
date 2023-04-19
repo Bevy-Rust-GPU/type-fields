@@ -38,10 +38,10 @@
 //! with respect to its output type.
 //!
 //! As is, this positions `Typeclass`es as pleasant interface primitives for concrete code,
-//! with strong-typing deferred to the implementation of each `Function`.
+//! with strong-typing deferred to the implementation of each `Function`,
+//! and trait bounds as a purely informational conceit.
 //! i.e. You can use the `Applicative` interface with a type that
-//! implements `Apply` but not `Pure`,
-//! since `Apply` can't reason about its sibling `Pure` impl.
+//! implements `Apply` but not `Pure`, since `Apply` can't reason about its sibling `Pure` impl.
 //!
 //! This could be improved with higher-kinded type bounds
 //! (i.e. `for<T> U: Apply<T> + Pure<T>`)
@@ -57,13 +57,12 @@ mod copointed;
 mod foldable;
 mod function;
 mod functor;
-mod macros;
+pub mod list;
 mod monad;
 mod monoid;
 mod pointed;
 mod semigroup;
 mod traversable;
-pub mod list;
 
 pub use applicative::*;
 pub use bifunctor::*;
@@ -74,9 +73,9 @@ pub use foldable::*;
 pub use foldable::*;
 pub use function::*;
 pub use functor::*;
+pub use list::*;
 pub use monad::*;
 pub use monoid::*;
 pub use pointed::*;
 pub use semigroup::*;
 pub use traversable::*;
-pub use list::*;

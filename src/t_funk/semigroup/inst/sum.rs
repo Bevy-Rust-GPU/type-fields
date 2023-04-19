@@ -1,20 +1,27 @@
-use crate::{
-    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
-    derive_pointed,
-    t_funk::{Copointed, Pointed, Mappend},
-};
+use type_fields_macros::{Applicative, Copointed, Functor, Monad, Monoid, Pointed};
+
+use crate::t_funk::{Copointed, Mappend, Pointed};
 use core::ops::Add;
 
 /// A `Semigroup` wrapper that can append additively.
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Functor,
+    Applicative,
+    Monad,
+    Monoid,
+)]
 pub struct Sum<T>(T);
-
-derive_pointed!(Sum<T>);
-derive_copointed!(Sum<T>);
-derive_functor!(Sum<T>);
-derive_applicative!(Sum<T>);
-derive_monad!(Sum<T>);
-derive_monoid!(Sum<T>);
 
 impl<T> Mappend<Sum<T>> for Sum<T>
 where
@@ -29,7 +36,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{Copointed, Pointed, Mappend, Sum};
+    use crate::t_funk::{Copointed, Mappend, Pointed, Sum};
 
     #[test]
     fn test_sum() {

@@ -1,7 +1,6 @@
-use crate::{
-    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_pointed,
-    t_funk::{Apply, Copointed, Fmap, Chain, Pointed},
-};
+use type_fields_macros::{Applicative, Copointed, Functor, Monad, Pointed};
+
+use crate::t_funk::{Apply, Chain, Copointed, Fmap, Pointed};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Nothing;
@@ -46,14 +45,23 @@ impl<F> Chain<F> for Nothing {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Functor,
+    Applicative,
+    Monad,
+)]
 pub struct Just<T>(T);
-
-derive_pointed!(Just<T>);
-derive_copointed!(Just<T>);
-derive_functor!(Just<T>);
-derive_applicative!(Just<T>);
-derive_monad!(Just<T>);
 
 pub trait Maybe {}
 impl Maybe for Nothing {}
@@ -61,9 +69,7 @@ impl<T> Maybe for Just<T> {}
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{
-        test_functor_laws, Add, Closure, Curry, CurryN, Fmap, Mul, Pointed,
-    };
+    use crate::t_funk::{test_functor_laws, Add, Closure, Curry, CurryN, Fmap, Mul, Pointed};
 
     use super::{Just, Nothing};
 

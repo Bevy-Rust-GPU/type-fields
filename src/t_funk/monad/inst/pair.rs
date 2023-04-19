@@ -1,14 +1,10 @@
-use crate::{
-    derive_copointed, derive_pointed,
-    t_funk::{Closure, Copointed, Fmap, Pointed},
-};
+use type_fields_macros::{Copointed, Pointed};
+
+use crate::t_funk::{Closure, Copointed, Fmap, Pointed};
 
 /// Identity monad, used to lift values into a monadic context.
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Pair<A, B>(A, B);
-
-derive_pointed!(Pair<A, B>);
-derive_copointed!(Pair<A, B>);
 
 impl<A, B, F> Fmap<F> for Pair<A, B>
 where

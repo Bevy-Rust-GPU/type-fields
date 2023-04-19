@@ -1,7 +1,6 @@
-use crate::{
-    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_pointed,
-    t_funk::{Closure, Pointed},
-};
+use type_fields_macros::{Copointed, Pointed};
+
+use crate::t_funk::{Closure, Pointed};
 
 /// Feed one argument into both inputs of an arity 2 function
 pub trait Spread: Sized {
@@ -14,14 +13,8 @@ impl<T> Spread for T {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Spreaded<F>(F);
-
-derive_pointed!(Spreaded<F>);
-derive_copointed!(Spreaded<F>);
-derive_functor!(Spreaded<F>);
-derive_applicative!(Spreaded<F>);
-derive_monad!(Spreaded<F>);
 
 impl<F, A> Closure<A> for Spreaded<F>
 where

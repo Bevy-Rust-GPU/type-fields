@@ -1,7 +1,6 @@
-use crate::{
-    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_pointed,
-    t_funk::{Closure, Pointed},
-};
+use type_fields_macros::{Copointed, Pointed};
+
+use crate::t_funk::{Closure, Pointed};
 
 /// Flip the arguments of an arity 2 function
 pub trait Flip: Sized {
@@ -14,14 +13,8 @@ impl<T> Flip for T {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Flipped<F>(F);
-
-derive_pointed!(Flipped<F>);
-derive_copointed!(Flipped<F>);
-derive_functor!(Flipped<F>);
-derive_applicative!(Flipped<F>);
-derive_monad!(Flipped<F>);
 
 impl<F, A, B> Closure<(B, A)> for Flipped<F>
 where

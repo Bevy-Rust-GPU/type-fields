@@ -1,11 +1,25 @@
-use crate::{
-    derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
-    derive_pointed, derive_semigroup,
-    t_funk::{Mappend, Pointed, Pure},
-};
+use type_fields_macros::{Applicative, Copointed, Functor, Monad, Monoid, Pointed, Semigroup};
+
+use crate::t_funk::{Mappend, Pointed, Pure};
 
 /// Identity monad, used to lift values into a monadic context.
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Functor,
+    Applicative,
+    Monad,
+    Monoid,
+    Semigroup,
+)]
 pub struct Identity<T>(T);
 
 impl<T> Pure for Identity<T> {
@@ -15,14 +29,6 @@ impl<T> Pure for Identity<T> {
         Identity::point(t)
     }
 }
-
-derive_pointed!(Identity<T>);
-derive_copointed!(Identity<T>);
-derive_functor!(Identity<T>);
-derive_applicative!(Identity<T>);
-derive_monad!(Identity<T>);
-derive_monoid!(Identity<T>);
-derive_semigroup!(Identity<T>);
 
 impl<T> Mappend<()> for Identity<T> {
     type Mappend = Identity<T>;
