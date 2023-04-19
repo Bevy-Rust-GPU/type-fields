@@ -5,9 +5,9 @@
 extern crate self as type_fields;
 
 pub mod field;
-pub mod hlist;
 pub mod path;
-pub mod functional;
+pub mod t_funk;
+pub mod type_machine;
 
 pub use type_fields_macros::Field;
 

@@ -1,4 +1,4 @@
-use crate::{hlist::tuple::Cons, path::Path};
+use crate::{path::Path, t_funk::tlist::ToHList};
 
 /// Type-level field access using [`Path`]
 pub trait Field<V, P>: Sized
@@ -62,12 +62,12 @@ where
 /// Cell [`Cons`] type blanket impl
 impl<C, T> FieldPath<Cell, T> for C
 where
-    C: Cons,
-    <C as Cons>::Cons: Path<T>,
+    C: ToHList,
+    <C as ToHList>::HList: Path<T>,
 {
-    type Type = <<C as Cons>::Cons as Path<T>>::Type;
+    type Type = <<C as ToHList>::HList as Path<T>>::Type;
 
     fn field(self, t: &mut T) -> &mut Self::Type {
-        self.cons().field(t)
+        self.to_hlist().field(t)
     }
 }
