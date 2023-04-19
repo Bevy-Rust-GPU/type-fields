@@ -1,13 +1,13 @@
-use crate::functional::{Closure, Functor};
+use crate::functional::{Closure, Fmap};
 
-impl<Head, Tail, F> Functor<F> for (Head, Tail)
+impl<Head, Tail, F> Fmap<F> for (Head, Tail)
 where
     F: Clone + Closure<Head>,
-    Tail: Functor<F>,
+    Tail: Fmap<F>,
 {
-    type Mapped = (F::Output, Tail::Mapped);
+    type Fmap = (F::Output, Tail::Fmap);
 
-    fn fmap(self, f: F) -> Self::Mapped {
+    fn fmap(self, f: F) -> Self::Fmap {
         (f.clone().call(self.0), self.1.fmap(f))
     }
 }
@@ -16,7 +16,7 @@ where
 mod test {
     use crate::{
         derive_closure,
-        functional::{Function, Functor},
+        functional::{Function, Fmap},
         hlist::{cons::Uncons, tuple::Cons},
     };
 

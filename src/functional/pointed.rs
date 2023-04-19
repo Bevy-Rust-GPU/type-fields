@@ -17,21 +17,21 @@ where
 }
 
 /// Pointed::point
-pub struct Point<I>(PhantomData<I>);
+pub struct PointF<I>(PhantomData<I>);
 
-impl<T> Default for Point<T> {
+impl<T> Default for PointF<T> {
     fn default() -> Self {
-        Point(PhantomData)
+        PointF(PhantomData)
     }
 }
 
-impl<T> Clone for Point<T> {
+impl<T> Clone for PointF<T> {
     fn clone(&self) -> Self {
-        Point(PhantomData)
+        PointF(PhantomData)
     }
 }
 
-impl<I> Function<I::Pointed> for Point<I>
+impl<I> Function<I::Pointed> for PointF<I>
 where
     I: Pointed,
 {
@@ -42,4 +42,4 @@ where
     }
 }
 
-derive_closure!(Point<I>);
+derive_closure!(PointF<I>);

@@ -1,7 +1,7 @@
 use crate::{
     derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
     derive_pointed,
-    functional::{Copointed, Pointed, Semigroup},
+    functional::{Copointed, Pointed, Mappend},
 };
 
 /// A `Semigroup` wrapper that can append with OR semantics.
@@ -14,13 +14,13 @@ derive_applicative!(Any<T>);
 derive_monad!(Any<T>);
 derive_monoid!(Any<T>);
 
-impl<T> Semigroup<Any<T>> for Any<T>
+impl<T> Mappend<Any<T>> for Any<T>
 where
     T: core::ops::BitOr<T>,
 {
-    type Appended = Any<T::Output>;
+    type Mappend = Any<T::Output>;
 
-    fn mappend(self, t: Any<T>) -> Self::Appended {
+    fn mappend(self, t: Any<T>) -> Self::Mappend {
         Pointed::point(self.copoint() | t.copoint())
     }
 }
@@ -28,7 +28,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        semigroup::{Any, Semigroup},
+        semigroup::{Any, Mappend},
         Copointed, Pointed,
     };
 

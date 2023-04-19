@@ -1,12 +1,28 @@
-mod endo;
-pub use endo::*;
+mod inst;
+mod mempty;
 
-/// A type that can provide a neutral element.
-///
-/// To be definition-correct, `Monoid` types must also implement `Semigroup`,
-/// but this cannot be strongly modeled without higher-ranked type bounds.
-pub trait Monoid {
-    type Identity;
+pub use inst::*;
+pub use mempty::*;
 
-    fn mempty() -> Self::Identity;
+use crate::functional::Semigroup;
+
+pub trait Monoid: Semigroup {
+    type Identity
+    where
+        Self: Mempty;
+
+    fn mempty() -> Self::Identity
+    where
+        Self: Mempty;
+}
+
+impl<T> Monoid for T {
+    type Identity = T::Mempty where T: Mempty;
+
+    fn mempty() -> Self::Identity
+    where
+        T: Mempty,
+    {
+        <T as Mempty>::mempty()
+    }
 }

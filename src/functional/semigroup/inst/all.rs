@@ -1,7 +1,7 @@
 use crate::{
     derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
     derive_pointed,
-    functional::{Copointed, Pointed, Semigroup},
+    functional::{Copointed, Pointed, Mappend},
 };
 
 /// A `Semigroup` wrapper that can append with AND semantics.
@@ -14,13 +14,13 @@ derive_applicative!(All<T>);
 derive_monad!(All<T>);
 derive_monoid!(All<T>);
 
-impl<T> Semigroup<All<T>> for All<T>
+impl<T> Mappend<All<T>> for All<T>
 where
     T: core::ops::BitAnd<T>,
 {
-    type Appended = All<T::Output>;
+    type Mappend = All<T::Output>;
 
-    fn mappend(self, t: All<T>) -> Self::Appended {
+    fn mappend(self, t: All<T>) -> Self::Mappend {
         Pointed::point(self.copoint() & t.copoint())
     }
 }
@@ -28,7 +28,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        semigroup::{All, Semigroup},
+        semigroup::{All, Mappend},
         Copointed, Pointed,
     };
 

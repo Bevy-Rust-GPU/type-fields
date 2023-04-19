@@ -1,7 +1,7 @@
 use crate::{
     derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
     derive_pointed,
-    functional::{Copointed, Pointed, Semigroup},
+    functional::{Copointed, Pointed, Mappend},
 };
 use core::ops::Add;
 
@@ -16,23 +16,20 @@ derive_applicative!(Sum<T>);
 derive_monad!(Sum<T>);
 derive_monoid!(Sum<T>);
 
-impl<T> Semigroup<Sum<T>> for Sum<T>
+impl<T> Mappend<Sum<T>> for Sum<T>
 where
     T: Add<T>,
 {
-    type Appended = Sum<T::Output>;
+    type Mappend = Sum<T::Output>;
 
-    fn mappend(self, t: Sum<T>) -> Self::Appended {
+    fn mappend(self, t: Sum<T>) -> Self::Mappend {
         Pointed::point(self.copoint() + t.copoint())
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{
-        semigroup::{sum::Sum, Semigroup},
-        Copointed, Pointed,
-    };
+    use crate::functional::{Copointed, Pointed, Mappend, Sum};
 
     #[test]
     fn test_sum() {

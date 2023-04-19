@@ -1,12 +1,10 @@
 use crate::{
     derive_closure, derive_copointed, derive_pointed,
     functional::{
-        Applicative, Closure, Const, CurriedA, Curry, Function, Functor, Pointed, Pure, Spread,
+        Apply, Closure, Const, CurriedA, Curry, Fmap, Function, Chain, Pointed, Pure, Spread,
         Spreaded,
     },
 };
-
-use super::Monad;
 
 /// 2-tuple constructor
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -36,10 +34,10 @@ impl<F> Pure for State<F> {
 derive_pointed!(State<F>);
 derive_copointed!(State<F>);
 
-impl<F1, F2> Functor<F2> for State<F1> {
-    type Mapped = State<StateFunctor<F1, F2>>;
+impl<F1, F2> Fmap<F2> for State<F1> {
+    type Fmap = State<StateFunctor<F1, F2>>;
 
-    fn fmap(self, f: F2) -> Self::Mapped {
+    fn fmap(self, f: F2) -> Self::Fmap {
         State(StateFunctor(self.0, f))
     }
 }
@@ -60,10 +58,10 @@ where
     }
 }
 
-impl<F1, F2> Applicative<State<F2>> for State<F1> {
-    type Applied = State<StateApplicative<F1, F2>>;
+impl<F1, F2> Apply<State<F2>> for State<F1> {
+    type Apply = State<StateApplicative<F1, F2>>;
 
-    fn apply(self, f: State<F2>) -> Self::Applied {
+    fn apply(self, f: State<F2>) -> Self::Apply {
         State(StateApplicative(self, f))
     }
 }
@@ -86,10 +84,10 @@ where
     }
 }
 
-impl<T, F> Monad<F> for State<T> {
-    type Chained = State<StateMonad<T, F>>;
+impl<T, F> Chain<F> for State<T> {
+    type Chain = State<StateMonad<T, F>>;
 
-    fn chain(self, f: F) -> Self::Chained {
+    fn chain(self, f: F) -> Self::Chain {
         State(StateMonad(self, f))
     }
 }
@@ -142,8 +140,8 @@ mod test {
     use crate::{
         derive_closure,
         functional::{
-            Closure, Const, Copointed, CurriedA, Curry, Function, Get, Monad, Pointed, Put,
-            ReplicateM, SequenceA, State, Traversable,
+            Closure, Const, Copointed, CurriedA, Curry, Function, Get, Chain, Pointed, Put,
+            ReplicateM, SequenceA, State, Traverse,
         },
         hlist::tuple::Cons,
     };
@@ -289,7 +287,7 @@ mod test {
         assert_eq!(res, (Thank, Unlocked));
 
         let list = (Coin, Push, Push, Coin, Push).cons();
-        let res = Traversable::<TurnS, State<()>>::traverse(list, TurnS)
+        let res = Traverse::<TurnS, State<()>>::traverse(list, TurnS)
             .copoint()
             .call(Locked);
         assert_eq!(res, ((Thank, (Open, (Tut, (Thank, (Open, ()))))), Locked));

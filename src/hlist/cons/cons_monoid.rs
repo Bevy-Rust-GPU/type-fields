@@ -1,9 +1,9 @@
-use crate::functional::Monoid;
+use crate::functional::Mempty;
 
-impl<Head, Tail> Monoid for (Head, Tail) {
-    type Identity = ();
+impl<Head, Tail> Mempty for (Head, Tail) {
+    type Mempty = ();
 
-    fn mempty() -> Self::Identity {
+    fn mempty() -> Self::Mempty {
         ()
     }
 }

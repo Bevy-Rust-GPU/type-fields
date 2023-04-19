@@ -1,21 +1,21 @@
 /// Derive `Closure<T>` for a type that implements `Function<T>`
 #[macro_export]
 macro_rules! derive_closure {
-    ($ident:ident) => {
-        impl<_Input> crate::functional::Closure<_Input> for $ident where $ident: Function<_Input> {
-            type Output = <$ident as Function<_Input>>::Output;
+    ($ident:ident $(<>)?) => {
+        impl<_Input> crate::functional::Closure<_Input> for $ident where $ident: crate::functional::Function<_Input> {
+            type Output = <$ident as crate::functional::Function<_Input>>::Output;
 
             fn call(self, input: _Input) -> Self::Output {
-                <$ident as Function<_Input>>::call(input)
+                <$ident as crate::functional::Function<_Input>>::call(input)
             }
         }
     };
     ($ident:ident < $($tys:ident),+ >) => {
-        impl<_Input, $($tys),+> crate::functional::Closure<_Input> for $ident < $($tys),+ > where $ident < $($tys),+ >: Function<_Input> {
-            type Output = <$ident < $($tys),+ > as Function<_Input>>::Output;
+        impl<_Input, $($tys),+> crate::functional::Closure<_Input> for $ident < $($tys),+ > where $ident < $($tys),+ >: crate::functional::Function<_Input> {
+            type Output = <$ident < $($tys),+ > as crate::functional::Function<_Input>>::Output;
 
             fn call(self, input: _Input) -> Self::Output {
-                <$ident < $($tys),+ > as Function<_Input>>::call(input)
+                <$ident < $($tys),+ > as crate::functional::Function<_Input>>::call(input)
             }
         }
     };
@@ -72,13 +72,13 @@ macro_rules! derive_copointed {
 #[macro_export]
 macro_rules! derive_functor {
     ($ident:ident < $ty:ident >) => {
-        impl<$ty, _Function> crate::functional::Functor<_Function> for $ident<$ty>
+        impl<$ty, _Function> crate::functional::Fmap<_Function> for $ident<$ty>
         where
             _Function: crate::functional::Closure<$ty>,
         {
-            type Mapped = $ident<_Function::Output>;
+            type Fmap = $ident<_Function::Output>;
 
-            fn fmap(self, f: _Function) -> Self::Mapped {
+            fn fmap(self, f: _Function) -> Self::Fmap {
                 crate::functional::Pointed::point(
                     f.call(crate::functional::Copointed::copoint(self)),
                 )
@@ -90,13 +90,13 @@ macro_rules! derive_functor {
 #[macro_export]
 macro_rules! derive_applicative {
     ($ident:ident < $ty:ident >) => {
-        impl<$ty, _Value> crate::functional::Applicative<$ident<_Value>> for $ident<$ty>
+        impl<$ty, _Value> crate::functional::Apply<$ident<_Value>> for $ident<$ty>
         where
             $ty: crate::functional::Closure<_Value>,
         {
-            type Applied = $ident<$ty::Output>;
+            type Apply = $ident<$ty::Output>;
 
-            fn apply(self, a: $ident<_Value>) -> Self::Applied
+            fn apply(self, a: $ident<_Value>) -> Self::Apply
             where
                 $ty: crate::functional::Closure<_Value>,
             {
@@ -112,13 +112,13 @@ macro_rules! derive_applicative {
 #[macro_export]
 macro_rules! derive_monad {
     ($ident:ident < $ty:ident >) => {
-        impl<$ty, _Function> crate::functional::Monad<_Function> for $ident<$ty>
+        impl<$ty, _Function> crate::functional::Chain<_Function> for $ident<$ty>
         where
             _Function: crate::functional::Closure<$ty>,
         {
-            type Chained = _Function::Output;
+            type Chain = _Function::Output;
 
-            fn chain(self, f: _Function) -> Self::Chained {
+            fn chain(self, f: _Function) -> Self::Chain {
                 f.call(crate::functional::Copointed::copoint(self))
             }
         }
@@ -128,13 +128,13 @@ macro_rules! derive_monad {
 #[macro_export]
 macro_rules! derive_monoid {
     ($ident:ident < $ty:ident >) => {
-        impl<$ty> crate::functional::Monoid for $ident<$ty>
+        impl<$ty> crate::functional::Mempty for $ident<$ty>
         where
-            $ty: crate::functional::Monoid,
+            $ty: crate::functional::Mempty,
         {
-            type Identity = $ident<$ty::Identity>;
+            type Mempty = $ident<$ty::Mempty>;
 
-            fn mempty() -> Self::Identity {
+            fn mempty() -> Self::Mempty {
                 crate::functional::Pointed::point($ty::mempty())
             }
         }
@@ -144,13 +144,13 @@ macro_rules! derive_monoid {
 #[macro_export]
 macro_rules! derive_semigroup {
     ($ident:ident < $ty:ident >) => {
-        impl<$ty, U> crate::functional::Semigroup<$ident<U>> for $ident<$ty>
+        impl<$ty, U> crate::functional::Mappend<$ident<U>> for $ident<$ty>
         where
-            $ty: crate::functional::Semigroup<U>,
+            $ty: crate::functional::Mappend<U>,
         {
-            type Appended = $ident<$ty::Appended>;
+            type Mappend = $ident<$ty::Mappend>;
 
-            fn mappend(self, t: $ident<U>) -> Self::Appended {
+            fn mappend(self, t: $ident<U>) -> Self::Mappend {
                 crate::functional::Pointed::point(
                     self.0.mappend(crate::functional::Copointed::copoint(t)),
                 )

@@ -93,7 +93,7 @@ where
 mod test {
     use crate::{
         derive_closure,
-        functional::{function::curry_n::CurryN, Closure, Function},
+        functional::{Closure, CurryN, Function},
     };
 
     #[test]

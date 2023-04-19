@@ -1,8 +1,7 @@
-use crate::derive_closure;
-
-use super::Function;
+use type_fields_macros::functions;
 
 /// A type that can unwrap a value
+#[functions]
 pub trait Copointed
 where
     Self: Sized,
@@ -12,20 +11,3 @@ where
     /// Unwrap `Unit` from `Self`
     fn copoint(self) -> Self::Copointed;
 }
-
-/// Copointed::copoint
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Copoint;
-
-impl<I> Function<I> for Copoint
-where
-    I: Copointed,
-{
-    type Output = I::Copointed;
-
-    fn call(input: I) -> I::Copointed {
-        input.copoint()
-    }
-}
-
-derive_closure!(Copoint);

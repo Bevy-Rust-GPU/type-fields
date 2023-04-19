@@ -1,6 +1,6 @@
 use crate::{
     derive_applicative, derive_copointed, derive_functor, derive_monad, derive_pointed,
-    functional::{Applicative, Copointed, Functor, Monad, Pointed},
+    functional::{Apply, Copointed, Fmap, Chain, Pointed},
 };
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -22,26 +22,26 @@ impl Copointed for Nothing {
     }
 }
 
-impl<F> Functor<F> for Nothing {
-    type Mapped = Nothing;
+impl<F> Fmap<F> for Nothing {
+    type Fmap = Nothing;
 
-    fn fmap(self, _: F) -> Self::Mapped {
+    fn fmap(self, _: F) -> Self::Fmap {
         Nothing
     }
 }
 
-impl<T> Applicative<T> for Nothing {
-    type Applied = T;
+impl<T> Apply<T> for Nothing {
+    type Apply = T;
 
-    fn apply(self, a: T) -> Self::Applied {
+    fn apply(self, a: T) -> Self::Apply {
         a
     }
 }
 
-impl<F> Monad<F> for Nothing {
-    type Chained = Nothing;
+impl<F> Chain<F> for Nothing {
+    type Chain = Nothing;
 
-    fn chain(self, _: F) -> Self::Chained {
+    fn chain(self, _: F) -> Self::Chain {
         Nothing
     }
 }
@@ -62,7 +62,7 @@ impl<T> Maybe for Just<T> {}
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        test_functor_laws, Add, Closure, Curry, CurryN, Functor, Mul, Pointed,
+        test_functor_laws, Add, Closure, Curry, CurryN, Fmap, Mul, Pointed,
     };
 
     use super::{Just, Nothing};

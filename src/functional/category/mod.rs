@@ -1,5 +1,6 @@
 use crate::functional::{Compose, Composed, Function, Id};
 
+/// A set of types with an identity function and composition operator.
 trait Category<Of> {
     type Composed<F>
     where

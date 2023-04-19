@@ -1,41 +1,41 @@
-use crate::functional::{Mappend, Monoid, Semigroup, SemigroupConcat};
+use crate::functional::{MappendF, Mempty, Mappend, SemigroupConcat};
 
 use super::ConsFoldRight;
 
-impl<Head, Tail, U> Semigroup<U> for (Head, Tail)
+impl<Head, Tail, U> Mappend<U> for (Head, Tail)
 where
-    Tail: Semigroup<U>,
+    Tail: Mappend<U>,
 {
-    type Appended = (Head, Tail::Appended);
+    type Mappend = (Head, Tail::Mappend);
 
-    fn mappend(self, t: U) -> Self::Appended {
+    fn mappend(self, t: U) -> Self::Mappend {
         (self.0, self.1.mappend(t))
     }
 }
 
-impl<U> Semigroup<U> for () {
-    type Appended = U;
+impl<U> Mappend<U> for () {
+    type Mappend = U;
 
-    fn mappend(self, t: U) -> Self::Appended {
+    fn mappend(self, t: U) -> Self::Mappend {
         t
     }
 }
 
 impl<T> SemigroupConcat for T
 where
-    T: Monoid + ConsFoldRight<T::Identity, Mappend>,
+    T: Mempty + ConsFoldRight<T::Mempty, MappendF>,
 {
     type Concatenated = T::Folded;
 
     fn mconcat(self) -> Self::Concatenated {
-        self.cons_fold_right(T::mempty(), Mappend::default())
+        self.cons_fold_right(T::mempty(), MappendF::default())
     }
 }
 
 #[cfg(test)]
 mod test {
     use crate::{
-        functional::{Copointed, Functor, Point, SemigroupConcat, Sum},
+        functional::{Copointed, Fmap, PointF, SemigroupConcat, Sum},
         hlist::tuple::Cons,
     };
 
@@ -43,10 +43,9 @@ mod test {
     fn test_cons_semigroup() {
         let concat = (1, 2, 3)
             .cons()
-            .fmap(Point::<Sum<i32>>::default())
+            .fmap(PointF::<Sum<i32>>::default())
             .mconcat();
 
         assert_eq!(concat.copoint(), 6);
     }
 }
-

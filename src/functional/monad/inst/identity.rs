@@ -1,7 +1,7 @@
 use crate::{
     derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
     derive_pointed, derive_semigroup,
-    functional::{Pointed, Pure, Semigroup},
+    functional::{Pointed, Pure, Mappend},
 };
 
 /// Identity monad, used to lift values into a monadic context.
@@ -24,10 +24,10 @@ derive_monad!(Identity<T>);
 derive_monoid!(Identity<T>);
 derive_semigroup!(Identity<T>);
 
-impl<T> Semigroup<()> for Identity<T> {
-    type Appended = Identity<T>;
+impl<T> Mappend<()> for Identity<T> {
+    type Mappend = Identity<T>;
 
-    fn mappend(self, _: ()) -> Self::Appended {
+    fn mappend(self, _: ()) -> Self::Mappend {
         self
     }
 }
@@ -36,8 +36,8 @@ impl<T> Semigroup<()> for Identity<T> {
 mod test {
     use crate::{
         functional::{
-            test_functor_laws, Add, Applicative, Closure, Composed, Copointed, CurriedA, Curry,
-            CurryN, Div, Flip, Flipped, Foldable, Functor, Identity, Monad, Mul, Point, Pointed,
+            test_functor_laws, Add, Apply, Closure, Composed, Copointed, CurriedA, Curry,
+            CurryN, Div, Flip, Flipped, FoldMap, Fmap, Identity, Chain, Mul, PointF, Pointed,
             Sub, Sum, Then,
         },
         hlist::tuple::Cons,
@@ -57,7 +57,7 @@ mod test {
         assert_eq!(id3.copoint(), 12);
 
         let id4: Identity<i32> = id3.chain(
-            Composed::point((Div.flip(), Point::<Identity<_>>::default()))
+            Composed::point((Div.flip(), PointF::<Identity<_>>::default()))
                 .curry_n()
                 .call(3),
         );
@@ -68,7 +68,7 @@ mod test {
 
         let id6: Sum<i32> = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
             .cons()
-            .fold_map(Point::<Sum<i32>>::default());
+            .fold_map(PointF::<Sum<i32>>::default());
         assert_eq!(id6.copoint(), 55);
     }
 

@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::functional::{
-    Applicative, Closure, Copointed, Functor, Monad, Monoid, Pointed, Semigroup,
+    Apply, Closure, Copointed, Fmap, Chain, Mempty, Pointed, Mappend,
 };
 
 /// Phantom monad, used to lift values into a monadic context
@@ -83,24 +83,24 @@ impl<P, T> Copointed for Tagged<P, T> {
     }
 }
 
-impl<P, A, F> Functor<F> for Tagged<P, A>
+impl<P, A, F> Fmap<F> for Tagged<P, A>
 where
     F: Closure<A>,
 {
-    type Mapped = Tagged<P, F::Output>;
+    type Fmap = Tagged<P, F::Output>;
 
-    fn fmap(self, f: F) -> Self::Mapped {
+    fn fmap(self, f: F) -> Self::Fmap {
         Tagged::point(f.call(self.copoint()))
     }
 }
 
-impl<P, T, U> Applicative<U> for Tagged<P, T>
+impl<P, T, U> Apply<U> for Tagged<P, T>
 where
     T: Closure<U>,
 {
-    type Applied = T::Output;
+    type Apply = T::Output;
 
-    fn apply(self, a: U) -> Self::Applied
+    fn apply(self, a: U) -> Self::Apply
     where
         T: Closure<U>,
     {
@@ -108,35 +108,35 @@ where
     }
 }
 
-impl<P, T, F> Monad<F> for Tagged<P, T>
+impl<P, T, F> Chain<F> for Tagged<P, T>
 where
     F: Closure<T>,
 {
-    type Chained = F::Output;
+    type Chain = F::Output;
 
-    fn chain(self, f: F) -> Self::Chained {
+    fn chain(self, f: F) -> Self::Chain {
         f.call(self.copoint())
     }
 }
 
-impl<P, T> Monoid for Tagged<P, T>
+impl<P, T> Mempty for Tagged<P, T>
 where
-    T: Monoid,
+    T: Mempty,
 {
-    type Identity = T::Identity;
+    type Mempty = T::Mempty;
 
-    fn mempty() -> Self::Identity {
+    fn mempty() -> Self::Mempty {
         T::mempty()
     }
 }
 
-impl<P, T, U> Semigroup<Tagged<P, U>> for Tagged<P, T>
+impl<P, T, U> Mappend<Tagged<P, U>> for Tagged<P, T>
 where
-    T: Semigroup<U>,
+    T: Mappend<U>,
 {
-    type Appended = Tagged<P, T::Appended>;
+    type Mappend = Tagged<P, T::Mappend>;
 
-    fn mappend(self, t: Tagged<P, U>) -> Self::Appended {
+    fn mappend(self, t: Tagged<P, U>) -> Self::Mappend {
         Pointed::point(self.1.mappend(t.copoint()))
     }
 }
@@ -144,8 +144,8 @@ where
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        test_functor_laws, Add, Applicative, Closure, Composed, Copointed, Curry, CurryN, Div,
-        Flip, Fmap, Functor, Monad, Mul, Point, Pointed, Sub, Tagged, Then,
+        test_functor_laws, Add, Apply, Closure, Composed, Copointed, Curry, CurryN, Div,
+        Flip, FmapF, Fmap, Chain, Mul, PointF, Pointed, Sub, Tagged, Then,
     };
 
     #[test]
@@ -159,12 +159,12 @@ mod test {
         assert_eq!(id2.copoint(), 15);
 
         let id3: Tagged<Tag, i32> =
-            Tagged::<Tag, _>::point(Fmap.flip().curry_n().call(Sub.flip().curry_n().call(3)))
+            Tagged::<Tag, _>::point(FmapF.flip().curry_n().call(Sub.flip().curry_n().call(3)))
                 .apply(id2);
         assert_eq!(id3.copoint(), 12);
 
         let id4: Tagged<Tag, i32> = id3.chain(
-            Composed::point((Div.flip(), Point::<Tagged<Tag, _>>::default()))
+            Composed::point((Div.flip(), PointF::<Tagged<Tag, _>>::default()))
                 .curry_n()
                 .call(3),
         );

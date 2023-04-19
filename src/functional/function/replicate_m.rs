@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     functional::{
-        Apply, Closure, Curried, CurriedA, Curry, Flip, Flipped, Function, Functor, LiftA2, Pure,
+        ApplyF, Closure, Curried, CurriedA, Curry, Flip, Flipped, Fmap, Function, LiftA2, Pure,
         Then,
     },
     hlist::cons::PushFront,
@@ -13,14 +13,13 @@ pub struct ReplicateM<C, P>(PhantomData<(C, P)>);
 impl<F, Next, P> Function<F> for ReplicateM<(Next,), P>
 where
     ReplicateM<Next, P>: Function<F>,
-    F: Clone + Functor<Curried<Flipped<PushFront>>>,
-    CurriedA<Apply, <F as Functor<Curried<Flipped<PushFront>>>>::Mapped>:
+    F: Clone + Fmap<Curried<Flipped<PushFront>>>,
+    CurriedA<ApplyF, <F as Fmap<Curried<Flipped<PushFront>>>>::Fmap>:
         Closure<<ReplicateM<Next, P> as Function<F>>::Output>,
 {
-    type Output =
-        <CurriedA<Apply, <F as Functor<Curried<Flipped<PushFront>>>>::Mapped> as Closure<
-            <ReplicateM<Next, P> as Function<F>>::Output,
-        >>::Output;
+    type Output = <CurriedA<ApplyF, <F as Fmap<Curried<Flipped<PushFront>>>>::Fmap> as Closure<
+        <ReplicateM<Next, P> as Function<F>>::Output,
+    >>::Output;
 
     fn call(f: F) -> Self::Output {
         LiftA2

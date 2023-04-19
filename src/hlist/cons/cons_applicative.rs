@@ -1,14 +1,14 @@
-use crate::functional::{Applicative, Functor, Pure, Semigroup};
+use crate::functional::{Apply, Fmap, Pure, Mappend};
 
-impl<Head, Tail, U> Applicative<U> for (Head, Tail)
+impl<Head, Tail, U> Apply<U> for (Head, Tail)
 where
-    Tail: Applicative<U>,
-    U: Clone + Functor<Head>,
-    U::Mapped: Semigroup<Tail::Applied>,
+    Tail: Apply<U>,
+    U: Clone + Fmap<Head>,
+    U::Fmap: Mappend<Tail::Apply>,
 {
-    type Applied = <U::Mapped as Semigroup<<Tail as Applicative<U>>::Applied>>::Appended;
+    type Apply = <U::Fmap as Mappend<<Tail as Apply<U>>::Apply>>::Mappend;
 
-    fn apply(self, a: U) -> Self::Applied {
+    fn apply(self, a: U) -> Self::Apply {
         a.clone().fmap(self.0).mappend(self.1.apply(a))
     }
 }
@@ -34,7 +34,7 @@ impl Pure for () {
 
 #[cfg(test)]
 mod test {
-    use crate::functional::{Add, Applicative, Curry, Flip, Mul};
+    use crate::functional::{Add, Apply, Curry, Flip, Mul};
 
     #[test]
     fn test_cons_applicative() {

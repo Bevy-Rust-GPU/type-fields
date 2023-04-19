@@ -1,65 +1,46 @@
-mod identity;
-mod maybe;
-mod pair;
-mod state;
-mod tagged;
+mod chain;
+mod inst;
+mod then;
 
-pub use identity::*;
-pub use maybe::*;
-pub use pair::*;
-pub use state::*;
-pub use tagged::*;
+pub use chain::*;
+pub use inst::*;
+pub use then::*;
 
-use core::marker::PhantomData;
+use super::Applicative;
 
-use super::{Applicative, Const, CurriedA, Function, Functor, FunctorReplace, Id};
+pub trait Monad: Applicative {
+    type Chained<F>
+    where
+        Self: Chain<F>;
+    type Then<F>
+    where
+        Self: Then<F>;
 
-/// A type that can flat-map a function over its wrapped value
-///
-/// To be definition-correct, `Monad` types must also implement `Applicative`,
-/// but this cannot be strongly modeled without higher-ranked type bounds.
-pub trait Monad<F> {
-    type Chained;
+    fn chain<F>(self, f: F) -> Self::Chained<F>
+    where
+        Self: Chain<F>;
 
-    fn chain(self, f: F) -> Self::Chained;
+    fn then<F>(self, f: F) -> <Self as Monad>::Then<F>
+    where
+        Self: Then<F>;
 }
 
-impl<F> Monad<F> for () {
-    type Chained = ();
+impl<T> Monad for T {
+    type Chained<F> = T::Chain where T: Chain<F>;
 
-    fn chain(self, _: F) -> Self::Chained {
-        self
+    type Then<F> = T::Then where T: Then<F>;
+
+    fn chain<F>(self, f: F) -> Self::Chained<F>
+    where
+        Self: Chain<F>,
+    {
+        Chain::chain(self, f)
     }
-}
 
-/// Monad::chain
-struct Chain<F>(PhantomData<F>);
-
-impl<F, A> Function<(A, F)> for Chain<F>
-where
-    A: Monad<F>,
-{
-    type Output = A::Chained;
-
-    fn call((a, f): (A, F)) -> Self::Output {
-        a.chain(f)
-    }
-}
-
-pub trait Then<F> {
-    type Then;
-
-    fn then(self, f: F) -> Self::Then;
-}
-
-impl<T, F> Then<F> for T
-where
-    T: FunctorReplace<Id>,
-    T::Mapped: Applicative<F>,
-{
-    type Then = <<T as Functor<CurriedA<Const, Id>>>::Mapped as Applicative<F>>::Applied;
-
-    fn then(self, f: F) -> Self::Then {
-        self.replace(Id).apply(f)
+    fn then<F>(self, f: F) -> <Self as Monad>::Then<F>
+    where
+        Self: Then<F>,
+    {
+        Then::then(self, f)
     }
 }

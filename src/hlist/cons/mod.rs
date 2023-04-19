@@ -63,7 +63,7 @@ mod do_notation_monadic {
         derive_closure,
         functional::{
             Closure, Compose, Composed, Copointed, CurriedA, Curry, FirstF, Flip, Flipped,
-            Function, Monad, Pointed, Pure, Spread, Spreaded, State, Tagged, Then, Tuple,
+            Function, Chain, Pointed, Pure, Spread, Spreaded, State, Tagged, Then, Tuple,
         },
         hlist::{
             cons::{ConsGet, ConsSet, Uncons},
@@ -233,9 +233,9 @@ mod do_notation_monadic {
 
         impl<F, Rhs> Shr<Rhs> for State<F>
         where
-            State<F>: Monad<Rhs>,
+            State<F>: Chain<Rhs>,
         {
-            type Output = <State<F> as Monad<Rhs>>::Chained;
+            type Output = <State<F> as Chain<Rhs>>::Chain;
 
             fn shr(self, rhs: Rhs) -> Self::Output {
                 self.chain(rhs)

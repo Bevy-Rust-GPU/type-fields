@@ -1,6 +1,6 @@
 use crate::{
     derive_copointed, derive_pointed,
-    functional::{Closure, Copointed, Functor, Pointed},
+    functional::{Closure, Copointed, Fmap, Pointed},
 };
 
 /// Identity monad, used to lift values into a monadic context.
@@ -10,13 +10,13 @@ pub struct Pair<A, B>(A, B);
 derive_pointed!(Pair<A, B>);
 derive_copointed!(Pair<A, B>);
 
-impl<A, B, F> Functor<F> for Pair<A, B>
+impl<A, B, F> Fmap<F> for Pair<A, B>
 where
     F: Clone + Closure<A> + Closure<B>,
 {
-    type Mapped = Pair<<F as Closure<A>>::Output, <F as Closure<B>>::Output>;
+    type Fmap = Pair<<F as Closure<A>>::Output, <F as Closure<B>>::Output>;
 
-    fn fmap(self, f: F) -> Self::Mapped {
+    fn fmap(self, f: F) -> Self::Fmap {
         let (a, b) = self.copoint();
         Pointed::point((f.clone().call(a), f.call(b)))
     }
@@ -25,7 +25,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::{functional::{
-        monad::Pair, test_functor_laws, Add, Copointed, Curry, Function, Functor, Mul, Pointed,
+        monad::Pair, test_functor_laws, Add, Copointed, Curry, Function, Fmap, Mul, Pointed,
     }, derive_closure};
 
     #[test]

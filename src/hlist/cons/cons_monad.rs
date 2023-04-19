@@ -1,13 +1,13 @@
-use crate::functional::{Closure, Monad};
+use crate::functional::{Closure, Chain};
 
-impl<Head, Tail, F> Monad<F> for (Head, Tail)
+impl<Head, Tail, F> Chain<F> for (Head, Tail)
 where
     F: Clone + Closure<Head>,
-    Tail: Monad<F>,
+    Tail: Chain<F>,
 {
-    type Chained = (F::Output, Tail::Chained);
+    type Chain = (F::Output, Tail::Chain);
 
-    fn chain(self, f: F) -> Self::Chained {
+    fn chain(self, f: F) -> Self::Chain {
         (f.clone().call(self.0), self.1.chain(f))
     }
 }

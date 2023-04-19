@@ -1,7 +1,7 @@
 use crate::{
     derive_applicative, derive_copointed, derive_functor, derive_monad, derive_monoid,
     derive_pointed,
-    functional::{Copointed, Pointed, Semigroup},
+    functional::{Copointed, Pointed, Mappend},
 };
 use core::ops::Mul;
 
@@ -15,13 +15,13 @@ derive_applicative!(Product<T>);
 derive_monad!(Product<T>);
 derive_monoid!(Product<T>);
 
-impl<T> Semigroup<Product<T>> for Product<T>
+impl<T> Mappend<Product<T>> for Product<T>
 where
     T: Mul<T>,
 {
-    type Appended = Product<T::Output>;
+    type Mappend = Product<T::Output>;
 
-    fn mappend(self, t: Product<T>) -> Self::Appended {
+    fn mappend(self, t: Product<T>) -> Self::Mappend {
         Pointed::point(self.copoint() * t.copoint())
     }
 }
@@ -29,7 +29,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::functional::{
-        semigroup::{Product, Semigroup},
+        semigroup::{Product, Mappend},
         Copointed, Pointed,
     };
 

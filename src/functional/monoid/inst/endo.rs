@@ -1,11 +1,10 @@
 use crate::{
     derive_copointed, derive_pointed,
     functional::{
-        Applicative, Closure, Compose, Composed, Copointed, Functor, Id, Pointed, Pure, Semigroup,
+        Apply, Closure, Compose, Composed, Copointed, Fmap, Id, Mempty, Pointed, Pure,
+        Mappend,
     },
 };
-
-use super::Monoid;
 
 /// The monoid of endomorphisms under composition.
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -14,18 +13,18 @@ pub struct Endo<T>(T);
 derive_pointed!(Endo<T>);
 derive_copointed!(Endo<T>);
 
-impl<F1, F2> Functor<F2> for Endo<F1> {
-    type Mapped = Endo<Composed<F1, F2>>;
+impl<F1, F2> Fmap<F2> for Endo<F1> {
+    type Fmap = Endo<Composed<F1, F2>>;
 
-    fn fmap(self, f: F2) -> Self::Mapped {
+    fn fmap(self, f: F2) -> Self::Fmap {
         Endo(self.copoint().compose(f))
     }
 }
 
-impl<F1, F2> Applicative<Endo<F2>> for Endo<F1> {
-    type Applied = Endo<EndoApplicative<F1, F2>>;
+impl<F1, F2> Apply<Endo<F2>> for Endo<F1> {
+    type Apply = Endo<EndoApplicative<F1, F2>>;
 
-    fn apply(self, f: Endo<F2>) -> Self::Applied {
+    fn apply(self, f: Endo<F2>) -> Self::Apply {
         Endo(EndoApplicative(self, f))
     }
 }
@@ -57,21 +56,21 @@ where
     }
 }
 
-impl<T> Monoid for Endo<T>
+impl<T> Mempty for Endo<T>
 where
-    T: Monoid,
+    T: Mempty,
 {
-    type Identity = Endo<Id>;
+    type Mempty = Endo<Id>;
 
-    fn mempty() -> Self::Identity {
+    fn mempty() -> Self::Mempty {
         Endo::point(Id)
     }
 }
 
-impl<T, U> Semigroup<Endo<U>> for Endo<T> {
-    type Appended = Endo<Composed<T, U>>;
+impl<T, U> Mappend<Endo<U>> for Endo<T> {
+    type Mappend = Endo<Composed<T, U>>;
 
-    fn mappend(self, u: Endo<U>) -> Self::Appended {
+    fn mappend(self, u: Endo<U>) -> Self::Mappend {
         Endo::point(Composed::point((self.copoint(), u.copoint())))
     }
 }
@@ -80,8 +79,8 @@ impl<T, U> Semigroup<Endo<U>> for Endo<T> {
 mod test {
     use crate::{
         functional::{
-            Add, Closure, Compose, Composed, Copointed, CurriedN, CurryN, Foldr, Point, Pointed,
-            Semigroup,
+            Add, Closure, Compose, Composed, Copointed, CurriedN, CurryN, Foldr, PointF, Pointed,
+            Mappend,
         },
         hlist::tuple::Cons,
     };
@@ -111,10 +110,11 @@ mod test {
         let add_result: i32 = add.call((1, 2));
         assert_eq!(add_result, 3);
 
-        let endo = Point::default();
+        let endo = PointF::default();
         let _endo_result: Endo<Add> = endo.call(add);
 
-        let add_endo: Composed<Add, Point<Endo<i32>>> = add.compose(Point::<Endo<i32>>::default());
+        let add_endo: Composed<Add, PointF<Endo<i32>>> =
+            add.compose(PointF::<Endo<i32>>::default());
         let add_endo_result: Endo<i32> = add_endo.call((1, 2));
         assert_eq!(add_endo_result.copoint(), 3);
 
@@ -125,8 +125,8 @@ mod test {
 
         let add_curry_endo_a: Composed<
             CurriedN<Add, (), _>,
-            Point<Endo<<CurriedN<Add, (), _> as Closure<i32>>::Output>>,
-        > = Add.curry_n().compose(Point::default());
+            PointF<Endo<<CurriedN<Add, (), _> as Closure<i32>>::Output>>,
+        > = Add.curry_n().compose(PointF::default());
         let add_curry_endo_b: Endo<CurriedN<Add, (i32, ()), _>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.copoint().call(2);
         assert_eq!(add_curry_endo_result, 3);

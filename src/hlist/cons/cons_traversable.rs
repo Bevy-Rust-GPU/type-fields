@@ -1,21 +1,21 @@
 use crate::functional::{
-    Applicative, Closure, Curried, Curry, Flip, Flipped, Functor, Id, Pure, SequenceA, Traversable,
+    Apply, Closure, Curried, Curry, Flip, Flipped, Fmap, Id, Pure, SequenceA, Traverse,
 };
 
 use super::PushFront;
 
-impl<Head, Tail, F, P> Traversable<F, P> for (Head, Tail)
+impl<Head, Tail, F, P> Traverse<F, P> for (Head, Tail)
 where
     F: Clone + Closure<Head>,
-    F::Output: Functor<Curried<Flipped<PushFront>>>,
-    <F::Output as Functor<Curried<Flipped<PushFront>>>>::Mapped: Applicative<Tail::Traversed>,
-    Tail: Traversable<F, P>,
+    F::Output: Fmap<Curried<Flipped<PushFront>>>,
+    <F::Output as Fmap<Curried<Flipped<PushFront>>>>::Fmap: Apply<Tail::Traverse>,
+    Tail: Traverse<F, P>,
 {
-    type Traversed = <<F::Output as Functor<Curried<Flipped<PushFront>>>>::Mapped as Applicative<
-        Tail::Traversed,
-    >>::Applied;
+    type Traverse = <<F::Output as Fmap<Curried<Flipped<PushFront>>>>::Fmap as Apply<
+        Tail::Traverse,
+    >>::Apply;
 
-    fn traverse(self, f: F) -> Self::Traversed {
+    fn traverse(self, f: F) -> Self::Traverse {
         f.clone()
             .call(self.0)
             .fmap(PushFront.flip().curry())
@@ -23,24 +23,24 @@ where
     }
 }
 
-impl<F, P> Traversable<F, P> for ()
+impl<F, P> Traverse<F, P> for ()
 where
     P: Pure,
 {
-    type Traversed = P::Pure<Self>;
+    type Traverse = P::Pure<Self>;
 
-    fn traverse(self, _: F) -> Self::Traversed {
+    fn traverse(self, _: F) -> Self::Traverse {
         P::pure::<()>(self)
     }
 }
 
 impl<T, P> SequenceA<P> for T
 where
-    Self: Traversable<Id, P>,
+    Self: Traverse<Id, P>,
 {
-    type Sequenced = <Self as Traversable<Id, P>>::Traversed;
+    type SequenceA = <Self as Traverse<Id, P>>::Traverse;
 
-    fn sequence_a(self) -> Self::Sequenced {
+    fn sequence_a(self) -> Self::SequenceA {
         self.traverse(Id)
     }
 }
@@ -48,7 +48,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::{
-        functional::{Id, SequenceA, Traversable},
+        functional::{Id, SequenceA, Traverse},
         hlist::tuple::Cons,
     };
 
@@ -73,7 +73,7 @@ mod test {
     #[test]
     fn test_traverse() {
         let list = ((0,).cons(), (0, 1).cons(), (0, 1, 2).cons()).cons();
-        let decafisbad = Traversable::<Id, ()>::traverse(list, Id);
+        let decafisbad = Traverse::<Id, ()>::traverse(list, Id);
         assert_eq!(
             decafisbad,
             (

@@ -1,42 +1,26 @@
-mod all;
-mod any;
-mod product;
-mod sum;
+mod inst;
+mod mappend;
 
-pub use all::*;
-pub use any::*;
-pub use product::*;
-pub use sum::*;
+pub use inst::*;
+pub use mappend::*;
 
-use crate::derive_closure;
+pub trait Semigroup {
+    type Appended<V>
+    where
+        Self: Mappend<V>;
 
-use super::Function;
-
-/// A type with a binary associative function.
-pub trait Semigroup<T> {
-    type Appended;
-
-    fn mappend(self, t: T) -> Self::Appended;
+    fn mappend<V>(self, v: V) -> Self::Appended<V>
+    where
+        Self: Mappend<V>;
 }
 
-#[derive(Default, Clone)]
-pub struct Mappend;
+impl<T> Semigroup for T {
+    type Appended<V> = T::Mappend where T: Mappend<V>;
 
-impl<A, B> Function<(A, B)> for Mappend
-where
-    A: Semigroup<B>,
-{
-    type Output = A::Appended;
-
-    fn call((a, b): (A, B)) -> Self::Output {
-        a.mappend(b)
+    fn mappend<V>(self, v: V) -> Self::Appended<V>
+    where
+        T: Mappend<V>,
+    {
+        self.mappend(v)
     }
-}
-
-derive_closure!(Mappend);
-
-pub trait SemigroupConcat: Sized {
-    type Concatenated;
-
-    fn mconcat(self) -> Self::Concatenated;
 }

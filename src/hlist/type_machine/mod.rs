@@ -45,7 +45,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::{
-        functional::{Copoint, Copointed, Pointed, Tagged},
+        functional::{CopointF, Copointed, Pointed, Tagged},
         hlist::{
             tuple::TupleMap,
             type_machine::{
@@ -109,6 +109,6 @@ mod test {
             Acc::set() << Const::point(1),
         ));
 
-        assert_eq!(ctx.map(Copoint), (3.0, 1.0, 1));
+        assert_eq!(ctx.map(CopointF), (3.0, 1.0, 1));
     }
 }
