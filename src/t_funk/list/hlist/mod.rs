@@ -64,17 +64,17 @@ mod do_notation_monadic {
         ops::{BitAnd, Shr},
     };
 
-    use crate::{
-        derive_closure,
-        t_funk::{
-            hlist::ToTList, tlist::ToHList, Chain, Closure, Compose, Composed, Copointed, CurriedA,
-            Curry, FirstF, Flip, Flipped, Function, Pointed, Pure, Spread, Spreaded, State, Tagged,
-            Then, Tuple,
-        },
+    use type_fields_macros::Closure;
+
+    use crate::t_funk::{
+        hlist::ToTList, tlist::ToHList, Chain, Closure, Compose, Composed, Copointed, CurriedA,
+        Curry, FirstF, Flip, Flipped, Function, Pointed, Pure, Spread, Spreaded, State, Tagged,
+        Then, Tuple,
     };
 
     #[test]
     fn test_monadic_do() {
+        #[derive(Closure)]
         struct StateGet<M, T, P>(PhantomData<(M, T, P)>);
 
         impl<M, T, P> Default for StateGet<M, T, P> {
@@ -102,8 +102,7 @@ mod do_notation_monadic {
             }
         }
 
-        derive_closure!(StateGet<M, T, P>);
-
+        #[derive(Closure)]
         struct StateSet<U, P>(PhantomData<(U, P)>);
 
         impl<U, P> Default for StateSet<U, P> {
@@ -131,9 +130,7 @@ mod do_notation_monadic {
             }
         }
 
-        derive_closure!(StateSet<U, P>);
-
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct Test;
 
         impl Function<(i32, f32, &str)> for Test {
@@ -144,9 +141,7 @@ mod do_notation_monadic {
             }
         }
 
-        derive_closure!(Test);
-
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct Push;
 
         impl<F, I> Function<(F, I)> for Push {
@@ -167,8 +162,7 @@ mod do_notation_monadic {
             }
         }
 
-        derive_closure!(Push);
-
+        #[derive(Closure)]
         struct Run;
 
         impl<F, I> Function<(F, I)> for Run
@@ -183,8 +177,7 @@ mod do_notation_monadic {
             }
         }
 
-        derive_closure!(Run);
-
+        #[derive(Closure)]
         struct Set<M, P>(PhantomData<(M, P)>);
 
         impl<M, P> Default for Set<M, P> {
@@ -207,8 +200,7 @@ mod do_notation_monadic {
             }
         }
 
-        derive_closure!(Set<M, P>);
-
+        #[derive(Closure)]
         struct Take<M, T, P>(PhantomData<(M, T, P)>);
 
         impl<M, T, P> Default for Take<M, T, P> {
@@ -222,8 +214,6 @@ mod do_notation_monadic {
                 Take(PhantomData)
             }
         }
-
-        derive_closure!(Take<M, T, P>);
 
         impl<M, T, P, I> Function<I> for Take<M, T, P> {
             type Output = State<CurriedA<StateGet<M, T, P>, I>>;

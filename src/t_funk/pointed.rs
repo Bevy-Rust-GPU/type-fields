@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use crate::derive_closure;
+use type_fields_macros::Closure;
 
 use super::Function;
 
@@ -17,6 +17,7 @@ where
 }
 
 /// Pointed::point
+#[derive(Closure)]
 pub struct PointF<I>(PhantomData<I>);
 
 impl<T> Default for PointF<T> {
@@ -41,5 +42,3 @@ where
         I::point(input)
     }
 }
-
-derive_closure!(PointF<I>);

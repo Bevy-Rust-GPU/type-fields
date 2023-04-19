@@ -14,14 +14,13 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        derive_closure,
-        t_funk::{hlist::ToTList, tlist::ToHList, Fmap, Function},
-    };
+    use type_fields_macros::Closure;
+
+    use crate::t_funk::{hlist::ToTList, tlist::ToHList, Fmap, Function};
 
     #[test]
     fn test_cons_functor() {
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct Mul2;
 
         impl Function<u32> for Mul2 {
@@ -39,8 +38,6 @@ mod test {
                 input * 2.0
             }
         }
-
-        derive_closure!(Mul2);
 
         let list = (1u32, 2.0f32, 3u32).to_hlist();
         let list = list.fmap(Mul2);

@@ -89,13 +89,11 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        derive_closure,
-        t_funk::{Closure, CurryN, Function},
-    };
+    use crate::t_funk::{Closure, CurryN, Function};
 
     #[test]
     fn test_curry_n() {
+        #[derive(type_fields_macros::Closure)]
         struct ManyArgs;
 
         impl<A, B, C, D, E, F, G> Function<(A, B, C, D, E, F, G)> for ManyArgs {
@@ -105,8 +103,6 @@ mod test {
                 input
             }
         }
-
-        derive_closure!(ManyArgs);
 
         let curried = ManyArgs.curry_n();
         let curried = curried.call(1);

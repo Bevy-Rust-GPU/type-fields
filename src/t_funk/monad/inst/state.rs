@@ -1,5 +1,7 @@
+use type_fields_macros::Closure;
+
 use crate::{
-    derive_closure, derive_copointed, derive_pointed,
+    derive_copointed, derive_pointed,
     t_funk::{
         Apply, Chain, Closure, Const, CurriedA, Curry, Fmap, Function, Pointed, Pure, Spread,
         Spreaded,
@@ -7,7 +9,9 @@ use crate::{
 };
 
 /// 2-tuple constructor
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, type_fields_macros::Closure,
+)]
 pub struct Tuple;
 
 impl<A, B> Function<(A, B)> for Tuple {
@@ -17,8 +21,6 @@ impl<A, B> Function<(A, B)> for Tuple {
         input
     }
 }
-
-derive_closure!(Tuple);
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct State<F>(F);
@@ -109,7 +111,7 @@ where
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct Put;
 
 impl<I> Function<I> for Put {
@@ -120,9 +122,7 @@ impl<I> Function<I> for Put {
     }
 }
 
-derive_closure!(Put);
-
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct Get;
 
 impl Function<()> for Get {
@@ -133,25 +133,19 @@ impl Function<()> for Get {
     }
 }
 
-derive_closure!(Get);
-
 #[cfg(test)]
 mod test {
-    use crate::{
-        derive_closure,
-        t_funk::{
-            tlist::ToHList, Chain, Closure, Const, Copointed, CurriedA, Curry, Function, Pointed,
-            Put, ReplicateM, SequenceA, State, Traverse,
-        },
+    use type_fields_macros::Closure;
+
+    use crate::t_funk::{
+        tlist::ToHList, Chain, Closure, Const, Copointed, CurriedA, Curry, Function, Pointed, Put,
+        ReplicateM, SequenceA, State, Traverse,
     };
 
     use super::Get;
 
     #[test]
     fn test_state() {
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        struct Push;
-
         #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
         struct Locked;
 
@@ -167,8 +161,11 @@ mod test {
         #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
         struct Tut;
 
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct Coin;
+
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+        struct Push;
 
         impl<I> Function<I> for Coin {
             type Output = (Thank, Unlocked);
@@ -177,8 +174,6 @@ mod test {
                 (Thank, Unlocked)
             }
         }
-
-        derive_closure!(Coin);
 
         impl Function<Locked> for Push {
             type Output = (Tut, Locked);
@@ -195,8 +190,6 @@ mod test {
                 (Open, Locked)
             }
         }
-
-        derive_closure!(Push);
 
         let coin_s = State::point(Coin);
         let push_s = State::point(Push);
@@ -245,7 +238,7 @@ mod test {
             .call(Unlocked);
         assert_eq!(res, ((Open, Tut, Tut, Tut, Tut, Tut).to_hlist(), Locked));
 
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct TurnSImpl;
 
         impl<T> Function<(Coin, T)> for TurnSImpl {
@@ -272,9 +265,7 @@ mod test {
             }
         }
 
-        derive_closure!(TurnSImpl);
-
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct TurnS;
 
         impl<A> Function<A> for TurnS {
@@ -284,8 +275,6 @@ mod test {
                 State::point(TurnSImpl.curry_a(a))
             }
         }
-
-        derive_closure!(TurnS);
 
         let res = TurnS.call(Coin).copoint().call(Locked);
         assert_eq!(res, (Thank, Unlocked));

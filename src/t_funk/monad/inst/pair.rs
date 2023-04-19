@@ -24,13 +24,15 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::{t_funk::{
-        monad::Pair, test_functor_laws, Add, Copointed, Curry, Function, Fmap, Mul, Pointed,
-    }, derive_closure};
+    use type_fields_macros::Closure;
+
+    use crate::t_funk::{
+        monad::Pair, test_functor_laws, Add, Copointed, Curry, Fmap, Function, Mul, Pointed,
+    };
 
     #[test]
     fn test_pair() {
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct Mul3;
 
         impl Function<i32> for Mul3 {
@@ -48,8 +50,6 @@ mod test {
                 input * 3.0
             }
         }
-
-        derive_closure!(Mul3);
 
         let id1: Pair<i32, f32> = Pair::point((5, 6.0));
         assert_eq!(id1.copoint(), (5, 6.0));

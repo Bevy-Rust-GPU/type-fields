@@ -23,11 +23,13 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::{derive_closure, t_funk::tlist::Map, t_funk::Function};
+    use type_fields_macros::Closure;
+
+    use crate::t_funk::{tlist::Map, Function};
 
     #[test]
     fn test_tuple_map() {
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct Mul2;
 
         impl Function<u32> for Mul2 {
@@ -45,8 +47,6 @@ mod test {
                 input * 2.0
             }
         }
-
-        derive_closure!(Mul2);
 
         let list = (1, 2.0, 3);
         let list = list.map(Mul2);

@@ -1,9 +1,8 @@
-use crate::{
-    derive_closure,
-    t_funk::{ApplyF, CurriedA, Curry, Fmap, Function},
-};
+use type_fields_macros::Closure;
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+use crate::t_funk::{ApplyF, CurriedA, Curry, Fmap, Function};
+
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct LiftA2;
 
 impl<F, X> Function<(F, X)> for LiftA2
@@ -16,8 +15,6 @@ where
         ApplyF.curry_a(x.fmap(f))
     }
 }
-
-derive_closure!(LiftA2);
 
 #[cfg(test)]
 mod test {

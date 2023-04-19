@@ -1,4 +1,4 @@
-/// Derive `Closure<T>` for a type that implements `Function<T>`
+/*
 #[macro_export]
 macro_rules! derive_closure {
     ($ident:ident $(<>)?) => {
@@ -20,6 +20,7 @@ macro_rules! derive_closure {
         }
     };
 }
+*/
 
 #[macro_export]
 macro_rules! derive_pointed {
