@@ -1,18 +1,5 @@
-mod add;
-mod constant;
-mod div;
-mod id;
-mod mul;
-mod replicate_m;
-mod sub;
-
-pub use add::*;
-pub use constant::*;
-pub use div::*;
-pub use id::*;
-pub use mul::*;
-pub use replicate_m::*;
-pub use sub::*;
+mod inst;
+pub use inst::*;
 
 /// A pure function that takes input and returns output.
 ///

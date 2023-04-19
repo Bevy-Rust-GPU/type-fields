@@ -1,14 +1,6 @@
-mod spread;
-mod compose;
-mod curry;
-mod curry_n;
-mod flip;
+mod inst;
 
-pub use spread::*;
-pub use compose::*;
-pub use curry::*;
-pub use curry_n::*;
-pub use flip::*;
+pub use inst::*;
 
 use type_fields_macros::functions;
 

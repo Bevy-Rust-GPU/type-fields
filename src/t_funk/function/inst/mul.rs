@@ -1,17 +1,17 @@
 use type_fields_macros::Closure;
 
-use super::Function;
+use crate::t_funk::Function;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
-pub struct Sub;
+pub struct Mul;
 
-impl<A, B> Function<(A, B)> for Sub
+impl<A, B> Function<(A, B)> for Mul
 where
-    A: core::ops::Sub<B>,
+    A: core::ops::Mul<B>,
 {
     type Output = A::Output;
 
     fn call((a, b): (A, B)) -> Self::Output {
-        a - b
+        a * b
     }
 }
