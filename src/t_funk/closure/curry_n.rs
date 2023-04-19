@@ -2,7 +2,8 @@ use core::marker::PhantomData;
 
 use crate::t_funk::{
     hlist::{HList, PushBack, ToTList},
-    Closure, Pointed, ToHList,
+    tlist::ToHList,
+    Closure, Pointed,
 };
 
 pub trait CurryN<I> {

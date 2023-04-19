@@ -29,7 +29,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::t_funk::{hlist::Get, ToHList};
+    use crate::t_funk::{hlist::Get, tlist::ToHList};
 
     #[test]
     fn test_cons_get() {

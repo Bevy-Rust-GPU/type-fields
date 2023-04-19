@@ -63,8 +63,7 @@ mod monoid;
 mod pointed;
 mod semigroup;
 mod traversable;
-pub mod hlist;
-pub mod tlist;
+pub mod list;
 
 pub use applicative::*;
 pub use bifunctor::*;
@@ -80,5 +79,4 @@ pub use monoid::*;
 pub use pointed::*;
 pub use semigroup::*;
 pub use traversable::*;
-pub use hlist::*;
-pub use tlist::*;
+pub use list::*;
