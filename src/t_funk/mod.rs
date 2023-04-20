@@ -49,6 +49,7 @@
 //! of all their component functions before any method can be called.
 //!
 
+mod arrow;
 mod applicative;
 mod bifunctor;
 mod category;
@@ -79,3 +80,4 @@ pub use monoid::*;
 pub use pointed::*;
 pub use semigroup::*;
 pub use traversable::*;
+

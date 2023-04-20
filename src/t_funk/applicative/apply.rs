@@ -20,4 +20,3 @@ impl<T> Apply<T> for () {
         ()
     }
 }
-

@@ -1,6 +1,6 @@
-use type_fields_macros::{Applicative, Copointed, Functor, Monad, Pointed};
+use type_fields_macros::{Apply, Copointed, Fmap, Monad, Pointed};
 
-use crate::t_funk::{Apply, Chain, Copointed, Fmap, Pointed};
+use crate::t_funk::{Applicative, Apply, Chain, Copointed, Fmap, Functor, Monad, Pointed};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Nothing;
@@ -57,15 +57,15 @@ impl<F> Chain<F> for Nothing {
     Hash,
     Pointed,
     Copointed,
-    Functor,
-    Applicative,
+    Fmap,
+    Apply,
     Monad,
 )]
 pub struct Just<T>(T);
 
-pub trait Maybe {}
-impl Maybe for Nothing {}
-impl<T> Maybe for Just<T> {}
+pub trait Maybe<T>: Pointed + Copointed + Functor + Applicative + Monad {}
+impl<T> Maybe<T> for Nothing {}
+impl<T> Maybe<T> for Just<T> {}
 
 #[cfg(test)]
 mod test {

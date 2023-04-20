@@ -1,4 +1,4 @@
-use type_fields_macros::{Applicative, Copointed, Functor, Monad, Monoid, Pointed};
+use type_fields_macros::{Apply, Copointed, Fmap, Monad, Monoid, Pointed};
 
 use crate::t_funk::{Copointed, Mappend, Pointed};
 use core::ops::Add;
@@ -16,8 +16,8 @@ use core::ops::Add;
     Hash,
     Pointed,
     Copointed,
-    Functor,
-    Applicative,
+    Fmap,
+    Apply,
     Monad,
     Monoid,
 )]

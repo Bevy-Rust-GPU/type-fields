@@ -1,5 +1,8 @@
+use type_fields_macros::functions;
+
 use crate::t_funk::{Closure, Copointed, Pointed};
 
+#[functions]
 pub trait Compose<F>: Sized {
     fn compose(self, f: F) -> Composed<Self, F>;
 }

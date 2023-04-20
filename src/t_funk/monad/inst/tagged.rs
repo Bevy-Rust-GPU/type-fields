@@ -7,7 +7,7 @@ use crate::t_funk::{
 /// Phantom monad, used to lift values into a monadic context
 /// alongside some additional type parameter to make them
 /// distinct from other instances of the same type.
-pub struct Tagged<M, T>(PhantomData<M>, T);
+pub struct Tagged<M, T>(pub PhantomData<M>, pub T);
 
 impl<P, T> core::fmt::Debug for Tagged<P, T>
 where
@@ -159,7 +159,7 @@ mod test {
         assert_eq!(id2.copoint(), 15);
 
         let id3: Tagged<Tag, i32> =
-            Tagged::<Tag, _>::point(FmapF.flip().curry_n().call(Sub.flip().curry_n().call(3)))
+            Tagged::<Tag, _>::point(FmapF::default().flip().curry_n().call(Sub.flip().curry_n().call(3)))
                 .apply(id2);
         assert_eq!(id3.copoint(), 12);
 

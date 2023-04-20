@@ -19,7 +19,7 @@ where
     >>::Output;
 
     fn call(f: F) -> Self::Output {
-        LiftA2
+        LiftA2::default()
             .call((PushFrontF.flip().curry(), f.clone()))
             .call(ReplicateM::<Next, P>::call(f))
     }

@@ -1,7 +1,7 @@
 use crate::t_funk::{Compose, Composed, Function, Id};
 
 /// A set of types with an identity function and composition operator.
-trait Category<Of> {
+pub trait Category<Of> {
     type Composed<F>
     where
         Self: Compose<F>;
@@ -14,7 +14,7 @@ trait Category<Of> {
 }
 
 /// Closure category
-enum ClosureC {}
+pub enum ClosureC {}
 
 impl<T> Category<ClosureC> for T {
     type Composed<F> = Composed<Self, F> where Self: Compose<F>;

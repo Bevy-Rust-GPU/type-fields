@@ -1,7 +1,8 @@
 use type_fields_macros::{Closure, Copointed, Pointed};
 
 use crate::t_funk::{
-    Apply, Chain, Closure, Const, CurriedA, Curry, Fmap, Function, Pointed, Pure, Spread, Spreaded,
+    Apply, Chain, Closure, Const, Copointed, CurriedA, Curry, Fmap, Function, Pointed, Pure,
+    Spread, Spreaded,
 };
 
 /// 2-tuple constructor
@@ -73,8 +74,8 @@ where
     type Output = (O1::Output, S3);
 
     fn call(self, s1: S1) -> Self::Output {
-        let (fx, s2) = self.0 .0.call(s1);
-        let (x, s3) = self.1 .0.call(s2);
+        let (fx, s2) = self.0.copoint().call(s1);
+        let (x, s3) = self.1.copoint().call(s2);
         (fx.call(x), s3)
     }
 }
@@ -100,7 +101,7 @@ where
 
     fn call(self, s: S1) -> Self::Output {
         let (x, s2) = self.0 .0.call(s);
-        self.1.call(x).0.call(s2)
+        self.1.call(x).copoint().call(s2)
     }
 }
 
