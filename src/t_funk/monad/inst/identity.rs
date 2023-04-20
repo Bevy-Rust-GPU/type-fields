@@ -1,4 +1,4 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Chain, Mempty, Pointed, Mappend};
+use type_fields_macros::{Apply, Copointed, Fmap, Chain, Mempty, Pointed, Mappend, Replace};
 
 use crate::t_funk::{Mappend, Pointed, Pure};
 
@@ -15,6 +15,7 @@ use crate::t_funk::{Mappend, Pointed, Pure};
     Pointed,
     Copointed,
     Fmap,
+    Replace,
     Apply,
     Chain,
     Mempty,

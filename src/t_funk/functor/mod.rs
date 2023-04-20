@@ -1,9 +1,7 @@
-mod emplace;
 mod fmap;
 mod laws;
 mod replace;
 
-pub use emplace::*;
 pub use fmap::*;
 pub use laws::*;
 pub use replace::*;
@@ -28,7 +26,7 @@ pub trait Functor {
 
 impl<T> Functor for T {
     type Mapped<F> = T::Fmap where T: Fmap<F>;
-    type Replaced<V> = T::Fmap where T: Replace<V>;
+    type Replaced<V> = T::Replace where T: Replace<V>;
 
     fn fmap<F>(self, f: F) -> Self::Mapped<F>
     where

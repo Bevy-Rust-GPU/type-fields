@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::t_funk::{
-    Apply, Closure, Copointed, Fmap, Chain, Mempty, Pointed, Mappend,
+    Apply, Chain, Closure, Const, Copointed, Curry, Fmap, Mappend, Mempty, Pointed, Replace,
 };
 
 /// Phantom monad, used to lift values into a monadic context
@@ -94,6 +94,14 @@ where
     }
 }
 
+impl<P, A, B> Replace<B> for Tagged<P, A> {
+    type Replace = Tagged<P, B>;
+
+    fn replace(self, t: B) -> Self::Replace {
+        self.fmap(Const.curry_a(t))
+    }
+}
+
 impl<P, T, U> Apply<U> for Tagged<P, T>
 where
     T: Closure<U>,
@@ -144,8 +152,8 @@ where
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        test_functor_laws, Add, Apply, Closure, Composed, Copointed, Curry, CurryN, Div,
-        Flip, FmapF, Fmap, Chain, Mul, PointF, Pointed, Sub, Tagged, Then,
+        test_functor_laws, Add, Apply, Chain, Closure, Composed, Copointed, Curry, CurryN, Div,
+        Flip, Fmap, FmapF, Mul, PointF, Pointed, Sub, Tagged, Then,
     };
 
     #[test]
@@ -158,9 +166,13 @@ mod test {
         let id2: Tagged<Tag, i32> = id1.fmap(Mul.curry_n().call(3));
         assert_eq!(id2.copoint(), 15);
 
-        let id3: Tagged<Tag, i32> =
-            Tagged::<Tag, _>::point(FmapF::default().flip().curry_n().call(Sub.flip().curry_n().call(3)))
-                .apply(id2);
+        let id3: Tagged<Tag, i32> = Tagged::<Tag, _>::point(
+            FmapF::default()
+                .flip()
+                .curry_n()
+                .call(Sub.flip().curry_n().call(3)),
+        )
+        .apply(id2);
         assert_eq!(id3.copoint(), 12);
 
         let id4: Tagged<Tag, i32> = id3.chain(
