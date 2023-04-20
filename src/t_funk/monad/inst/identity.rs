@@ -1,4 +1,4 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Monad, Monoid, Pointed, Semigroup};
+use type_fields_macros::{Apply, Copointed, Fmap, Chain, Mempty, Pointed, Mappend};
 
 use crate::t_funk::{Mappend, Pointed, Pure};
 
@@ -16,9 +16,9 @@ use crate::t_funk::{Mappend, Pointed, Pure};
     Copointed,
     Fmap,
     Apply,
-    Monad,
-    Monoid,
-    Semigroup,
+    Chain,
+    Mempty,
+    Mappend,
 )]
 pub struct Identity<T>(T);
 

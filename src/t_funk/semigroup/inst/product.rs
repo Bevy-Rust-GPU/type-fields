@@ -1,4 +1,4 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Monad, Monoid, Pointed};
+use type_fields_macros::{Apply, Copointed, Fmap, Chain, Mempty, Pointed};
 
 use crate::t_funk::{Copointed, Mappend, Pointed};
 use core::ops::Mul;
@@ -18,8 +18,8 @@ use core::ops::Mul;
     Copointed,
     Fmap,
     Apply,
-    Monad,
-    Monoid,
+    Chain,
+    Mempty,
 )]
 pub struct Product<T>(T);
 

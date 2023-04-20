@@ -1,4 +1,4 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Monad, Monoid, Pointed};
+use type_fields_macros::{Apply, Copointed, Fmap, Chain, Mempty, Pointed};
 
 use crate::t_funk::{Copointed, Mappend, Pointed};
 
@@ -17,8 +17,8 @@ use crate::t_funk::{Copointed, Mappend, Pointed};
     Copointed,
     Fmap,
     Apply,
-    Monad,
-    Monoid,
+    Chain,
+    Mempty,
 )]
 pub struct All<T>(T);
 

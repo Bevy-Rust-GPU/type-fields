@@ -1,4 +1,4 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Monad, Pointed};
+use type_fields_macros::{Apply, Copointed, Fmap, Chain, Pointed};
 
 use crate::t_funk::{Applicative, Apply, Chain, Copointed, Fmap, Functor, Monad, Pointed};
 
@@ -59,7 +59,7 @@ impl<F> Chain<F> for Nothing {
     Copointed,
     Fmap,
     Apply,
-    Monad,
+    Chain,
 )]
 pub struct Just<T>(T);
 

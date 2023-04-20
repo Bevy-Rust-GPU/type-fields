@@ -1,4 +1,4 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Monad, Pointed};
+use type_fields_macros::{Apply, Copointed, Fmap, Chain, Pointed};
 
 use crate::t_funk::{Applicative, Copointed, Functor, Monad, Pointed};
 
@@ -16,7 +16,7 @@ use crate::t_funk::{Applicative, Copointed, Functor, Monad, Pointed};
     Copointed,
     Fmap,
     Apply,
-    Monad,
+    Chain,
 )]
 pub struct Left<T>(T);
 
@@ -34,7 +34,7 @@ pub struct Left<T>(T);
     Copointed,
     Fmap,
     Apply,
-    Monad,
+    Chain,
 )]
 pub struct Right<T>(T);
 
