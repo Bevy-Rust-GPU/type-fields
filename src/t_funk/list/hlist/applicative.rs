@@ -1,4 +1,4 @@
-use crate::t_funk::{Apply, Fmap, Pure, Mappend};
+use crate::t_funk::{Apply, Fmap, Mappend, Pure};
 
 impl<Head, Tail, U> Apply<U> for (Head, Tail)
 where
@@ -38,7 +38,7 @@ mod test {
 
     #[test]
     fn test_cons_applicative() {
-        let funcs = (Add.flip().curry_a(2), (Mul.flip().curry_a(2), ()));
+        let funcs = (Add.curry_b(2), (Mul.flip().curry_a(2), ()));
         let nums = (1, (2, (3, ())));
         let res = funcs.apply(nums);
         assert_eq!(res, (3, (4, (5, (2, (4, (6, ())))))));

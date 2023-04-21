@@ -1,8 +1,9 @@
-use type_fields_macros::{Copointed, Pointed};
+use type_fields_macros::{Copointed, Pointed, functions};
 
 use crate::t_funk::{Closure, Pointed};
 
 /// Feed one argument into both inputs of an arity 2 function
+#[functions]
 pub trait Spread: Sized {
     fn spread(self) -> Spreaded<Self>;
 }

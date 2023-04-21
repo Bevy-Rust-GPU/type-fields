@@ -1,8 +1,9 @@
-use type_fields_macros::{Copointed, Pointed};
+use type_fields_macros::{Copointed, Pointed, functions};
 
 use crate::t_funk::{Closure, Pointed};
 
 /// Flip the arguments of an arity 2 function
+#[functions]
 pub trait Flip: Sized {
     fn flip(self) -> Flipped<Self>;
 }

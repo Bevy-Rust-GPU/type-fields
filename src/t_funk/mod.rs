@@ -65,6 +65,7 @@ mod pointed;
 mod semigroup;
 mod traversable;
 
+pub use arrow::*;
 pub use applicative::*;
 pub use bifunctor::*;
 pub use category::*;

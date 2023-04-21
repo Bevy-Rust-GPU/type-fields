@@ -1,4 +1,4 @@
-use crate::t_funk::Closure;
+use crate::t_funk::{Closure, Flipped, Flip};
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
 pub trait Curry: Sized {
@@ -6,6 +6,10 @@ pub trait Curry: Sized {
 
     fn curry_a<A>(self, a: A) -> CurriedA<Self, A> {
         self.curry().call(a)
+    }
+
+    fn curry_b<B>(self, a: B) -> CurriedA<Flipped<Self>, B> {
+        self.flip().curry_a(a)
     }
 }
 

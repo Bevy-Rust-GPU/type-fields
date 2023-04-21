@@ -2,6 +2,8 @@ use type_fields_macros::functions;
 
 use crate::t_funk::{Closure, Copointed, Pointed};
 
+/// Right-to-left composition
+/// (. or <<<)
 #[functions]
 pub trait Compose<F>: Sized {
     fn compose(self, f: F) -> Composed<Self, F>;
@@ -10,6 +12,19 @@ pub trait Compose<F>: Sized {
 impl<T, F> Compose<F> for T {
     fn compose(self, f: F) -> Composed<Self, F> {
         Composed(self, f)
+    }
+}
+
+/// Left-to-right composition
+/// (>>>)
+#[functions]
+pub trait ComposeL<F>: Sized {
+    fn compose_l(self, f: F) -> Composed<F, Self>;
+}
+
+impl<T, F> ComposeL<F> for T {
+    fn compose_l(self, f: F) -> Composed<F, Self> {
+        Composed(f, self)
     }
 }
 
