@@ -33,7 +33,18 @@ where
     }
 }
 
-impl<T, P> SequenceA<P> for T
+impl<Head, Tail, P> SequenceA<P> for (Head, Tail)
+where
+    Self: Traverse<Id, P>,
+{
+    type SequenceA = <Self as Traverse<Id, P>>::Traverse;
+
+    fn sequence_a(self) -> Self::SequenceA {
+        self.traverse(Id)
+    }
+}
+
+impl<P> SequenceA<P> for ()
 where
     Self: Traverse<Id, P>,
 {

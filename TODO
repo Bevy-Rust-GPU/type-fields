@@ -1,22 +1,3 @@
-* Transition away from derives for function instances
-  * Instead, make a concrete FunctionF the first-class 'provided' impl,
-    and call into it from local impls.
-    * Should allow better equivalence with haskell implementation
-
-* Proper derives for typeclass impls
-  * Currently misnamed, since they actually derive some subset of requisite functions
-  * Instead, should attempt to impl the top-level typeclass trait and error naturally from there
-    * Removing type bounds should allow delegation to local impl checks
-    * Allows strong encoding due to requisite functions being called by wrappers.
-    * Note: GATs may cause problems here.
-
-* Replace Foldable blanket impl with provided default impl
-
-* Fix list Foldable impl
-  * Should be able to thinly wrap FoldLeft / FoldRight and escape blanket limitations
-
-* Implement Dual
-
 * Implement Arrow
 
 * Create new variant of do notation test using Arrow

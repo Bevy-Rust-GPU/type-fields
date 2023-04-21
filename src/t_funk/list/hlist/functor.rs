@@ -1,4 +1,4 @@
-use crate::t_funk::{Closure, Fmap};
+use crate::t_funk::{Closure, Fmap, Replace};
 
 impl<Head, Tail, F> Fmap<F> for (Head, Tail)
 where
@@ -9,6 +9,18 @@ where
 
     fn fmap(self, f: F) -> Self::Fmap {
         (f.clone().call(self.0), self.1.fmap(f))
+    }
+}
+
+impl<Head, Tail, T> Replace<T> for (Head, Tail)
+where
+    T: Clone,
+    Tail: Replace<T>,
+{
+    type Replace = (T, Tail::Replace);
+
+    fn replace(self, t: T) -> Self::Replace {
+        (t.clone(), self.1.replace(t))
     }
 }
 

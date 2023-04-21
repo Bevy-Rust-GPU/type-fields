@@ -1,6 +1,4 @@
-use crate::t_funk::{Mappend, MappendF, Mempty, SemigroupConcat};
-
-use super::FoldRight;
+use crate::t_funk::{Foldr, Mappend, MappendF, Mconcat, Mempty};
 
 impl<Head, Tail, U> Mappend<U> for (Head, Tail)
 where
@@ -21,22 +19,30 @@ impl<U> Mappend<U> for () {
     }
 }
 
-impl<T> SemigroupConcat for T
+impl<Head, Tail> Mconcat for (Head, Tail)
 where
-    T: Mempty + FoldRight<T::Mempty, MappendF>,
+    Self: Mempty + Foldr<MappendF, <Self as Mempty>::Mempty>,
 {
-    type Concatenated = T::Folded;
+    type Mconcat = <(Head, Tail) as Foldr<MappendF, <Self as Mempty>::Mempty>>::Foldr;
 
-    fn mconcat(self) -> Self::Concatenated {
-        self.fold_right(T::mempty(), MappendF::default())
+    fn mconcat(self) -> Self::Mconcat {
+        self.foldr(MappendF::default(), Self::mempty())
+    }
+}
+
+impl Mconcat for () {
+    type Mconcat = ();
+
+    fn mconcat(self) -> Self::Mconcat {
+        ()
     }
 }
 
 #[cfg(test)]
 mod test {
     use crate::{
-        t_funk::{Copointed, Fmap, PointF, SemigroupConcat, Sum},
         t_funk::tlist::ToHList,
+        t_funk::{Copointed, Fmap, Mconcat, PointF, Sum},
     };
 
     #[test]

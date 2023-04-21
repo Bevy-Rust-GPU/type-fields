@@ -1,4 +1,4 @@
-use crate::t_funk::{Closure, Chain};
+use crate::t_funk::{Chain, Closure};
 
 impl<Head, Tail, F> Chain<F> for (Head, Tail)
 where
@@ -9,5 +9,13 @@ where
 
     fn chain(self, f: F) -> Self::Chain {
         (f.clone().call(self.0), self.1.chain(f))
+    }
+}
+
+impl<F> Chain<F> for () {
+    type Chain = ();
+
+    fn chain(self, _: F) -> Self::Chain {
+        self
     }
 }

@@ -1,7 +1,8 @@
 use core::marker::PhantomData;
 
 use crate::t_funk::{
-    Apply, Chain, Closure, Const, Copointed, Curry, Fmap, Mappend, Mempty, Pointed, Replace,
+    Apply, Chain, Closure, Copointed, Fmap, Fold, Foldr, Id, Mappend, Mconcat, Mempty, Pointed,
+    Replace, Then,
 };
 
 /// Phantom monad, used to lift values into a monadic context
@@ -98,7 +99,7 @@ impl<P, A, B> Replace<B> for Tagged<P, A> {
     type Replace = Tagged<P, B>;
 
     fn replace(self, t: B) -> Self::Replace {
-        self.fmap(Const.curry_a(t))
+        Tagged::point(t)
     }
 }
 
@@ -127,14 +128,22 @@ where
     }
 }
 
+impl<P, T, F> Then<F> for Tagged<P, T> {
+    type Then = F;
+
+    fn then(self, f: F) -> Self::Then {
+        self.replace(Id).apply(f)
+    }
+}
+
 impl<P, T> Mempty for Tagged<P, T>
 where
     T: Mempty,
 {
-    type Mempty = T::Mempty;
+    type Mempty = Tagged<P, T::Mempty>;
 
     fn mempty() -> Self::Mempty {
-        T::mempty()
+        Tagged::point(T::mempty())
     }
 }
 
@@ -146,6 +155,39 @@ where
 
     fn mappend(self, t: Tagged<P, U>) -> Self::Mappend {
         Pointed::point(self.1.mappend(t.copoint()))
+    }
+}
+
+impl<P, T> Mconcat for Tagged<P, T>
+where
+    T: Mconcat,
+{
+    type Mconcat = Tagged<P, T::Mconcat>;
+
+    fn mconcat(self) -> Self::Mconcat {
+        Tagged::point(self.copoint().mconcat())
+    }
+}
+
+impl<P, T, F, Z> Foldr<F, Z> for Tagged<P, T>
+where
+    T: Foldr<F, Z>,
+{
+    type Foldr = Tagged<P, T::Foldr>;
+
+    fn foldr(self, f: F, z: Z) -> Self::Foldr {
+        Tagged::point(self.copoint().foldr(f, z))
+    }
+}
+
+impl<P, T> Fold for Tagged<P, T>
+where
+    T: Fold,
+{
+    type Fold = Tagged<P, T::Fold>;
+
+    fn fold(self) -> Self::Fold {
+        Pointed::point(self.copoint().fold())
     }
 }
 

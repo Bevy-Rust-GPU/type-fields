@@ -10,12 +10,3 @@ pub trait Chain<F> {
 
     fn chain(self, f: F) -> Self::Chain;
 }
-
-impl<F> Chain<F> for () {
-    type Chain = ();
-
-    fn chain(self, _: F) -> Self::Chain {
-        self
-    }
-}
-

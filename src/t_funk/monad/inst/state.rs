@@ -1,14 +1,12 @@
 use type_fields_macros::{Closure, Copointed, Pointed};
 
 use crate::t_funk::{
-    Apply, Chain, Closure, Const, Copointed, CurriedA, Curry, Fmap, Function, Pointed, Pure,
-    Spread, Spreaded,
+    Apply, Chain, Closure, Const, Copointed, CurriedA, Curry, Fmap, Function, Id, Pointed, Pure,
+    Replace, Spread, Spreaded, Then,
 };
 
 /// 2-tuple constructor
-#[derive(
-    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, type_fields_macros::Closure,
-)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct Tuple;
 
 impl<A, B> Function<(A, B)> for Tuple {
@@ -21,14 +19,6 @@ impl<A, B> Function<(A, B)> for Tuple {
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct State<F>(F);
-
-impl<F> Pure for State<F> {
-    type Pure<T> = State<CurriedA<Tuple, T>>;
-
-    fn pure<T>(t: T) -> Self::Pure<T> {
-        State(Tuple.curry_a(t))
-    }
-}
 
 impl<F1, F2> Fmap<F2> for State<F1> {
     type Fmap = State<StateFunctor<F1, F2>>;
@@ -51,6 +41,22 @@ where
     fn call(self, input: S1) -> Self::Output {
         let (result, s2) = self.0.call(input);
         (self.1.call(result), s2)
+    }
+}
+
+impl<F1, F2> Replace<F2> for State<F1> {
+    type Replace = State<F2>;
+
+    fn replace(self, f: F2) -> Self::Replace {
+        State(f)
+    }
+}
+
+impl<F> Pure for State<F> {
+    type Pure<T> = State<CurriedA<Tuple, T>>;
+
+    fn pure<T>(t: T) -> Self::Pure<T> {
+        State(Tuple.curry_a(t))
     }
 }
 
@@ -102,6 +108,17 @@ where
     fn call(self, s: S1) -> Self::Output {
         let (x, s2) = self.0 .0.call(s);
         self.1.call(x).copoint().call(s2)
+    }
+}
+
+impl<T, _Function> Then<_Function> for State<T>
+where
+    State<Id>: Apply<_Function>,
+{
+    type Then = <<Self as Replace<Id>>::Replace as Apply<_Function>>::Apply;
+
+    fn then(self, f: _Function) -> Self::Then {
+        self.replace(Id).apply(f)
     }
 }
 

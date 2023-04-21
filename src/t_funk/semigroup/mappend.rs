@@ -8,10 +8,3 @@ pub trait Mappend<T> {
     fn mappend(self, t: T) -> Self::Mappend;
 }
 
-#[functions]
-pub trait SemigroupConcat: Sized {
-    type Concatenated;
-
-    fn mconcat(self) -> Self::Concatenated;
-}
-

@@ -1,6 +1,12 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Chain, Pointed};
+use type_fields_macros::{
+    Apply, Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Mconcat, Pointed, Pure, Replace,
+    Then,
+};
 
-use crate::t_funk::{Applicative, Apply, Chain, Copointed, Fmap, Functor, Monad, Pointed};
+use crate::t_funk::{
+    Applicative, Apply, Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Functor, Mappend,
+    Mconcat, Mempty, Monad, Pointed, Pure, Replace, Then,
+};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Nothing;
@@ -29,6 +35,22 @@ impl<F> Fmap<F> for Nothing {
     }
 }
 
+impl<T> Replace<T> for Nothing {
+    type Replace = Nothing;
+
+    fn replace(self, _: T) -> Self::Replace {
+        Nothing
+    }
+}
+
+impl Pure for Nothing {
+    type Pure<T> = Just<T>;
+
+    fn pure<T>(t: T) -> Self::Pure<T> {
+        Just::point(t)
+    }
+}
+
 impl<T> Apply<T> for Nothing {
     type Apply = T;
 
@@ -45,6 +67,78 @@ impl<F> Chain<F> for Nothing {
     }
 }
 
+impl<F> Then<F> for Nothing {
+    type Then = Nothing;
+
+    fn then(self, _: F) -> Self::Then {
+        Nothing
+    }
+}
+
+impl Mempty for Nothing {
+    type Mempty = Nothing;
+
+    fn mempty() -> Self::Mempty {
+        Nothing
+    }
+}
+
+impl Mappend<Nothing> for Nothing {
+    type Mappend = Nothing;
+
+    fn mappend(self, _: Nothing) -> Self::Mappend {
+        self
+    }
+}
+
+impl<T> Mappend<Just<T>> for Nothing {
+    type Mappend = Just<T>;
+
+    fn mappend(self, t: Just<T>) -> Self::Mappend {
+        t
+    }
+}
+
+impl Mconcat for Nothing {
+    type Mconcat = Nothing;
+
+    fn mconcat(self) -> Self::Mconcat {
+        Nothing
+    }
+}
+
+impl<F> FoldMap<F> for Nothing {
+    type FoldMap = Nothing;
+
+    fn fold_map(self, _: F) -> Self::FoldMap {
+        self
+    }
+}
+
+impl<F, Z> Foldr<F, Z> for Nothing {
+    type Foldr = Z;
+
+    fn foldr(self, _: F, z: Z) -> Self::Foldr {
+        z
+    }
+}
+
+impl<F, Z> Foldl<F, Z> for Nothing {
+    type Foldl = Z;
+
+    fn foldl(self, _: F, z: Z) -> Self::Foldl {
+        z
+    }
+}
+
+impl Fold for Nothing {
+    type Fold = Nothing;
+
+    fn fold(self) -> Self::Fold {
+        self
+    }
+}
+
 #[derive(
     Debug,
     Default,
@@ -58,10 +152,45 @@ impl<F> Chain<F> for Nothing {
     Pointed,
     Copointed,
     Fmap,
+    Replace,
+    Pure,
     Apply,
     Chain,
+    Then,
+    Mconcat,
+    FoldMap,
+    Foldr,
+    Foldl,
+    Fold,
 )]
 pub struct Just<T>(T);
+
+impl<T> Mempty for Just<T> {
+    type Mempty = Nothing;
+
+    fn mempty() -> Self::Mempty {
+        Nothing
+    }
+}
+
+impl<T> Mappend<Nothing> for Just<T> {
+    type Mappend = Just<T>;
+
+    fn mappend(self, _: Nothing) -> Self::Mappend {
+        self
+    }
+}
+
+impl<T, U> Mappend<Just<U>> for Just<T>
+where
+    T: Mappend<U>,
+{
+    type Mappend = Just<T::Mappend>;
+
+    fn mappend(self, t: Just<U>) -> Self::Mappend {
+        Just::point(self.copoint().mappend(t.copoint()))
+    }
+}
 
 pub trait Maybe<T>: Pointed + Copointed + Functor + Applicative + Monad {}
 impl<T> Maybe<T> for Nothing {}

@@ -95,7 +95,7 @@ mod test {
     #[test]
     fn test_foldr() {
         let list = (1, 2, 3).to_hlist();
-        let folded = list.foldr(Add.curry_n(), 0);
+        let folded = list.foldr(Add, 0);
         assert_eq!(folded, 6);
     }
 

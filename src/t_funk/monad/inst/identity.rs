@@ -1,6 +1,7 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Chain, Mempty, Pointed, Mappend, Replace};
-
-use crate::t_funk::{Mappend, Pointed, Pure};
+use type_fields_macros::{
+    Apply, Chain, Copointed, Fmap, FoldMap, Foldl, Foldr, Mappend, Mconcat, Mempty, Pointed, Pure,
+    Replace, Then, Fold,
+};
 
 /// Identity monad, used to lift values into a monadic context.
 #[derive(
@@ -16,28 +17,19 @@ use crate::t_funk::{Mappend, Pointed, Pure};
     Copointed,
     Fmap,
     Replace,
+    Pure,
     Apply,
     Chain,
+    Then,
     Mempty,
     Mappend,
+    Mconcat,
+    FoldMap,
+    Foldr,
+    Foldl,
+    Fold,
 )]
 pub struct Identity<T>(T);
-
-impl<T> Pure for Identity<T> {
-    type Pure<U> = Identity<U>;
-
-    fn pure<U>(t: U) -> Self::Pure<U> {
-        Identity::point(t)
-    }
-}
-
-impl<T> Mappend<()> for Identity<T> {
-    type Mappend = Identity<T>;
-
-    fn mappend(self, _: ()) -> Self::Mappend {
-        self
-    }
-}
 
 #[cfg(test)]
 mod test {
