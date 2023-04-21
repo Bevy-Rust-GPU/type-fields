@@ -12,12 +12,20 @@ pub use split::*;
 
 use crate::t_funk::Category;
 
-trait Arrow<Of>: Category<Of> {
+trait Arrow: Category {
     type Arr;
-    type First;
-    type Second;
-    type Split<A>;
-    type Fanout<A>;
+    type First
+    where
+        Self: First;
+    type Second
+    where
+        Self: Second;
+    type Splitted<A>
+    where
+        Self: Split<A>;
+    type Fanouted<A>
+    where
+        Self: Fanout<A>;
 
     fn arr(self) -> <Self as Arr>::Arr
     where
@@ -32,7 +40,7 @@ trait Arrow<Of>: Category<Of> {
         Self: Second;
 
     /// ***
-    fn split<A>(self, a: A) -> Self::Split<A>
+    fn split<A>(self, a: A) -> Self::Split
     where
         Self: Split<A>;
 
@@ -42,33 +50,48 @@ trait Arrow<Of>: Category<Of> {
         Self: Fanout<A>;
 }
 
-impl<T, Of> Arrow<Of> for T
+impl<T> Arrow for T
 where
-    T: Category<Of>,
+    T: Category,
 {
     type Arr = T::Arr where T: Arr;
     type First = T::First where T: First;
     type Second = T::Second where T: Second;
-    type Split<A> = Splitted<T, A> where T: Split<A>;
-    type Fanout<A> = T::Fanout where T: Fanout<A>;
+    type Splitted<A> = Splitted<T, A> where T: Split<A>;
+    type Fanouted<A> = T::Fanout where T: Fanout<A>;
 
-    fn arr(self) -> Self::Arr {
+    fn arr(self) -> T::Arr
+    where
+        T: Arr,
+    {
         Arr::arr(self)
     }
 
-    fn first(self) -> Self::First {
+    fn first(self) -> T::First
+    where
+        T: First,
+    {
         First::first(self)
     }
 
-    fn second(self) -> Self::Second {
+    fn second(self) -> T::Second
+    where
+        T: Second,
+    {
         Second::second(self)
     }
 
-    fn split<A>(self, a: A) -> Self::Split<A> {
+    fn split<A>(self, a: A) -> T::Split
+    where
+        T: Split<A>,
+    {
         Split::<A>::split(self, a)
     }
 
-    fn fanout<A>(self, a: A) -> Self::Fanout<A> {
+    fn fanout<A>(self, a: A) -> T::Fanout
+    where
+        T: Fanout<A>,
+    {
         Fanout::<A>::fanout(self, a)
     }
 }
@@ -76,14 +99,14 @@ where
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        arrow::{First, Second},
-        Add, Closure, ComposeL, Curry, Fanout, Mul, Split,
+        arrow::First, arrow::Second, Add, Closure, ComposeL, Curry, Fanout, Mul, Split,
     };
 
     #[test]
     fn test() {
         let a1 = Add.curry_b(5);
         let a2 = Mul.curry_b(2);
+
         let res = a1.compose_l(a2).call(3);
         assert_eq!(res, 11);
 

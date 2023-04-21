@@ -1,4 +1,4 @@
-use crate::t_funk::{Closure, Compose, Composed, Id};
+use crate::t_funk::{function::Id, Closure, Compose, Composed};
 
 use super::Fmap;
 
@@ -14,7 +14,7 @@ where
     <F as Fmap<Composed<F1, F2>>>::Fmap: core::fmt::Debug,
     <F as Fmap<F1>>::Fmap: core::fmt::Debug + Fmap<F2, Fmap = G>,
     <<F as Fmap<F1>>::Fmap as Fmap<F2>>::Fmap: core::fmt::Debug + PartialEq,
-    F1: Clone,
+    F1: Clone + Compose<F2>,
     F2: Clone,
 {
     test_functor_identity(f.clone());
@@ -32,7 +32,7 @@ where
 pub fn test_functor_composition<F, F1, F2, G>(f: F, f1: F1, f2: F2)
 where
     F: Clone + Fmap<F1> + Fmap<F2> + Fmap<Composed<F1, F2>, Fmap = G>,
-    F1: Clone,
+    F1: Clone + Compose<F2>,
     F2: Clone,
     <F as Fmap<F1>>::Fmap: Fmap<F2, Fmap = G>,
     <<F as Fmap<F1>>::Fmap as Fmap<F2>>::Fmap: core::fmt::Debug + PartialEq,
@@ -43,4 +43,3 @@ where
         f.fmap(f1.compose(f2))
     )
 }
-

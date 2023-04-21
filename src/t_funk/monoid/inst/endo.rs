@@ -1,14 +1,18 @@
 use type_fields_macros::{Copointed, Pointed};
 
 use crate::t_funk::{
-    Apply, Closure, Compose, Composed, Copointed, Fmap, Id, Mappend, Mempty, Pointed, Pure,
+    function::Id, Apply, Closure, Compose, Composed, Copointed, Fmap, Mappend, Mempty, Pointed,
+    Pure,
 };
 
 /// The monoid of endomorphisms under composition.
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Endo<T>(T);
 
-impl<F1, F2> Fmap<F2> for Endo<F1> {
+impl<F1, F2> Fmap<F2> for Endo<F1>
+where
+    F1: Compose<F2>,
+{
     type Fmap = Endo<Composed<F1, F2>>;
 
     fn fmap(self, f: F2) -> Self::Fmap {

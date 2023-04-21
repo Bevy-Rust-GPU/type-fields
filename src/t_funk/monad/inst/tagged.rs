@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::t_funk::{
-    Apply, Chain, Closure, Copointed, Fmap, Fold, Foldr, Id, Mappend, Mconcat, Mempty, Pointed,
+    Apply, Chain, Closure, Copointed, Fmap, Fold, Foldr, function::Id, Mappend, Mconcat, Mempty, Pointed,
     Replace, Then,
 };
 

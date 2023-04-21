@@ -1,4 +1,4 @@
-use type_fields_macros::{Copointed, Pointed, functions};
+use type_fields_macros::{functions, Compose, Copointed, First, Id, Pointed, Second};
 
 use crate::t_funk::{Closure, Pointed};
 
@@ -14,7 +14,23 @@ impl<T> Flip for T {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Id,
+    Compose,
+    First,
+    Second,
+)]
 pub struct Flipped<F>(F);
 
 impl<F, A, B> Closure<(B, A)> for Flipped<F>

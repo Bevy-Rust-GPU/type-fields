@@ -1,5 +1,5 @@
 use crate::t_funk::{
-    Apply, Closure, Curried, Curry, Flip, Flipped, Fmap, Id, Pure, SequenceA, Traverse,
+    function::Id, Apply, Closure, Curried, Curry, Flip, Flipped, Fmap, Pure, SequenceA, Traverse,
 };
 
 use super::PushFrontF;
@@ -57,7 +57,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{tlist::ToHList, Id, SequenceA, Traverse};
+    use crate::t_funk::{tlist::ToHList, function::Id, SequenceA, Traverse};
 
     #[test]
     fn test_sequence_a() {

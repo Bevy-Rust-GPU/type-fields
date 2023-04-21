@@ -1,4 +1,6 @@
-use crate::t_funk::{Closure, Flipped, Flip};
+use type_fields_macros::{Compose, First, Id, Second};
+
+use crate::t_funk::{Closure, Flip, Flipped};
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
 pub trait Curry: Sized {
@@ -20,7 +22,9 @@ impl<T> Curry for T {
 }
 
 /// Curry function with F stored
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Id, Compose, First, Second,
+)]
 pub struct Curried<F>(F);
 
 impl<F, A> Closure<A> for Curried<F> {
@@ -32,7 +36,9 @@ impl<F, A> Closure<A> for Curried<F> {
 }
 
 /// Curry function with F, A stored
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Id, Compose, First, Second,
+)]
 pub struct CurriedA<F, A>(F, A);
 
 impl<F, A, B> Closure<B> for CurriedA<F, A>

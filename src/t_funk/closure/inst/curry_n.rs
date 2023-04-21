@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use type_fields_macros::{Compose, Id, First, Second};
+
 use crate::t_funk::{
     hlist::{HList, PushBack, ToTList},
     tlist::ToHList,
@@ -24,6 +26,7 @@ where
     }
 }
 
+#[derive(Id, Compose, First, Second)]
 pub struct CurriedN<F, AO, AI>(F, AO, PhantomData<AI>);
 
 impl<F, AI> Default for CurriedN<F, (), AI>

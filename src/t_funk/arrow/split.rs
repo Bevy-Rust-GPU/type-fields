@@ -1,11 +1,18 @@
+use type_fields_macros::functions;
+
 use crate::t_funk::Closure;
 
+#[functions]
 pub trait Split<G>: Sized {
-    fn split(self, g: G) -> Splitted<Self, G>;
+    type Split;
+
+    fn split(self, g: G) -> Self::Split;
 }
 
 impl<T, G> Split<G> for T {
-    fn split(self, g: G) -> Splitted<Self, G> {
+    type Split = Splitted<Self, G>;
+
+    fn split(self, g: G) -> Self::Split {
         Splitted(self, g)
     }
 }
@@ -24,4 +31,3 @@ where
         (self.0.call(x), self.1.call(y))
     }
 }
-

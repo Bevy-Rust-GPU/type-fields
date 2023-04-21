@@ -9,12 +9,6 @@ pub trait Compose<F>: Sized {
     fn compose(self, f: F) -> Composed<Self, F>;
 }
 
-impl<T, F> Compose<F> for T {
-    fn compose(self, f: F) -> Composed<Self, F> {
-        Composed(self, f)
-    }
-}
-
 /// Left-to-right composition
 /// (>>>)
 #[functions]

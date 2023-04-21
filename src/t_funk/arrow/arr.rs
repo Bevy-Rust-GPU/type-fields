@@ -1,3 +1,6 @@
+use type_fields_macros::functions;
+
+#[functions]
 pub trait Arr {
     type Arr;
 
@@ -11,4 +14,3 @@ impl<T> Arr for T {
         self
     }
 }
-

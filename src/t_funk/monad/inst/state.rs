@@ -1,8 +1,8 @@
 use type_fields_macros::{Closure, Copointed, Pointed};
 
 use crate::t_funk::{
-    Apply, Chain, Closure, Const, Copointed, CurriedA, Curry, Fmap, Function, Id, Pointed, Pure,
-    Replace, Spread, Spreaded, Then,
+    function::Id, Apply, Chain, Closure, Const, Copointed, CurriedA, Curry, Fmap, Function,
+    Pointed, Pure, Replace, Spread, Spreaded, Then,
 };
 
 /// 2-tuple constructor
