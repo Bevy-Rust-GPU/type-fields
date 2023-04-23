@@ -11,3 +11,17 @@ pub trait Closure<Input>: Sized {
 
     fn call(self, input: Input) -> Self::Output;
 }
+
+/// Blanket impl for value-level functions.
+///
+/// API-friendly simplification for non-generic functions.
+impl<F, I, O> Closure<I> for F
+where
+    F: FnOnce(I) -> O,
+{
+    type Output = O;
+
+    fn call(self, input: I) -> Self::Output {
+        self(input)
+    }
+}

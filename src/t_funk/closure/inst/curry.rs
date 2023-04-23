@@ -1,4 +1,4 @@
-use type_fields_macros::{Compose, First, Id, Second};
+use type_fields_macros::{Compose, First, Id, Second, Pointed, Copointed};
 
 use crate::t_funk::{Closure, Flip, Flipped};
 
@@ -23,9 +23,23 @@ impl<T> Curry for T {
 
 /// Curry function with F stored
 #[derive(
-    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Id, Compose, First, Second,
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Id,
+    Compose,
+    First,
+    Second,
 )]
-pub struct Curried<F>(F);
+pub struct Curried<F>(pub F);
 
 impl<F, A> Closure<A> for Curried<F> {
     type Output = CurriedA<F, A>;

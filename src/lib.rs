@@ -4,16 +4,16 @@
 
 extern crate self as type_fields;
 
+pub use type_fields_macros as macros;
+
 pub mod field;
 pub mod path;
 pub mod t_funk;
 pub mod type_machine;
 
-pub use type_fields_macros::Field;
-
 #[cfg(test)]
 pub mod tests {
-    use crate::{field::Field, Field};
+    use crate::{field::Field, macros::Field};
 
     #[derive(Default, Field)]
     struct Wrapper<Sdf> {

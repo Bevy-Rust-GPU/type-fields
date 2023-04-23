@@ -1,7 +1,7 @@
 use type_fields_macros::{Closure, Copointed, Pointed};
 
 use crate::t_funk::{
-    function::Id, Apply, Chain, Closure, Const, Copointed, CurriedA, Curry, Fmap, Function,
+    function::Id, Apply, Chain, Closure, function::Const, Copointed, CurriedA, Curry, Fmap, Function,
     Pointed, Pure, Replace, Spread, Spreaded, Then,
 };
 
@@ -149,7 +149,7 @@ mod test {
     use type_fields_macros::Closure;
 
     use crate::t_funk::{
-        tlist::ToHList, Chain, Closure, Const, Copointed, CurriedA, Curry, Function, Pointed, Put,
+        tlist::ToHList, Chain, Closure, function::Const, Copointed, CurriedA, Curry, Function, Pointed, Put,
         ReplicateM, SequenceA, State, Traverse,
     };
 
