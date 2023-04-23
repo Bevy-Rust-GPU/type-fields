@@ -49,9 +49,9 @@
 //! of all their component functions before any method can be called.
 //!
 
-mod arrow;
+pub mod arrow;
 mod applicative;
-mod bifunctor;
+pub mod bifunctor;
 mod category;
 mod closure;
 mod copointed;

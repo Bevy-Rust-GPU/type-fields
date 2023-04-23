@@ -1,4 +1,4 @@
-use type_fields_macros::{Copointed, Pointed, functions};
+use type_fields_macros::{functions, Copointed, First, Id, Pointed, Second, Compose};
 
 use crate::t_funk::{Closure, Pointed};
 
@@ -14,7 +14,23 @@ impl<T> Spread for T {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Id,
+    Compose,
+    First,
+    Second,
+)]
 pub struct Spreaded<F>(F);
 
 impl<F, A> Closure<A> for Spreaded<F>
