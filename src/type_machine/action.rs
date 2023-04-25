@@ -1,13 +1,14 @@
 use core::ops::{Shl, Shr};
 
-use crate::t_funk::{Copointed, Tagged, Pointed};
+use crate::t_funk::{Copointed, Pointed, Tagged};
 
 use super::{
-    input::Input, input_mode::InputMode, instruction::Instruction, output_mode::OutputMode, output::Output,
+    input::Input, input_mode::InputMode, instruction::Instruction, output::Output,
+    output_mode::OutputMode,
 };
 
 /// An action in a do block
-pub struct Action<T>(T);
+pub struct Action<T>(pub T);
 
 impl<T> Pointed for Action<T> {
     type Pointed = T;
@@ -58,7 +59,7 @@ impl<T, Rhs> Shr<Output<Rhs>> for Action<T> {
     type Output = Tagged<Output<Rhs>, Action<T>>;
 
     fn shr(self, _: Output<Rhs>) -> Self::Output {
-        Pointed::point(self)
+        Tagged::point(self)
     }
 }
 
@@ -66,13 +67,13 @@ impl<T, Rhs> Shl<Input<Rhs>> for Action<T> {
     type Output = Tagged<Input<Rhs>, Action<T>>;
 
     fn shl(self, _: Input<Rhs>) -> Self::Output {
-        Pointed::point(self)
+        Tagged::point(self)
     }
 }
 
 pub trait ActionOf: Sized {
     fn action(self) -> Action<Self> {
-        Action::point(self)
+        Action(self)
     }
 }
 

@@ -9,8 +9,6 @@ use crate::macros::{
 
 use type_fields::t_funk::Mappend;
 
-use crate::t_funk::{Copointed, Pointed};
-
 #[derive(
     Debug,
     Default,
@@ -36,7 +34,7 @@ use crate::t_funk::{Copointed, Pointed};
     Foldl,
     Fold,
 )]
-pub struct Dual<T>(T);
+pub struct Dual<T>(pub T);
 
 impl<T, U> Mappend<Dual<U>> for Dual<T>
 where
@@ -45,6 +43,6 @@ where
     type Mappend = Dual<U::Mappend>;
 
     fn mappend(self, t: Dual<U>) -> Self::Mappend {
-        Pointed::point(t.copoint().mappend(self.copoint()))
+        Dual(t.0.mappend(self.0))
     }
 }

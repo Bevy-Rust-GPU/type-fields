@@ -38,7 +38,7 @@ mod tests {
     };
 
     #[test]
-    fn test_cons_set() {
+    fn test_hlist_set() {
         let list = (1, 2.0, "three").to_hlist();
         let list = list.set(6);
         let list = list.set(5.0);

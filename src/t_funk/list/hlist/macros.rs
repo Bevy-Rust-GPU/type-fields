@@ -1,6 +1,6 @@
-/// Macros for composing cons list literals.
+/// Macros for composing HList literals.
 
-/// Takes a flat list of tokens and nests it into a cons list.
+/// Takes a flat list of tokens and nests it into a HList.
 #[macro_export]
 macro_rules! cons {
     ($($exprs:expr),*) => {
@@ -14,7 +14,7 @@ macro_rules! cons {
     };
 }
 
-/// Takes a flat list of identifiers and nests it into a cons list.
+/// Takes a flat list of identifiers and nests it into a HList.
 #[macro_export]
 macro_rules! cons_ident {
     ($ident:ident $(, $idents:ident)+) => {
@@ -26,7 +26,7 @@ macro_rules! cons_ident {
     () => {};
 }
 
-/// Takes a flat list of expressions and nests it into a cons list.
+/// Takes a flat list of expressions and nests it into a HList.
 #[macro_export]
 macro_rules! cons_expr {
     ($expr:expr $(, $exprs:expr)+) => {
@@ -38,7 +38,7 @@ macro_rules! cons_expr {
     () => {};
 }
 
-/// Takes a flat list of types and nests it into a cons list.
+/// Takes a flat list of types and nests it into a HList.
 #[macro_export]
 macro_rules! cons_ty {
     ($ty:ty $(, $tys:ty)+) => {

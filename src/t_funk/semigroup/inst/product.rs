@@ -2,7 +2,7 @@ use crate::macros::{
     applicative::Apply, functor::Fmap, monad::Chain, monoid::Mempty, Copointed, Pointed,
 };
 
-use crate::t_funk::{Copointed, Mappend, Pointed};
+use crate::t_funk::Mappend;
 use core::ops::Mul;
 
 /// A `Semigroup` wrapper that can append multiplicatively.
@@ -23,7 +23,7 @@ use core::ops::Mul;
     Chain,
     Mempty,
 )]
-pub struct Product<T>(T);
+pub struct Product<T>(pub T);
 
 impl<T> Mappend<Product<T>> for Product<T>
 where
@@ -32,25 +32,19 @@ where
     type Mappend = Product<T::Output>;
 
     fn mappend(self, t: Product<T>) -> Self::Mappend {
-        Pointed::point(self.copoint() * t.copoint())
+        Product(self.0 * t.0)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{
-        semigroup::{Mappend, Product},
-        Copointed, Pointed,
-    };
+    use crate::t_funk::semigroup::{Mappend, Product};
 
     #[test]
     fn test_product() {
         assert_eq!(
-            48,
-            Product::point(2)
-                .mappend(Product::point(4))
-                .mappend(Product::point(6))
-                .copoint()
+            Product(48),
+            Product(2).mappend(Product(4)).mappend(Product(6))
         )
     }
 }

@@ -18,7 +18,7 @@ where
     type PopFront = <<T::HList as HListPopFront>::PopFront as ToTList>::TList;
 
     fn pop_front(self) -> Self::PopFront {
-        self.to_hlist().cons_pop_front().to_tlist()
+        self.to_hlist().pop_front().to_tlist()
     }
 }
 

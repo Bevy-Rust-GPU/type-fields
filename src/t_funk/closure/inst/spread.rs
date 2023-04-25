@@ -6,7 +6,7 @@ use crate::{
         category::{Compose, Id},
         functions, Copointed, Pointed,
     },
-    t_funk::{Closure, Pointed},
+    t_funk::Closure,
 };
 
 /// Feed one argument into both inputs of an arity 2 function
@@ -17,7 +17,7 @@ pub trait Spread: Sized {
 
 impl<T> Spread for T {
     fn spread(self) -> Spreaded<Self> {
-        Spreaded::point(self)
+        Spreaded(self)
     }
 }
 
@@ -41,7 +41,7 @@ impl<T> Spread for T {
     Split,
     Fanout,
 )]
-pub struct Spreaded<F>(F);
+pub struct Spreaded<F>(pub F);
 
 impl<F, A> Closure<A> for Spreaded<F>
 where

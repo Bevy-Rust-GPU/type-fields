@@ -32,7 +32,7 @@ mod tests {
     use crate::t_funk::{hlist::Get, tlist::ToHList};
 
     #[test]
-    fn test_cons_get() {
+    fn test_hlist_get() {
         let list = (1, 2.0, "three").to_hlist();
         let int: usize = list.get();
         let float: f32 = list.get();

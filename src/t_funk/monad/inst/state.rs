@@ -1,8 +1,8 @@
 use crate::macros::{Closure, Copointed, Pointed};
 
 use crate::t_funk::{
-    function::Id, Apply, Chain, Closure, function::Const, Copointed, CurriedA, Curry, Fmap, Function,
-    Pointed, Pure, Replace, Spread, Spreaded, Then,
+    function::Const, function::Id, Apply, Chain, Closure, CurriedA, Curry, Fmap, Function, Pure,
+    Replace, Spread, Spreaded, Then,
 };
 
 /// 2-tuple constructor
@@ -18,7 +18,7 @@ impl<A, B> Function<(A, B)> for Tuple {
 }
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
-pub struct State<F>(F);
+pub struct State<F>(pub F);
 
 impl<F1, F2> Fmap<F2> for State<F1> {
     type Fmap = State<StateFunctor<F1, F2>>;
@@ -80,8 +80,8 @@ where
     type Output = (O1::Output, S3);
 
     fn call(self, s1: S1) -> Self::Output {
-        let (fx, s2) = self.0.copoint().call(s1);
-        let (x, s3) = self.1.copoint().call(s2);
+        let (fx, s2) = self.0 .0.call(s1);
+        let (x, s3) = self.1 .0.call(s2);
         (fx.call(x), s3)
     }
 }
@@ -107,7 +107,7 @@ where
 
     fn call(self, s: S1) -> Self::Output {
         let (x, s2) = self.0 .0.call(s);
-        self.1.call(x).copoint().call(s2)
+        self.1.call(x).0.call(s2)
     }
 }
 
@@ -129,7 +129,7 @@ impl<I> Function<I> for Put {
     type Output = State<CurriedA<Const, ((), I)>>;
 
     fn call(input: I) -> Self::Output {
-        State::point(Const.prefix(((), input)))
+        State(Const.prefix(((), input)))
     }
 }
 
@@ -140,7 +140,7 @@ impl Function<()> for Get {
     type Output = State<Spreaded<Tuple>>;
 
     fn call(_: ()) -> Self::Output {
-        State::point(Tuple.spread())
+        State(Tuple.spread())
     }
 }
 
@@ -149,7 +149,7 @@ mod test {
     use crate::macros::Closure;
 
     use crate::t_funk::{
-        tlist::ToHList, Chain, Closure, function::Const, Copointed, CurriedA, Curry, Function, Pointed, Put,
+        function::Const, tlist::ToHList, Chain, Closure, CurriedA, Curry, Function, Put,
         ReplicateM, SequenceA, State, Traverse,
     };
 
@@ -202,25 +202,25 @@ mod test {
             }
         }
 
-        let coin_s = State::point(Coin);
-        let push_s = State::point(Push);
+        let coin_s = State(Coin);
+        let push_s = State(Push);
 
-        let arr = coin_s.copoint().call(Locked);
+        let arr = Coin.call(Locked);
         assert_eq!(arr, (Thank, Unlocked));
 
-        let arr = coin_s.chain(Const.prefix(push_s)).copoint().call(Unlocked);
+        let State(arr) = coin_s.chain(Const.prefix(push_s));
+        let arr = arr.call(Unlocked);
 
         assert_eq!(arr, (Open, Locked));
 
         // Chaining
         let monday_s = (coin_s, push_s, push_s, coin_s, push_s).to_hlist();
-        let res = SequenceA::<State<()>>::sequence_a(monday_s)
-            .copoint()
-            .call(Unlocked);
+        let State(res) = SequenceA::<State<()>>::sequence_a(monday_s);
+        let res = res.call(Unlocked);
         assert_eq!(res, ((Thank, (Open, (Tut, (Thank, (Open, ()))))), Locked));
 
         // Put
-        let put = SequenceA::<State<()>>::sequence_a(
+        let State(put) = SequenceA::<State<()>>::sequence_a(
             (
                 Put.call(Locked),
                 push_s,
@@ -230,23 +230,22 @@ mod test {
             )
                 .to_hlist(),
         );
-        let res = put.copoint().call(Unlocked);
+        let res = put.call(Unlocked);
         assert_eq!(res, (((), Tut, (), Open, ()).to_hlist(), Locked));
 
         // Get
-        let get = SequenceA::<State<()>>::sequence_a(
+        let State(get) = SequenceA::<State<()>>::sequence_a(
             (Get.call(()), push_s, Get.call(()), push_s, Get.call(())).to_hlist(),
         );
-        let res = get.copoint().call(Unlocked);
+        let res = get.call(Unlocked);
         assert_eq!(
             res,
             ((Unlocked, Open, Locked, Tut, Locked).to_hlist(), Locked)
         );
 
         // ReplicateM
-        let res = ReplicateM::<(((((((),),),),),),), State<()>>::call(push_s)
-            .copoint()
-            .call(Unlocked);
+        let State(res) = ReplicateM::<(((((((),),),),),),), State<()>>::call(push_s);
+        let res = res.call(Unlocked);
         assert_eq!(res, ((Open, Tut, Tut, Tut, Tut, Tut).to_hlist(), Locked));
 
         #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
@@ -283,17 +282,17 @@ mod test {
             type Output = State<CurriedA<TurnSImpl, A>>;
 
             fn call(a: A) -> Self::Output {
-                State::point(TurnSImpl.prefix(a))
+                State(TurnSImpl.prefix(a))
             }
         }
 
-        let res = TurnS.call(Coin).copoint().call(Locked);
+        let State(res) = TurnS.call(Coin);
+        let res = res.call(Locked);
         assert_eq!(res, (Thank, Unlocked));
 
         let list = (Coin, Push, Push, Coin, Push).to_hlist();
-        let res = Traverse::<TurnS, State<()>>::traverse(list, TurnS)
-            .copoint()
-            .call(Locked);
+        let State(res) = Traverse::<TurnS, State<()>>::traverse(list, TurnS);
+        let res = res.call(Locked);
         assert_eq!(res, ((Thank, (Open, (Tut, (Thank, (Open, ()))))), Locked));
     }
 }

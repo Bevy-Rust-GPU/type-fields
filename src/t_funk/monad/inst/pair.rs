@@ -1,10 +1,10 @@
 use crate::macros::{Copointed, Pointed};
 
-use crate::t_funk::{Closure, Copointed, Fmap, Pointed};
+use crate::t_funk::{Closure, Fmap};
 
 /// Identity monad, used to lift values into a monadic context.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
-pub struct Pair<A, B>(A, B);
+pub struct Pair<A, B>(pub A, pub B);
 
 impl<A, B, F> Fmap<F> for Pair<A, B>
 where
@@ -13,8 +13,7 @@ where
     type Fmap = Pair<<F as Closure<A>>::Output, <F as Closure<B>>::Output>;
 
     fn fmap(self, f: F) -> Self::Fmap {
-        let (a, b) = self.copoint();
-        Pointed::point((f.clone().call(a), f.call(b)))
+        Pair(f.clone().call(self.0), f.call(self.1))
     }
 }
 
@@ -22,9 +21,7 @@ where
 mod test {
     use crate::macros::Closure;
 
-    use crate::t_funk::{
-        monad::Pair, test_functor_laws, Add, Copointed, Curry, Fmap, Function, Mul, Pointed,
-    };
+    use crate::t_funk::{monad::Pair, test_functor_laws, Add, Curry, Fmap, Function, Mul};
 
     #[test]
     fn test_pair() {
@@ -47,15 +44,15 @@ mod test {
             }
         }
 
-        let id1: Pair<i32, f32> = Pair::point((5, 6.0));
-        assert_eq!(id1.copoint(), (5, 6.0));
+        let id1: Pair<i32, f32> = Pair(5, 6.0);
+        assert_eq!(id1, Pair(5, 6.0));
 
         let id2: Pair<i32, f32> = id1.fmap(Mul3);
-        assert_eq!(id2.copoint(), (15, 18.0));
+        assert_eq!(id2, Pair(15, 18.0));
     }
 
     #[test]
     fn test_functor_laws_pair() {
-        test_functor_laws(Pair::point((1, 2)), Add.prefix(2), Mul.prefix(2));
+        test_functor_laws(Pair(1, 2), Add.prefix(2), Mul.prefix(2));
     }
 }

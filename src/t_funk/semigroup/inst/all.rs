@@ -2,7 +2,7 @@ use crate::macros::{
     applicative::Apply, functor::Fmap, monad::Chain, monoid::Mempty, Copointed, Pointed,
 };
 
-use crate::t_funk::{Copointed, Mappend, Pointed};
+use crate::t_funk::Mappend;
 
 /// A `Semigroup` wrapper that can append with AND semantics.
 #[derive(
@@ -22,7 +22,7 @@ use crate::t_funk::{Copointed, Mappend, Pointed};
     Chain,
     Mempty,
 )]
-pub struct All<T>(T);
+pub struct All<T>(pub T);
 
 impl<T> Mappend<All<T>> for All<T>
 where
@@ -31,25 +31,16 @@ where
     type Mappend = All<T::Output>;
 
     fn mappend(self, t: All<T>) -> Self::Mappend {
-        Pointed::point(self.copoint() & t.copoint())
+        All(self.0 & t.0)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{
-        semigroup::{All, Mappend},
-        Copointed, Pointed,
-    };
+    use crate::t_funk::semigroup::{All, Mappend};
 
     #[test]
     fn test_all() {
-        assert_eq!(
-            false,
-            All::point(true)
-                .mappend(All::point(false))
-                .mappend(All::point(true))
-                .copoint()
-        )
+        assert_eq!(All(false), All(true).mappend(All(false)).mappend(All(true)))
     }
 }

@@ -28,7 +28,7 @@ mod tests {
     use super::PushFront;
 
     #[test]
-    fn test_cons_push_front() {
+    fn test_hlist_push_front() {
         let list: () = ();
         let list: (usize, ()) = list.push_front(1);
         let list: (usize, (usize, ())) = list.push_front(2);

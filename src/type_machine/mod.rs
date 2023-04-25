@@ -88,9 +88,9 @@ mod test {
         enum Vel {}
 
         let ctx = Do((
-            Pos::def() << Const::point(0.0),
-            Vel::def() << Const::point(1.0),
-            Acc::def() << Const::point(0),
+            Pos::def() << Const(0.0),
+            Vel::def() << Const(1.0),
+            Acc::def() << Const(0),
             NoOp,
             Acc::set() << Increment << Acc::get(),
             Pos::set() << Integrate << InputGets::<(Pos, Vel)>::input(),
@@ -103,7 +103,7 @@ mod test {
             Acc::set() << Increment << Acc::get(),
             Pos::set() << Integrate << InputGets::<(Pos, Vel)>::input(),
             NoOp,
-            Acc::set() << Const::point(1),
+            Acc::set() << Const(1),
         ));
 
         assert_eq!(ctx.map(CopointF), (3.0, 1.0, 1));

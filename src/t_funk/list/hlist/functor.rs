@@ -31,7 +31,7 @@ mod test {
     use crate::t_funk::{hlist::ToTList, tlist::ToHList, Fmap, Function};
 
     #[test]
-    fn test_cons_functor() {
+    fn test_hlist_functor() {
         #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
         struct Mul2;
 

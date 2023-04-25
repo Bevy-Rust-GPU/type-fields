@@ -5,10 +5,10 @@ use crate::macros::{
 
 use crate::t_funk::{Closure, Curried, Fmap};
 
-/// A lens over getter G and setter S
+/// A lens over getter `G` and setter `S`
 pub type Lens<G, S> = Curried<Lensed<G, Curried<S>>>;
 
-/// Construct a lens given instances of getter G and setter S
+/// Construct a lens given instances of getter `G` and setter `S`
 pub const fn lens<G, S>(get: G, set: S) -> Lens<G, S> {
     Curried(Lensed(get, Curried(set)))
 }
@@ -52,7 +52,6 @@ mod test {
 
     use crate::t_funk::{
         closure::Compose, function::Const, functor::Const as FConst, Closure, Curry, Identity,
-        Pointed,
     };
 
     #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd, Lenses)]
@@ -76,17 +75,17 @@ mod test {
 
         let point = Point { x: 1.0, y: 2.0 };
 
-        let identity = Atom::point.call(Identity::point).call(atom);
-        let get = Atom::point.call(FConst::point).call(atom);
+        let identity = Atom::point.call(Identity).call(atom);
+        let get = Atom::point.call(FConst).call(atom);
         let set = Atom::point
-            .call(Identity::point.compose(Const.prefix(point)))
+            .call(Identity.compose(Const.prefix(point)))
             .call(atom);
 
-        assert_eq!(identity, Identity::point(atom));
-        assert_eq!(get, FConst::point(Point { x: 0.0, y: 0.0 }));
+        assert_eq!(identity, Identity(atom));
+        assert_eq!(get, FConst(Point { x: 0.0, y: 0.0 }));
         assert_eq!(
             set,
-            Identity::point(Atom {
+            Identity(Atom {
                 element: "foo",
                 point
             })
@@ -102,17 +101,17 @@ mod test {
 
         let atom_point_x_lens = Atom::point.compose(Point::x);
 
-        let identity = atom_point_x_lens.call(Identity::point).call(atom);
-        let get = atom_point_x_lens.call(FConst::point).call(atom);
+        let identity = atom_point_x_lens.call(Identity).call(atom);
+        let get = atom_point_x_lens.call(FConst).call(atom);
         let set = atom_point_x_lens
-            .call(Identity::point.compose(Const.prefix(3.0)))
+            .call(Identity.compose(Const.prefix(3.0)))
             .call(atom);
 
-        assert_eq!(identity, Identity::point(atom));
-        assert_eq!(get, FConst::point(0.0));
+        assert_eq!(identity, Identity(atom));
+        assert_eq!(get, FConst(0.0));
         assert_eq!(
             set,
-            Identity::point(Atom {
+            Identity(Atom {
                 element: "foo",
                 point: Point { x: 3.0, y: 0.0 }
             })

@@ -1,6 +1,6 @@
 use super::HListRef;
 
-/// A cons list of mutable references
+/// A HList of mutable references
 pub trait HListMut<'a>: HListRef<'a> {
     type HeadMut: 'a;
     type TailMut: HListMut<'a>;

@@ -4,7 +4,7 @@ use crate::macros::{
     functions, Copointed, Pointed,
 };
 
-use crate::t_funk::{Closure, Pointed};
+use crate::t_funk::Closure;
 
 /// Flip the arguments of an arity 2 function
 #[functions]
@@ -14,7 +14,7 @@ pub trait Flip: Sized {
 
 impl<T> Flip for T {
     fn flip(self) -> Flipped<Self> {
-        Flipped::point(self)
+        Flipped(self)
     }
 }
 
@@ -38,7 +38,7 @@ impl<T> Flip for T {
     Split,
     Fanout,
 )]
-pub struct Flipped<F>(F);
+pub struct Flipped<F>(pub F);
 
 impl<F, A, B> Closure<(B, A)> for Flipped<F>
 where

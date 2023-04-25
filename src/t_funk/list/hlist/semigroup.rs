@@ -46,7 +46,7 @@ mod test {
     };
 
     #[test]
-    fn test_cons_semigroup() {
+    fn test_hlist_semigroup() {
         let concat = (1, 2, 3)
             .to_hlist()
             .fmap(PointF::<Sum<i32>>::default())

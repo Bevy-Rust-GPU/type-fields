@@ -1,6 +1,6 @@
 use crate::t_funk::hlist::{HListLength, ToTList};
 
-/// The base cons list type.
+/// The base HList type.
 /// Describes the Head / CAR, Tail / CDR structure via associated types.
 pub trait HList: HListLength + ToTList {
     type Head;

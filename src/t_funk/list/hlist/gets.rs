@@ -2,7 +2,7 @@ use crate::t_funk::hlist::{Path, Paths};
 
 use super::{Get, HList};
 
-/// Fetch multiple items by type from a cons list.
+/// Fetch multiple items by type from a `HList`.
 pub trait GetsImpl<T, P>: HList {
     fn gets_impl(self) -> T;
 }
@@ -54,7 +54,7 @@ mod tests {
     };
 
     #[test]
-    fn test_cons_gets() {
+    fn test_hlist_gets() {
         let list = (1, 2.0, "three").to_hlist();
         let gets: (&str, (f32, (usize, ()))) = list.gets_impl();
         assert_eq!(("three", 2.0, 1), gets.to_tlist());

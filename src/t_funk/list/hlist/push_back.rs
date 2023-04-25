@@ -39,7 +39,7 @@ mod tests {
     use super::PushBack;
 
     #[test]
-    fn test_cons_push_back() {
+    fn test_hlist_push_back() {
         let list: () = ();
         let list: (usize, ()) = list.push_back(1);
         let list: (usize, (usize, ())) = list.push_back(2);

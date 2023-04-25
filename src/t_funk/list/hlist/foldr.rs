@@ -28,7 +28,7 @@ mod test {
     use crate::t_funk::{tlist::ToHList, Foldr, Sub};
 
     #[test]
-    fn test_cons_fold_right() {
+    fn test_hlist_foldr() {
         let list = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10).to_hlist();
         let res = list.foldr(Sub, 0);
         assert_eq!(res, -10 - 9 - 8 - 7 - 6 - 5 - 4 - 3 - 2 - 1);

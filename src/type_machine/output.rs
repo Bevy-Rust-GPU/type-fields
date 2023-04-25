@@ -28,7 +28,7 @@ where
     type Output = Tagged<Output<T>, Action<Rhs>>;
 
     fn shl(self, rhs: Rhs) -> Self::Output {
-        Pointed::point(Pointed::point(rhs))
+        Tagged::point(Action(rhs))
     }
 }
 
@@ -36,7 +36,7 @@ impl<P, T, Rhs> Shr<Output<Rhs>> for Tagged<P, T> {
     type Output = Tagged<Output<Rhs>, Self>;
 
     fn shr(self, _: Output<Rhs>) -> Self::Output {
-        Pointed::point(self)
+        Tagged::point(self)
     }
 }
 
@@ -44,7 +44,7 @@ impl<P, T, Rhs> Shl<Output<Rhs>> for Tagged<P, T> {
     type Output = Tagged<Output<Rhs>, Self>;
 
     fn shl(self, _: Output<Rhs>) -> Self::Output {
-        Pointed::point(self)
+        Tagged::point(self)
     }
 }
 

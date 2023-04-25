@@ -2,7 +2,7 @@ use crate::macros::{
     applicative::Apply, functor::Fmap, monad::Chain, monoid::Mempty, Copointed, Pointed,
 };
 
-use crate::t_funk::{Copointed, Mappend, Pointed};
+use crate::t_funk::Mappend;
 use core::ops::Add;
 
 /// A `Semigroup` wrapper that can append additively.
@@ -23,7 +23,7 @@ use core::ops::Add;
     Chain,
     Mempty,
 )]
-pub struct Sum<T>(T);
+pub struct Sum<T>(pub T);
 
 impl<T> Mappend<Sum<T>> for Sum<T>
 where
@@ -32,22 +32,16 @@ where
     type Mappend = Sum<T::Output>;
 
     fn mappend(self, t: Sum<T>) -> Self::Mappend {
-        Pointed::point(self.copoint() + t.copoint())
+        Sum(self.0 + t.0)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{Copointed, Mappend, Pointed, Sum};
+    use crate::t_funk::{Mappend, Sum};
 
     #[test]
     fn test_sum() {
-        assert_eq!(
-            12,
-            Sum::point(2)
-                .mappend(Sum::point(4))
-                .mappend(Sum::point(6))
-                .copoint()
-        )
+        assert_eq!(Sum(2).mappend(Sum(4)).mappend(Sum(6)), Sum(12))
     }
 }

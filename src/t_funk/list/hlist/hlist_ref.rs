@@ -1,6 +1,6 @@
 use super::HList;
 
-/// A cons list of immutable references
+/// A HList of immutable references
 pub trait HListRef<'a>: HList {
     type HeadRef: 'a;
     type TailRef: HListRef<'a>;

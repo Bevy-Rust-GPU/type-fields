@@ -24,7 +24,7 @@ impl<T, Rhs> Shr<Action<Rhs>> for Input<T> {
     type Output = Tagged<Input<T>, Action<Rhs>>;
 
     fn shr(self, rhs: Action<Rhs>) -> Self::Output {
-        Pointed::point(rhs)
+        Tagged::point(rhs)
     }
 }
 
@@ -32,7 +32,7 @@ impl<T, Rhs> Shl<Input<Rhs>> for Input<T> {
     type Output = Tagged<Input<T>, Input<Rhs>>;
 
     fn shl(self, rhs: Input<Rhs>) -> Self::Output {
-        Pointed::point(rhs)
+        Tagged::point(rhs)
     }
 }
 
@@ -40,7 +40,7 @@ impl<T, Rhs> Shl<Action<Rhs>> for Input<T> {
     type Output = Tagged<Input<T>, Action<Rhs>>;
 
     fn shl(self, rhs: Action<Rhs>) -> Self::Output {
-        Pointed::point(rhs)
+        Tagged::point(rhs)
     }
 }
 
@@ -48,7 +48,7 @@ impl<P, T, Rhs> Shr<Input<Rhs>> for Tagged<P, T> {
     type Output = Tagged<Input<Rhs>, Self>;
 
     fn shr(self, _: Input<Rhs>) -> Self::Output {
-        Pointed::point(self)
+        Tagged::point(self)
     }
 }
 
@@ -56,7 +56,7 @@ impl<P, T, Rhs> Shl<Input<Rhs>> for Tagged<P, T> {
     type Output = Tagged<P, Tagged<Input<Rhs>, T>>;
 
     fn shl(self, _: Input<Rhs>) -> Self::Output {
-        Pointed::point(Pointed::point(self.copoint()))
+        Tagged::point(Tagged::point(self.copoint()))
     }
 }
 

@@ -1,4 +1,4 @@
-/// Concrete tuple implementations for cons lists and consable types.
+/// Concrete tuple implementations for HLists and consable types.
 use crate::{
     macro_cons,
     t_funk::{

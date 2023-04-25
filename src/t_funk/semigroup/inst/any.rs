@@ -1,6 +1,6 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Chain, Mempty, Pointed};
+use type_fields_macros::{Apply, Chain, Copointed, Fmap, Mempty, Pointed};
 
-use crate::t_funk::{Copointed, Mappend, Pointed};
+use crate::t_funk::Mappend;
 
 /// A `Semigroup` wrapper that can append with OR semantics.
 #[derive(
@@ -20,7 +20,7 @@ use crate::t_funk::{Copointed, Mappend, Pointed};
     Chain,
     Mempty,
 )]
-pub struct Any<T>(T);
+pub struct Any<T>(pub T);
 
 impl<T> Mappend<Any<T>> for Any<T>
 where
@@ -29,25 +29,16 @@ where
     type Mappend = Any<T::Output>;
 
     fn mappend(self, t: Any<T>) -> Self::Mappend {
-        Pointed::point(self.copoint() | t.copoint())
+        Any(self.0 | t.0)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{
-        semigroup::{Any, Mappend},
-        Copointed, Pointed,
-    };
+    use crate::t_funk::semigroup::{Any, Mappend};
 
     #[test]
     fn test_any() {
-        assert_eq!(
-            true,
-            Any::point(true)
-                .mappend(Any::point(false))
-                .mappend(Any::point(true))
-                .copoint()
-        )
+        assert_eq!(Any(true), Any(true).mappend(Any(false)).mappend(Any(true)))
     }
 }

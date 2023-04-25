@@ -38,7 +38,7 @@ mod test {
     };
 
     #[test]
-    fn test_cons_append() {
+    fn test_hlist_append() {
         let list_a = (1, 2, 3).to_hlist();
         let list_b = (4, 5, 6).to_hlist();
         let list_c = list_a.append(list_b);

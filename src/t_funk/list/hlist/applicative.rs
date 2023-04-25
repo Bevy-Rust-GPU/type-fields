@@ -34,11 +34,11 @@ impl Pure for () {
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{Add, Apply, Curry, Flip, Mul};
+    use crate::t_funk::{Add, Apply, Curry, Mul};
 
     #[test]
-    fn test_cons_applicative() {
-        let funcs = (Add.suffix(2), (Mul.flip().prefix(2), ()));
+    fn test_hlist_applicative() {
+        let funcs = (Add.suffix(2), (Mul.suffix(2), ()));
         let nums = (1, (2, (3, ())));
         let res = funcs.apply(nums);
         assert_eq!(res, (3, (4, (5, (2, (4, (6, ())))))));

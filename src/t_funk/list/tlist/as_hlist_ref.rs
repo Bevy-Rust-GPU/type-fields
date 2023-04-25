@@ -1,6 +1,6 @@
 use crate::{t_funk::hlist::HListRef, t_funk::tlist::TList};
 
-/// Immutably borrow a cons list from a flat tuple.
+/// Immutably borrow a HList from a flat tuple.
 /// ex. `&(1, 2, 3, 4)` -> `(&1, (&2, (&3, (&4, ()))))`
 pub trait AsHListRef: TList {
     type HListRef<'a>: HListRef<'a>

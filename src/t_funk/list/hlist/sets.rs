@@ -40,7 +40,7 @@ mod tests {
     };
 
     #[test]
-    fn test_sets() {
+    fn test_hlist_sets() {
         let list = (1, 2.0, "three").to_hlist();
         let list = list.sets(("hello", (7.0, (4, ()))));
         assert_eq!((4, 7.0, "hello"), list.to_tlist());

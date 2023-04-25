@@ -22,6 +22,6 @@ where
     type Output = C;
 
     fn apply(context: C, output: O) -> Self::Output {
-        context.set(Pointed::point(output))
+        context.set(Tagged::point(output))
     }
 }

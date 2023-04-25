@@ -12,9 +12,9 @@ pub struct Here;
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct This;
 
-/// Path to an item in a cons list, in the form `(Next, (Next, (Here, ())))`.
+/// Path to an item in a HList, in the form `(Next, (Next, (Here, ())))`.
 ///
-/// Practically, this is a cons list that can only contain `Next` and `Here`.
+/// Practically, this is a HList that can only contain `Next` and `Here`.
 pub trait Path {}
 impl<PathNext> Path for (Next, PathNext) where PathNext: Path {}
 impl Path for (Here, ()) {}

@@ -4,7 +4,7 @@ use super::Instruction;
 
 /// Instruction for pushing a value to the back of the context
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Const<T>(T);
+pub struct Const<T>(pub T);
 
 impl<T> Pointed for Const<T> {
     type Pointed = T;

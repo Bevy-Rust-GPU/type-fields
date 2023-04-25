@@ -22,6 +22,6 @@ where
     type Output = C::TuplePushBack;
 
     fn apply(context: C, output: O) -> Self::Output {
-        context.push_back(Pointed::point(output))
+        context.push_back(Tagged::point(output))
     }
 }

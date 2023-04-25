@@ -51,7 +51,7 @@ impl Pure for Nothing {
     type Pure<T> = Just<T>;
 
     fn pure<T>(t: T) -> Self::Pure<T> {
-        Just::point(t)
+        Just(t)
     }
 }
 
@@ -192,7 +192,7 @@ where
     type Mappend = Just<T::Mappend>;
 
     fn mappend(self, t: Just<U>) -> Self::Mappend {
-        Just::point(self.copoint().mappend(t.copoint()))
+        Just(self.0.mappend(t.0))
     }
 }
 
@@ -202,7 +202,7 @@ impl<T> Maybe<T> for Just<T> {}
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{test_functor_laws, Add, Closure, Curry, CurryN, Fmap, Mul, Pointed};
+    use crate::t_funk::{test_functor_laws, Add, Closure, Curry, CurryN, Fmap, Mul};
 
     use super::{Just, Nothing};
 
@@ -212,7 +212,7 @@ mod test {
         let mapped = nothing.fmap(CurryN::<(i32, i32)>::curry_n(Add).call(1));
         assert_eq!(mapped, Nothing);
 
-        let just = Just::point(2);
+        let just = Just(2);
         let mapped = just.fmap(Add.curry_n().call(1));
         assert_eq!(mapped, Just(3));
     }
@@ -220,6 +220,6 @@ mod test {
     #[test]
     fn test_functor_laws_maybe() {
         test_functor_laws(Nothing, Add.prefix(2), Mul.prefix(2));
-        test_functor_laws(Just::point(1), Add.prefix(2), Mul.prefix(2));
+        test_functor_laws(Just(1), Add.prefix(2), Mul.prefix(2));
     }
 }

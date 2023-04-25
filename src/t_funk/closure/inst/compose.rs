@@ -1,6 +1,6 @@
 use crate::macros::{functions, Copointed, Pointed};
 
-use crate::t_funk::{Closure, Pointed};
+use crate::t_funk::Closure;
 
 /// Right-to-left composition
 /// (.)
@@ -15,13 +15,11 @@ impl<T, F> Compose<F> for T {
 
     /// Compose `F(A) -> B` with `F(B) -> C` to produce `F(A) -> C`
     fn compose(self, f: F) -> Self::Compose {
-        Composed::point((self, f))
+        Composed(self, f)
     }
 }
 
-#[derive(
-    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed,
-)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Composed<F1, F2>(F1, F2);
 
 impl<F1, F2, A> Closure<A> for Composed<F1, F2>
@@ -35,4 +33,3 @@ where
         self.0.call(self.1.call(a))
     }
 }
-

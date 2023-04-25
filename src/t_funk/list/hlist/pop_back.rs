@@ -34,7 +34,7 @@ mod test {
     use super::PopBack;
 
     #[test]
-    fn test_cons_pop_back() {
+    fn test_hlist_pop_back() {
         let list: (usize, (f32, (&str, ()))) = (1, 2.0, "three").to_hlist();
         let list: (usize, (f32, ())) = list.pop_back();
         let list: (usize, ()) = list.pop_back();
