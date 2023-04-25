@@ -1,4 +1,4 @@
-use type_fields_macros::functions;
+use crate::macros::functions;
 
 /// A type that can unwrap a value
 #[functions]

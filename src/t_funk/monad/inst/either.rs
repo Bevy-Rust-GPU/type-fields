@@ -1,6 +1,11 @@
-use type_fields_macros::{
-    Apply, Chain, Copointed, Fmap, FoldMap, Foldl, Foldr, Mappend, Mconcat, Mempty, Pointed, Pure,
-    Replace, Then,
+use crate::macros::{
+    applicative::{Apply, Pure},
+    foldable::{FoldMap, Foldl, Foldr},
+    functor::{Fmap, Replace},
+    monad::{Chain, Then},
+    monoid::{Mconcat, Mempty},
+    semigroup::Mappend,
+    Copointed, Pointed,
 };
 
 use crate::t_funk::{Applicative, Copointed, Functor, Monad, Pointed};
@@ -86,7 +91,7 @@ mod test {
 
     #[test]
     fn test_functor_laws_maybe() {
-        test_functor_laws(Left::point(1), Add.curry_a(2), Mul.curry_a(2));
-        test_functor_laws(Right::point(1), Add.curry_a(2), Mul.curry_a(2));
+        test_functor_laws(Left::point(1), Add.prefix(2), Mul.prefix(2));
+        test_functor_laws(Right::point(1), Add.prefix(2), Mul.prefix(2));
     }
 }

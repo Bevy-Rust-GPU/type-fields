@@ -1,4 +1,4 @@
-use type_fields_macros::functions;
+use crate::macros::functions;
 
 /// Right-to-left composition
 /// (. or <<<)

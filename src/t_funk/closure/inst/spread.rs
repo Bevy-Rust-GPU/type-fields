@@ -1,7 +1,11 @@
-use type_fields_macros::{Fanout, Split};
+use crate::macros::arrow::{Fanout, Split};
 
 use crate::{
-    macros::{functions, Arr, Compose, Copointed, First, Id, Pointed, Second},
+    macros::{
+        arrow::{Arr, First, Second},
+        category::{Compose, Id},
+        functions, Copointed, Pointed,
+    },
     t_funk::{Closure, Pointed},
 };
 

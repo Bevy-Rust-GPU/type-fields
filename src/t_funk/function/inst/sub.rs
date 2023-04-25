@@ -1,4 +1,8 @@
-use type_fields_macros::{Arr, Closure, Compose, Fanout, First, Id, Second, Split};
+use crate::macros::{
+    arrow::{Arr, Fanout, First, Second, Split},
+    category::{Compose, Id},
+    Closure,
+};
 
 use crate::t_funk::Function;
 

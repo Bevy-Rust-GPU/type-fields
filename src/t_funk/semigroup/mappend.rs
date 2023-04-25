@@ -1,4 +1,4 @@
-use type_fields_macros::functions;
+use crate::macros::functions;
 
 /// A type with a binary associative function.
 #[functions]

@@ -1,6 +1,9 @@
 use core::marker::PhantomData;
 
-use type_fields_macros::{Compose, Id, First, Second, Arr, Split, Fanout};
+use crate::macros::{
+    arrow::{Arr, Fanout, First, Second, Split},
+    category::{Compose, Id},
+};
 
 use crate::t_funk::{
     hlist::PushFrontF, ApplyF, Closure, Curried, CurriedA, Curry, Flip, Flipped, Fmap, Function,

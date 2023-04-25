@@ -1,6 +1,9 @@
 use core::marker::PhantomData;
 
-use type_fields_macros::{Arr, Compose, First, Id, Second, Split, Fanout};
+use crate::macros::{
+    arrow::{Arr, Fanout, First, Second, Split},
+    category::{Compose, Id},
+};
 
 use crate::t_funk::{
     hlist::{HList, PushBack, ToTList},
@@ -92,11 +95,14 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{Closure, CurryN, Function};
+    use crate::{
+        macros::Closure,
+        t_funk::{Closure, CurryN, Function},
+    };
 
     #[test]
     fn test_curry_n() {
-        #[derive(type_fields_macros::Closure)]
+        #[derive(Closure)]
         struct ManyArgs;
 
         impl<A, B, C, D, E, F, G> Function<(A, B, C, D, E, F, G)> for ManyArgs {

@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use type_fields_macros::Closure;
+use crate::macros::Closure;
 
 use crate::t_funk::Function;
 

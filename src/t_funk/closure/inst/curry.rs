@@ -1,17 +1,24 @@
-use type_fields_macros::{Arr, Compose, Copointed, First, Id, Pointed, Second, Split, Fanout};
+use crate::macros::{
+    arrow::{Arr, Fanout, First, Second, Split},
+    category::{Compose, Id},
+    Copointed, Pointed,
+};
 
 use crate::t_funk::{Closure, Flip, Flipped};
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
 pub trait Curry: Sized {
+    /// Convert `F(A, B) -> *` into `F(A) -> F(B) -> *`
     fn curry(self) -> Curried<Self>;
 
-    fn curry_a<A>(self, a: A) -> CurriedA<Self, A> {
+    /// Curry `A` into `F(A, B) -> *` to produce `F(B) -> *`
+    fn prefix<A>(self, a: A) -> CurriedA<Self, A> {
         self.curry().call(a)
     }
 
-    fn curry_b<B>(self, a: B) -> CurriedA<Flipped<Self>, B> {
-        self.flip().curry_a(a)
+    /// Curry `B` into `F(A, B) -> *` to produce `F(A) -> *`
+    fn suffix<B>(self, a: B) -> CurriedA<Flipped<Self>, B> {
+        self.flip().prefix(a)
     }
 }
 

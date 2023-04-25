@@ -3,7 +3,7 @@ mod curry_n;
 mod flip;
 mod spread;
 mod compose {
-    use type_fields_macros::{functions, Copointed, Pointed};
+    use crate::macros::{functions, Copointed, Pointed};
 
     use crate::t_funk::{Closure, Pointed};
 
@@ -18,6 +18,7 @@ mod compose {
     impl<T, F> Compose<F> for T {
         type Compose = Composed<T, F>;
 
+        /// Compose `F(A) -> B` with `F(B) -> C` to produce `F(A) -> C`
         fn compose(self, f: F) -> Self::Compose {
             Composed::point((self, f))
         }

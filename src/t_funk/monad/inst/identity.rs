@@ -1,6 +1,11 @@
-use type_fields_macros::{
-    Apply, Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Mappend, Mconcat, Mempty, Pointed,
-    Pure, Replace, Then,
+use crate::macros::{
+    applicative::{Apply, Pure},
+    foldable::{Fold, FoldMap, Foldl, Foldr},
+    functor::{Fmap, Replace},
+    monad::{Chain, Then},
+    monoid::{Mconcat, Mempty},
+    semigroup::Mappend,
+    Copointed, Pointed,
 };
 
 /// Identity monad, used to lift values into a monadic context.
@@ -71,6 +76,6 @@ mod test {
 
     #[test]
     fn test_functor_laws_identity() {
-        test_functor_laws(Identity::point(4), Add.curry_a(2), Mul.curry_a(2))
+        test_functor_laws(Identity::point(4), Add.prefix(2), Mul.prefix(2))
     }
 }

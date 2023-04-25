@@ -1,4 +1,4 @@
-use type_fields_macros::{functions, Copointed, Pointed};
+use crate::macros::{functions, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 

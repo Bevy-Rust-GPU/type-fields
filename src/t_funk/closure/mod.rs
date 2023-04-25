@@ -2,7 +2,7 @@ mod inst;
 
 pub use inst::*;
 
-use type_fields_macros::functions;
+use crate::macros::functions;
 
 /// A [`Function`] that closes over some external scope via `self` parameter.
 #[functions]

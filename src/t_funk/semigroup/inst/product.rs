@@ -1,4 +1,6 @@
-use type_fields_macros::{Apply, Copointed, Fmap, Chain, Mempty, Pointed};
+use crate::macros::{
+    applicative::Apply, functor::Fmap, monad::Chain, monoid::Mempty, Copointed, Pointed,
+};
 
 use crate::t_funk::{Copointed, Mappend, Pointed};
 use core::ops::Mul;

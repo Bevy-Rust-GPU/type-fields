@@ -1,4 +1,4 @@
-use type_fields_macros::functions;
+use crate::macros::functions;
 
 /// A type that can take a wrapped function,
 /// map it over a provided value, and wrap the result

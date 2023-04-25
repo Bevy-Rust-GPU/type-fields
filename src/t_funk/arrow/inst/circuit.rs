@@ -1,12 +1,15 @@
 use core::marker::PhantomData;
 
-use type_fields_macros::{Fanout, Split};
+use crate::macros::arrow::{Fanout, Split};
 
 use crate::{
-    macros::{Compose, Copointed, Id, Pointed},
+    macros::{
+        category::{Compose, Id},
+        Copointed, Pointed,
+    },
     t_funk::{
-        arrow::First, category::Compose, function::Id, Arr, Closure, Copointed, CurriedA, Curry,
-        Pointed, Tuple,
+        arrow::First, category::Compose, function::Id, Arr, Closure, CurriedA, Curry, Pointed,
+        Tuple,
     },
 };
 
@@ -25,13 +28,13 @@ use crate::{
     Split,
     Fanout,
 )]
-pub struct Circuit<F>(F);
+pub struct Circuit<F>(pub F);
 
 impl<F> crate::t_funk::category::Id for Circuit<F> {
     type Id = Circuit<CurriedA<Tuple, Id>>;
 
     fn id() -> Self::Id {
-        Circuit::point(Tuple.curry_a(Id))
+        Circuit(Tuple.prefix(Id))
     }
 }
 
@@ -39,12 +42,12 @@ impl<C1, C2> Compose<Circuit<C2>> for Circuit<C1> {
     type Compose = Circuit<CircuitCompose<C1, C2>>;
 
     fn compose(self, f: Circuit<C2>) -> Self::Compose {
-        Circuit::point(CircuitCompose(self.copoint(), f.copoint()))
+        Circuit(CircuitCompose(self.0, f.0))
     }
 }
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Id, Compose)]
-pub struct CircuitCompose<C1, C2>(C1, C2);
+pub struct CircuitCompose<C1, C2>(pub C1, pub C2);
 
 impl<C1, C2, A, C1A, B, C2A, C> Closure<A> for CircuitCompose<C1, C2>
 where
@@ -65,7 +68,7 @@ impl<T, F> Arr<F> for Circuit<T> {
     type Arr = Circuit<CircuitArr<F>>;
 
     fn arr(f: F) -> Self::Arr {
-        Circuit::point(CircuitArr::point(f))
+        Circuit(CircuitArr(f))
     }
 }
 
@@ -84,7 +87,7 @@ impl<T, F> Arr<F> for Circuit<T> {
     Id,
     Compose,
 )]
-pub struct CircuitArr<F>(F);
+pub struct CircuitArr<F>(pub F);
 
 impl<F, A> Closure<A> for CircuitArr<F>
 where
@@ -142,11 +145,13 @@ where
 
 #[cfg(test)]
 mod test {
-    use type_fields_macros::{Closure, Compose, Copointed, Id, Pointed};
+    use crate::macros::{
+        category::{Compose, Id},
+        Closure, Copointed, Pointed,
+    };
 
     use crate::t_funk::{
-        closure::Compose, function::Const, Add, Arr, Closure, Copointed, Curry, Div, Fanout,
-        Function, Pointed,
+        category::Compose, function::Const, Add, Arr, Closure, Curry, Div, Fanout, Function,
     };
 
     use super::Circuit;
@@ -161,7 +166,7 @@ mod test {
         type Output = Circuit<AccumImpl<A, F>>;
 
         fn call((a, f): (A, F)) -> Self::Output {
-            Circuit::point(AccumImpl::point((a, f)))
+            Circuit(AccumImpl(a, f))
         }
     }
 
@@ -193,7 +198,7 @@ mod test {
         type Output = <Accum as Closure<(A, AccumOutImpl<F>)>>::Output;
 
         fn call((a, f): (A, F)) -> Self::Output {
-            Accum.call((a, AccumOutImpl::point(f)))
+            Accum.call((a, AccumOutImpl(f)))
         }
     }
 
@@ -222,23 +227,23 @@ mod test {
     fn test_circuit() {
         let total = Total::<i32>::default();
 
-        let cir = total;
-        let (cir, a) = cir.copoint().call(1);
+        let Circuit(cir) = total;
+        let (Circuit(cir), a) = cir.call(1);
         assert_eq!(a, 1);
 
-        let (cir, b) = cir.copoint().call(2);
+        let (Circuit(cir), b) = cir.call(2);
         assert_eq!(b, 3);
 
-        let (cir, c) = cir.copoint().call(3);
+        let (Circuit(cir), c) = cir.call(3);
         assert_eq!(c, 6);
 
-        let (cir, d) = cir.copoint().call(4);
+        let (Circuit(_cir), d) = cir.call(4);
         assert_eq!(d, 10);
 
-        let mean1 = total.fanout(<Circuit<()> as Arr<_>>::arr(Const.curry_a(1.0)).compose(total));
-        let mean1 = mean1.compose(<Circuit<()> as Arr<_>>::arr(Div));
+        let mean1 = total.fanout(<Circuit<()> as Arr<_>>::arr(Const.prefix(1.0)).compose(total));
+        let Circuit(mean1) = mean1.compose(<Circuit<()> as Arr<_>>::arr(Div));
 
-        //let res = mean1.copoint().call(2.0);
+        //let res = mean1.call(2.0);
         //panic!("{res:?}");
     }
 }

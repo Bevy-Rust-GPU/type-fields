@@ -26,7 +26,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use type_fields_macros::Closure;
+    use crate::macros::Closure;
 
     use crate::t_funk::{hlist::ToTList, tlist::ToHList, Fmap, Function};
 

@@ -1,4 +1,4 @@
-use type_fields_macros::functions;
+use crate::macros::functions;
 
 /// A type that can flat-map a function over its wrapped value
 ///

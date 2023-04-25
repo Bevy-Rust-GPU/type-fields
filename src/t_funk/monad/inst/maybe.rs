@@ -1,6 +1,10 @@
-use type_fields_macros::{
-    Apply, Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Mconcat, Pointed, Pure, Replace,
-    Then,
+use crate::macros::{
+    applicative::{Apply, Pure},
+    foldable::{Fold, FoldMap, Foldl, Foldr},
+    functor::{Fmap, Replace},
+    monad::{Chain, Then},
+    monoid::Mconcat,
+    Copointed, Pointed,
 };
 
 use crate::t_funk::{
@@ -163,7 +167,7 @@ impl Fold for Nothing {
     Foldl,
     Fold,
 )]
-pub struct Just<T>(T);
+pub struct Just<T>(pub T);
 
 impl<T> Mempty for Just<T> {
     type Mempty = Nothing;
@@ -215,7 +219,7 @@ mod test {
 
     #[test]
     fn test_functor_laws_maybe() {
-        test_functor_laws(Nothing, Add.curry_a(2), Mul.curry_a(2));
-        test_functor_laws(Just::point(1), Add.curry_a(2), Mul.curry_a(2));
+        test_functor_laws(Nothing, Add.prefix(2), Mul.prefix(2));
+        test_functor_laws(Just::point(1), Add.prefix(2), Mul.prefix(2));
     }
 }

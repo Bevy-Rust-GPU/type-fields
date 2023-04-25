@@ -1,4 +1,4 @@
-use type_fields_macros::{Closure, Copointed, Pointed};
+use crate::macros::{Closure, Copointed, Pointed};
 
 use crate::t_funk::{
     function::Id, Apply, Chain, Closure, function::Const, Copointed, CurriedA, Curry, Fmap, Function,
@@ -56,7 +56,7 @@ impl<F> Pure for State<F> {
     type Pure<T> = State<CurriedA<Tuple, T>>;
 
     fn pure<T>(t: T) -> Self::Pure<T> {
-        State(Tuple.curry_a(t))
+        State(Tuple.prefix(t))
     }
 }
 
@@ -129,7 +129,7 @@ impl<I> Function<I> for Put {
     type Output = State<CurriedA<Const, ((), I)>>;
 
     fn call(input: I) -> Self::Output {
-        State::point(Const.curry_a(((), input)))
+        State::point(Const.prefix(((), input)))
     }
 }
 
@@ -146,7 +146,7 @@ impl Function<()> for Get {
 
 #[cfg(test)]
 mod test {
-    use type_fields_macros::Closure;
+    use crate::macros::Closure;
 
     use crate::t_funk::{
         tlist::ToHList, Chain, Closure, function::Const, Copointed, CurriedA, Curry, Function, Pointed, Put,
@@ -208,7 +208,7 @@ mod test {
         let arr = coin_s.copoint().call(Locked);
         assert_eq!(arr, (Thank, Unlocked));
 
-        let arr = coin_s.chain(Const.curry_a(push_s)).copoint().call(Unlocked);
+        let arr = coin_s.chain(Const.prefix(push_s)).copoint().call(Unlocked);
 
         assert_eq!(arr, (Open, Locked));
 
@@ -283,7 +283,7 @@ mod test {
             type Output = State<CurriedA<TurnSImpl, A>>;
 
             fn call(a: A) -> Self::Output {
-                State::point(TurnSImpl.curry_a(a))
+                State::point(TurnSImpl.prefix(a))
             }
         }
 

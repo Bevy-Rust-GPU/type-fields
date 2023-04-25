@@ -1,4 +1,4 @@
-use type_fields_macros::{Copointed, Pointed};
+use crate::macros::{Copointed, Pointed};
 
 use crate::t_funk::{
     closure::Compose, function::Id, Apply, Closure, Composed, Copointed, Fmap, Mappend, Mempty,

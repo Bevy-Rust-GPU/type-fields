@@ -1,4 +1,4 @@
-use type_fields_macros::{Copointed, Pointed};
+use crate::macros::{Copointed, Pointed};
 
 use crate::t_funk::{Closure, Copointed, Fmap, Pointed};
 
@@ -20,7 +20,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use type_fields_macros::Closure;
+    use crate::macros::Closure;
 
     use crate::t_funk::{
         monad::Pair, test_functor_laws, Add, Copointed, Curry, Fmap, Function, Mul, Pointed,
@@ -56,6 +56,6 @@ mod test {
 
     #[test]
     fn test_functor_laws_pair() {
-        test_functor_laws(Pair::point((1, 2)), Add.curry_a(2), Mul.curry_a(2));
+        test_functor_laws(Pair::point((1, 2)), Add.prefix(2), Mul.prefix(2));
     }
 }

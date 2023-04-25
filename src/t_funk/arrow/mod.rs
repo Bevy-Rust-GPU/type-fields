@@ -103,13 +103,13 @@ where
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        arrow::First, arrow::Second, Add, Closure, closure::Compose, Curry, Fanout, Mul, Split,
+        arrow::First, arrow::Second, closure::Compose, Add, Closure, Curry, Fanout, Mul, Split,
     };
 
     #[test]
     fn test() {
-        let a1 = Add.curry_b(5);
-        let a2 = Mul.curry_b(2);
+        let a1 = Add.suffix(5);
+        let a2 = Mul.suffix(2);
 
         let res = a1.compose(a2).call(3);
         assert_eq!(res, 11);
@@ -125,7 +125,7 @@ mod test {
         let res = a1.split(a2).call(q);
         assert_eq!(res, (6, 4));
 
-        let res = Fanout::fanout(a1, a2).call(5);
+        let res = a1.fanout(a2).call(5);
         assert_eq!(res, (10, 10));
     }
 }

@@ -1,4 +1,7 @@
-use type_fields_macros::{Compose, Copointed, Id, Pointed};
+use crate::macros::{
+    category::{Compose, Id},
+    Copointed, Pointed,
+};
 
 use crate::t_funk::{Closure, Curried, Fmap};
 
@@ -45,7 +48,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use type_fields_macros::Lenses;
+    use crate::macros::Lenses;
 
     use crate::t_funk::{
         closure::Compose, function::Const, functor::Const as FConst, Closure, Curry, Identity,
@@ -76,7 +79,7 @@ mod test {
         let identity = Atom::point.call(Identity::point).call(atom);
         let get = Atom::point.call(FConst::point).call(atom);
         let set = Atom::point
-            .call(Identity::point.compose(Const.curry_a(point)))
+            .call(Identity::point.compose(Const.prefix(point)))
             .call(atom);
 
         assert_eq!(identity, Identity::point(atom));
@@ -102,7 +105,7 @@ mod test {
         let identity = atom_point_x_lens.call(Identity::point).call(atom);
         let get = atom_point_x_lens.call(FConst::point).call(atom);
         let set = atom_point_x_lens
-            .call(Identity::point.compose(Const.curry_a(3.0)))
+            .call(Identity::point.compose(Const.prefix(3.0)))
             .call(atom);
 
         assert_eq!(identity, Identity::point(atom));

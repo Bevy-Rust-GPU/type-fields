@@ -1,4 +1,4 @@
-use type_fields_macros::Closure;
+use crate::macros::Closure;
 
 use crate::t_funk::{ApplyF, CurriedA, Curry, Fmap, Function};
 
@@ -12,19 +12,17 @@ where
     type Output = CurriedA<ApplyF, X::Fmap>;
 
     fn call((f, x): (F, X)) -> Self::Output {
-        ApplyF.curry_a(x.fmap(f))
+        ApplyF.prefix(x.fmap(f))
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{Closure, Curry, Just, LiftA2, Pointed, Tuple};
+    use crate::t_funk::{Closure, Curry, Just, LiftA2, Tuple};
 
     #[test]
     fn test_lift_a2() {
-        let foo = LiftA2
-            .call((Tuple.curry(), Just::point(3)))
-            .call(Just::point(5));
-        assert_eq!(foo, Just::point((3, 5)));
+        let foo = LiftA2.call((Tuple.curry(), Just(3))).call(Just(5));
+        assert_eq!(foo, Just((3, 5)));
     }
 }

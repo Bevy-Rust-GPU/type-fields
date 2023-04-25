@@ -1,6 +1,10 @@
 use core::marker::PhantomData;
 
-use type_fields_macros::{Closure, Compose, First, Id, Second, Arr};
+use crate::macros::{
+    arrow::{Arr, First, Second},
+    category::{Compose, Id},
+    Closure,
+};
 
 use super::Function;
 

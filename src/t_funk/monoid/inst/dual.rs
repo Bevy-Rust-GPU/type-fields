@@ -1,6 +1,10 @@
-use type_fields_macros::{
-    Apply, Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Mconcat, Mempty, Pointed, Pure,
-    Replace, Then,
+use crate::macros::{
+    applicative::{Apply, Pure},
+    foldable::{Fold, FoldMap, Foldl, Foldr},
+    functor::{Fmap, Replace},
+    monad::{Chain, Then},
+    monoid::{Mconcat, Mempty},
+    Copointed, Pointed,
 };
 
 use type_fields::t_funk::Mappend;
@@ -44,4 +48,3 @@ where
         Pointed::point(t.copoint().mappend(self.copoint()))
     }
 }
-
