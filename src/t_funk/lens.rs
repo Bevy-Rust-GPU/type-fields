@@ -48,7 +48,7 @@ mod test {
     use type_fields_macros::Lenses;
 
     use crate::t_funk::{
-        function::Const, functor::Const as FConst, Closure, Compose, ComposeL, Curry, Identity,
+        closure::Compose, function::Const, functor::Const as FConst, Closure, Curry, Identity,
         Pointed,
     };
 
@@ -76,7 +76,7 @@ mod test {
         let identity = Atom::point.call(Identity::point).call(atom);
         let get = Atom::point.call(FConst::point).call(atom);
         let set = Atom::point
-            .call(Const.curry_a(point).compose(Identity::point))
+            .call(Identity::point.compose(Const.curry_a(point)))
             .call(atom);
 
         assert_eq!(identity, Identity::point(atom));
@@ -97,12 +97,12 @@ mod test {
             point: Point { x: 0.0, y: 0.0 },
         };
 
-        let atom_point_x_lens = Atom::point.compose_l(Point::x);
+        let atom_point_x_lens = Atom::point.compose(Point::x);
 
         let identity = atom_point_x_lens.call(Identity::point).call(atom);
         let get = atom_point_x_lens.call(FConst::point).call(atom);
         let set = atom_point_x_lens
-            .call(Const.curry_a(3.0).compose(Identity::point))
+            .call(Identity::point.compose(Const.curry_a(3.0)))
             .call(atom);
 
         assert_eq!(identity, Identity::point(atom));

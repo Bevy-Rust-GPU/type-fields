@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use type_fields_macros::{Closure, Compose, First, Id, Second};
+use type_fields_macros::{Closure, Compose, First, Id, Second, Arr};
 
 use super::Function;
 
@@ -17,7 +17,7 @@ where
 }
 
 /// Pointed::point
-#[derive(Closure, Id, Compose, First, Second)]
+#[derive(Closure, Id, Compose, Arr, First, Second)]
 pub struct PointF<I>(PhantomData<I>);
 
 impl<T> Default for PointF<T> {

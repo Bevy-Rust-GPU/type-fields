@@ -4,5 +4,5 @@ use type_fields_macros::functions;
 pub trait Id {
     type Id;
 
-    fn id(self) -> Self::Id;
+    fn id() -> Self::Id;
 }

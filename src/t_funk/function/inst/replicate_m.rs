@@ -1,13 +1,13 @@
 use core::marker::PhantomData;
 
-use type_fields_macros::{Compose, Id, First, Second};
+use type_fields_macros::{Compose, Id, First, Second, Arr, Split, Fanout};
 
 use crate::t_funk::{
     hlist::PushFrontF, ApplyF, Closure, Curried, CurriedA, Curry, Flip, Flipped, Fmap, Function,
     LiftA2, Pure, Then,
 };
 
-#[derive(Id, Compose, First, Second)]
+#[derive(Id, Compose, Arr, First, Second, Split, Fanout)]
 pub struct ReplicateM<C, P>(PhantomData<(C, P)>);
 
 impl<F, Next, P> Function<F> for ReplicateM<(Next,), P>

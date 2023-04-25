@@ -1,4 +1,4 @@
-use type_fields_macros::{functions, Compose, Copointed, First, Id, Pointed, Second};
+use type_fields_macros::{functions, Compose, Copointed, First, Id, Pointed, Second, Arr, Split, Fanout};
 
 use crate::t_funk::{Closure, Pointed};
 
@@ -28,8 +28,11 @@ impl<T> Flip for T {
     Copointed,
     Id,
     Compose,
+    Arr,
     First,
     Second,
+    Split,
+    Fanout,
 )]
 pub struct Flipped<F>(F);
 

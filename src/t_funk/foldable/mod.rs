@@ -41,11 +41,12 @@ impl<T> Foldable for T {
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        tlist::ToHList, Closure, Compose, Copointed, Curry, Dual, Endo, Flip, FoldMap, PointF, Sub,
+        closure::Compose, tlist::ToHList, Closure, Copointed, Curry, Dual, Endo, Flip, FoldMap,
+        PointF, Sub,
     };
 
     // 'default' impl of Foldl with respect to Dual / Endo.
-    // 
+    //
     // May be useful for derives, but no compatible types outside of the already-specialized
     // HList have been implemented yet.
     #[test]
@@ -58,9 +59,9 @@ mod test {
 
         let res = t
             .fold_map(
-                f.flip()
-                    .curry()
-                    .compose(PointF::<Endo<_>>::default().compose(PointF::<Dual<_>>::default())),
+                PointF::<Dual<_>>::default()
+                    .compose(PointF::<Endo<_>>::default())
+                    .compose(f.flip().curry()),
             )
             .copoint()
             .copoint()

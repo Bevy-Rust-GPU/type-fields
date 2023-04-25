@@ -1,7 +1,10 @@
-//! # <T>-Funk
-//! ## (Or <F>-Funk, <G>-Funk, <P>-Funk, Type-Land, etc.)
+//! # <🕶️>🎸
+//! ## <T>-Funk
+//! ### (Or <F>-Funk, <G>-Funk, <P>-Funk, Type-Land, etc.)
 //!
-//! Type-level functional programming toolset for Rust.
+//! Do funky things with types.
+//!
+//! A type-level functional programming toolset for Rust.
 //!
 //! ## Idioms
 //!

@@ -1,6 +1,6 @@
 use type_fields_macros::{
-    Apply, Chain, Copointed, Fmap, FoldMap, Foldl, Foldr, Mappend, Mconcat, Mempty, Pointed, Pure,
-    Replace, Then, Fold,
+    Apply, Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Mappend, Mconcat, Mempty, Pointed,
+    Pure, Replace, Then,
 };
 
 /// Identity monad, used to lift values into a monadic context.
@@ -34,7 +34,7 @@ pub struct Identity<T>(T);
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        test_functor_laws, tlist::ToHList, Add, Apply, Chain, Closure, Composed, Copointed,
+        closure::Compose, test_functor_laws, tlist::ToHList, Add, Apply, Chain, Closure, Copointed,
         CurriedA, Curry, CurryN, Div, Flip, Flipped, Fmap, FoldMap, Identity, Mul, PointF, Pointed,
         Sub, Sum, Then,
     };
@@ -53,7 +53,8 @@ mod test {
         assert_eq!(id3.copoint(), 12);
 
         let id4: Identity<i32> = id3.chain(
-            Composed::point((Div.flip(), PointF::<Identity<_>>::default()))
+            PointF::<Identity<_>>::default()
+                .compose(Div.flip())
                 .curry_n()
                 .call(3),
         );

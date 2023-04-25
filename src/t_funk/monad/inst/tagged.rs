@@ -1,8 +1,8 @@
 use core::marker::PhantomData;
 
 use crate::t_funk::{
-    Apply, Chain, Closure, Copointed, Fmap, Fold, Foldr, function::Id, Mappend, Mconcat, Mempty, Pointed,
-    Replace, Then,
+    function::Id, Apply, Chain, Closure, Copointed, Fmap, Fold, Foldr, Mappend, Mconcat, Mempty,
+    Pointed, Replace, Then,
 };
 
 /// Phantom monad, used to lift values into a monadic context
@@ -194,8 +194,8 @@ where
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        test_functor_laws, Add, Apply, Chain, Closure, Composed, Copointed, Curry, CurryN, Div,
-        Flip, Fmap, FmapF, Mul, PointF, Pointed, Sub, Tagged, Then,
+        closure::Compose, test_functor_laws, Add, Apply, Chain, Closure, Copointed, Curry, CurryN,
+        Div, Flip, Fmap, FmapF, Mul, PointF, Pointed, Sub, Tagged, Then,
     };
 
     #[test]
@@ -218,7 +218,8 @@ mod test {
         assert_eq!(id3.copoint(), 12);
 
         let id4: Tagged<Tag, i32> = id3.chain(
-            Composed::point((Div.flip(), PointF::<Tagged<Tag, _>>::default()))
+            PointF::<Tagged<Tag, _>>::default()
+                .compose(Div.flip())
                 .curry_n()
                 .call(3),
         );

@@ -1,38 +1,28 @@
-use type_fields_macros::{functions, Copointed, Pointed};
-
-use crate::t_funk::Closure;
+use type_fields_macros::functions;
 
 /// Right-to-left composition
 /// (. or <<<)
 #[functions]
 pub trait Compose<F>: Sized {
-    fn compose(self, f: F) -> Composed<Self, F>;
+    type Compose;
+    fn compose(self, f: F) -> Self::Compose;
 }
 
 /// Left-to-right composition
 /// (>>>)
 #[functions]
 pub trait ComposeL<F>: Sized {
-    fn compose_l(self, f: F) -> Composed<F, Self>;
+    type ComposeL;
+    fn compose_l(self, f: F) -> Self::ComposeL;
 }
 
-impl<T, F> ComposeL<F> for T {
-    fn compose_l(self, f: F) -> Composed<F, Self> {
-        Composed(f, self)
-    }
-}
-
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
-pub struct Composed<F1, F2>(F1, F2);
-
-impl<F1, F2, A> Closure<A> for Composed<F1, F2>
+impl<T, F> ComposeL<F> for T
 where
-    F1: Closure<A>,
-    F2: Closure<F1::Output>,
+    F: Compose<T>,
 {
-    type Output = F2::Output;
+    type ComposeL = F::Compose;
 
-    fn call(self, a: A) -> Self::Output {
-        self.1.call(self.0.call(a))
+    fn compose_l(self, f: F) -> Self::ComposeL {
+        f.compose(self)
     }
 }

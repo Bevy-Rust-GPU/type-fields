@@ -1,4 +1,4 @@
-use type_fields_macros::{Closure, Compose, First, Id, Second};
+use type_fields_macros::{Closure, Compose, First, Id, Second, Arr, Split, Fanout};
 
 use crate::t_funk::Function;
 
@@ -15,8 +15,11 @@ use crate::t_funk::Function;
     Closure,
     Id,
     Compose,
+    Arr,
     First,
     Second,
+    Split,
+    Fanout,
 )]
 pub struct Id;
 

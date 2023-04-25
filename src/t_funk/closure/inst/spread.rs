@@ -1,6 +1,9 @@
-use type_fields_macros::{functions, Copointed, First, Id, Pointed, Second, Compose};
+use type_fields_macros::{Fanout, Split};
 
-use crate::t_funk::{Closure, Pointed};
+use crate::{
+    macros::{functions, Arr, Compose, Copointed, First, Id, Pointed, Second},
+    t_funk::{Closure, Pointed},
+};
 
 /// Feed one argument into both inputs of an arity 2 function
 #[functions]
@@ -28,8 +31,11 @@ impl<T> Spread for T {
     Copointed,
     Id,
     Compose,
+    Arr,
     First,
     Second,
+    Split,
+    Fanout,
 )]
 pub struct Spreaded<F>(F);
 

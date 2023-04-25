@@ -26,13 +26,13 @@ pub trait Category {
 impl<T> Category for T {
     type Identity = T::Id where T: Id;
 
-    type Composed<F> = Composed<T, F> where T: Compose<F>;
+    type Composed<F> = T::Compose where T: Compose<F>;
 
     fn id(self) -> Self::Identity
     where
         T: Id,
     {
-        Id::id(self)
+        <T as Id>::id()
     }
 
     fn compose<F>(self, f: F) -> <Self as Category>::Composed<F>
@@ -45,14 +45,14 @@ impl<T> Category for T {
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{category::Id, Add, Closure, Compose, Curry};
+    use crate::t_funk::{category::Compose, category::Id, Add, Closure, Curry};
 
     #[test]
     fn test_category() {
         let foo = Add.curry_b(3);
-        let bar = foo.id();
+        let bar = Add::id();
         let baz = foo.compose(bar);
         let res = baz.call(1234);
-        assert_eq!(res, 1240)
+        assert_eq!(res, 1237)
     }
 }

@@ -1,8 +1,8 @@
 use type_fields_macros::{Copointed, Pointed};
 
 use crate::t_funk::{
-    function::Id, Apply, Closure, Compose, Composed, Copointed, Fmap, Mappend, Mempty, Pointed,
-    Pure,
+    closure::Compose, function::Id, Apply, Closure, Composed, Copointed, Fmap, Mappend, Mempty,
+    Pointed, Pure,
 };
 
 /// The monoid of endomorphisms under composition.
@@ -13,7 +13,7 @@ impl<F1, F2> Fmap<F2> for Endo<F1>
 where
     F1: Compose<F2>,
 {
-    type Fmap = Endo<Composed<F1, F2>>;
+    type Fmap = Endo<<F1 as Compose<F2>>::Compose>;
 
     fn fmap(self, f: F2) -> Self::Fmap {
         Endo(self.copoint().compose(f))
@@ -79,8 +79,8 @@ mod test {
     use crate::{
         t_funk::tlist::ToHList,
         t_funk::{
-            Add, Closure, Compose, Composed, Copointed, CurriedN, CurryN, Foldr, Mappend, PointF,
-            Pointed,
+            closure::Compose, Add, Closure, Composed, Copointed, CurriedN, CurryN, Foldr, Mappend,
+            PointF, Pointed,
         },
     };
 
@@ -105,15 +105,14 @@ mod test {
 
     #[test]
     fn test_composition() {
-        let add: Add = Add;
-        let add_result: i32 = add.call((1, 2));
+        let add_result: i32 = Add.call((1, 2));
         assert_eq!(add_result, 3);
 
         let endo = PointF::default();
-        let _endo_result: Endo<Add> = endo.call(add);
+        let _endo_result: Endo<Add> = endo.call(Add);
 
-        let add_endo: Composed<Add, PointF<Endo<i32>>> =
-            add.compose(PointF::<Endo<i32>>::default());
+        let add_endo: Composed<PointF<Endo<i32>>, Add> =
+            PointF::<Endo<i32>>::default().compose(Add);
         let add_endo_result: Endo<i32> = add_endo.call((1, 2));
         assert_eq!(add_endo_result.copoint(), 3);
 
@@ -123,9 +122,9 @@ mod test {
         assert_eq!(add_curry_result, 2);
 
         let add_curry_endo_a: Composed<
-            CurriedN<Add, (), _>,
             PointF<Endo<<CurriedN<Add, (), _> as Closure<i32>>::Output>>,
-        > = Add.curry_n().compose(PointF::default());
+            CurriedN<Add, (), _>,
+        > = PointF::default().compose(Add.curry_n());
         let add_curry_endo_b: Endo<CurriedN<Add, (i32, ()), _>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.copoint().call(2);
         assert_eq!(add_curry_endo_result, 3);

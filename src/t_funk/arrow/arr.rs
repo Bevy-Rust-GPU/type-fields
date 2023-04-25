@@ -1,16 +1,5 @@
-use type_fields_macros::functions;
-
-#[functions]
-pub trait Arr {
+pub trait Arr<F> {
     type Arr;
 
-    fn arr(self) -> Self::Arr;
-}
-
-impl<T> Arr for T {
-    type Arr = Self;
-
-    fn arr(self) -> Self::Arr {
-        self
-    }
+    fn arr(f: F) -> Self::Arr;
 }

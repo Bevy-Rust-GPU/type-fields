@@ -1,19 +1,23 @@
 mod arr;
 mod fanout;
 mod first;
+mod inst;
 mod second;
 mod split;
 
 pub use arr::*;
 pub use fanout::*;
 pub use first::*;
+pub use inst::*;
 pub use second::*;
 pub use split::*;
 
 use crate::t_funk::Category;
 
 trait Arrow: Category {
-    type Arr;
+    type Arr<F>
+    where
+        Self: Arr<F>;
     type First
     where
         Self: First;
@@ -27,9 +31,9 @@ trait Arrow: Category {
     where
         Self: Fanout<A>;
 
-    fn arr(self) -> <Self as Arr>::Arr
+    fn arr<F>(f: F) -> <Self as Arr<F>>::Arr
     where
-        Self: Arr;
+        Self: Arr<F>;
 
     fn first(self) -> <Self as First>::First
     where
@@ -54,17 +58,17 @@ impl<T> Arrow for T
 where
     T: Category,
 {
-    type Arr = T::Arr where T: Arr;
+    type Arr<F> = T::Arr where T: Arr<F>;
     type First = T::First where T: First;
     type Second = T::Second where T: Second;
     type Splitted<A> = Splitted<T, A> where T: Split<A>;
     type Fanouted<A> = T::Fanout where T: Fanout<A>;
 
-    fn arr(self) -> T::Arr
+    fn arr<F>(f: F) -> T::Arr
     where
-        T: Arr,
+        T: Arr<F>,
     {
-        Arr::arr(self)
+        <T as Arr<F>>::arr(f)
     }
 
     fn first(self) -> T::First
@@ -99,7 +103,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        arrow::First, arrow::Second, Add, Closure, ComposeL, Curry, Fanout, Mul, Split,
+        arrow::First, arrow::Second, Add, Closure, closure::Compose, Curry, Fanout, Mul, Split,
     };
 
     #[test]
@@ -107,7 +111,7 @@ mod test {
         let a1 = Add.curry_b(5);
         let a2 = Mul.curry_b(2);
 
-        let res = a1.compose_l(a2).call(3);
+        let res = a1.compose(a2).call(3);
         assert_eq!(res, 11);
 
         let q = (1, 2);
@@ -121,7 +125,7 @@ mod test {
         let res = a1.split(a2).call(q);
         assert_eq!(res, (6, 4));
 
-        let res = a1.fanout(a2).call(5);
+        let res = Fanout::fanout(a1, a2).call(5);
         assert_eq!(res, (10, 10));
     }
 }

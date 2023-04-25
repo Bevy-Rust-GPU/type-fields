@@ -1,4 +1,4 @@
-use type_fields_macros::functions;
+use type_fields_macros::{functions, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 
@@ -9,15 +9,7 @@ pub trait Split<G>: Sized {
     fn split(self, g: G) -> Self::Split;
 }
 
-impl<T, G> Split<G> for T {
-    type Split = Splitted<Self, G>;
-
-    fn split(self, g: G) -> Self::Split {
-        Splitted(self, g)
-    }
-}
-
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Splitted<F, G>(F, G);
 
 impl<F, G, X, Y> Closure<(X, Y)> for Splitted<F, G>

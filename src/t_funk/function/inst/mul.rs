@@ -1,9 +1,25 @@
-use type_fields_macros::{Closure, Compose, Id};
+use type_fields_macros::{Arr, Closure, Compose, First, Id, Second, Split, Fanout};
 
 use crate::t_funk::Function;
 
 #[derive(
-    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Id, Compose,
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Closure,
+    Id,
+    Compose,
+    Arr,
+    First,
+    Second,
+    Split,
+    Fanout,
 )]
 pub struct Mul;
 
