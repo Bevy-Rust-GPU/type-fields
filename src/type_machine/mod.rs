@@ -45,7 +45,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::{
-        t_funk::{tlist::Map, CopointF, Copointed, Pointed, Tagged},
+        t_funk::{tlist::Map, CopointF, Copointed, Tagged},
         type_machine::{
             input::{GetOf, InputOf},
             input_mode::InputGets,

@@ -14,7 +14,7 @@ pub use split::*;
 
 use crate::t_funk::Category;
 
-trait Arrow: Category {
+pub trait Arrow: Category {
     type Arr<F>
     where
         Self: Arr<F>;
@@ -125,7 +125,7 @@ mod test {
         let res = a1.split(a2).call(q);
         assert_eq!(res, (6, 4));
 
-        let res = a1.fanout(a2).call(5);
+        let res = Fanout::fanout(a1, a2).call(5);
         assert_eq!(res, (10, 10));
     }
 }

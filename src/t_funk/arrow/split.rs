@@ -1,4 +1,8 @@
-use crate::macros::{functions, Copointed, Pointed};
+use crate::macros::{
+    arrow::{Arr, Fanout, First, Second, Split},
+    category::{Compose, Id},
+    functions, Copointed, Pointed,
+};
 
 use crate::t_funk::Closure;
 
@@ -9,7 +13,26 @@ pub trait Split<G>: Sized {
     fn split(self, g: G) -> Self::Split;
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Id,
+    Compose,
+    Arr,
+    First,
+    Second,
+    Split,
+    Fanout,
+)]
 pub struct Splitted<F, G>(F, G);
 
 impl<F, G, X, Y> Closure<(X, Y)> for Splitted<F, G>
