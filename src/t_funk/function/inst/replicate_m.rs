@@ -6,7 +6,7 @@ use crate::macros::{
 };
 
 use crate::t_funk::{
-    hlist::PushFrontF, ApplyF, Closure, Curried, CurriedA, Curry, Flip, Flipped, Fmap, Function,
+    hlist::PushFrontF, ApplyF, Closure, Curried, Prefixed, Curry, Flip, Flipped, Fmap, Function,
     LiftA2, Pure, Then,
 };
 
@@ -17,10 +17,10 @@ impl<F, Next, P> Function<F> for ReplicateM<(Next,), P>
 where
     ReplicateM<Next, P>: Function<F>,
     F: Clone + Fmap<Curried<Flipped<PushFrontF>>>,
-    CurriedA<ApplyF, <F as Fmap<Curried<Flipped<PushFrontF>>>>::Fmap>:
+    Prefixed<ApplyF, <F as Fmap<Curried<Flipped<PushFrontF>>>>::Fmap>:
         Closure<<ReplicateM<Next, P> as Function<F>>::Output>,
 {
-    type Output = <CurriedA<ApplyF, <F as Fmap<Curried<Flipped<PushFrontF>>>>::Fmap> as Closure<
+    type Output = <Prefixed<ApplyF, <F as Fmap<Curried<Flipped<PushFrontF>>>>::Fmap> as Closure<
         <ReplicateM<Next, P> as Function<F>>::Output,
     >>::Output;
 

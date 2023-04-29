@@ -4,29 +4,27 @@ use crate::macros::{
     Copointed, Pointed,
 };
 
-use crate::t_funk::{Closure, Flip, Flipped};
+use crate::t_funk::Closure;
 
 /// Utility trait for constructing a CurryA from a Function<(A, B)>
 pub trait Curry: Sized {
     /// Convert `F(A, B) -> *` into `F(A) -> F(B) -> *`
-    fn curry(self) -> Curried<Self>;
-
-    /// Curry `A` into `F(A, B) -> *` to produce `F(B) -> *`
-    fn prefix<A>(self, a: A) -> CurriedA<Self, A> {
-        self.curry().call(a)
-    }
-
-    /// Curry `B` into `F(A, B) -> *` to produce `F(A) -> *`
-    fn suffix<B>(self, a: B) -> CurriedA<Flipped<Self>, B> {
-        self.flip().prefix(a)
-    }
-}
-
-impl<T> Curry for T {
     fn curry(self) -> Curried<Self> {
         Curried(self)
     }
+
+    /// Curry `A` into `F(A, B) -> *` to produce `F(B) -> *`
+    fn prefix<A>(self, a: A) -> Prefixed<Self, A> {
+        Prefixed(self, a)
+    }
+
+    /// Curry `B` into `F(A, B) -> *` to produce `F(A) -> *`
+    fn suffix<B>(self, b: B) -> Suffixed<Self, B> {
+        Suffixed(self, b)
+    }
 }
+
+impl<T> Curry for T {}
 
 /// Curry function with F stored
 #[derive(
@@ -52,10 +50,10 @@ impl<T> Curry for T {
 pub struct Curried<F>(pub F);
 
 impl<F, A> Closure<A> for Curried<F> {
-    type Output = CurriedA<F, A>;
+    type Output = Prefixed<F, A>;
 
     fn call(self, input: A) -> Self::Output {
-        CurriedA(self.0, input)
+        Prefixed(self.0, input)
     }
 }
 
@@ -78,9 +76,9 @@ impl<F, A> Closure<A> for Curried<F> {
     Split,
     Fanout,
 )]
-pub struct CurriedA<F, A>(F, A);
+pub struct Prefixed<F, A>(pub F, pub A);
 
-impl<F, A, B> Closure<B> for CurriedA<F, A>
+impl<F, A, B> Closure<B> for Prefixed<F, A>
 where
     F: Closure<(A, B)>,
 {
@@ -88,6 +86,38 @@ where
 
     fn call(self, input: B) -> Self::Output {
         self.0.call((self.1, input))
+    }
+}
+
+/// Curry function with F, B stored
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Id,
+    Compose,
+    Arr,
+    First,
+    Second,
+    Split,
+    Fanout,
+)]
+pub struct Suffixed<F, B>(pub F, pub B);
+
+impl<F, B, A> Closure<A> for Suffixed<F, B>
+where
+    F: Closure<(A, B)>,
+{
+    type Output = F::Output;
+
+    fn call(self, input: A) -> Self::Output {
+        self.0.call((input, self.1))
     }
 }
 

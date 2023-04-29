@@ -39,8 +39,8 @@ pub struct Identity<T>(pub T);
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        closure::Compose, test_functor_laws, tlist::ToHList, Add, Apply, Chain, Closure, CurriedA,
-        Curry, CurryN, Div, Flip, Flipped, Fmap, FoldMap, Identity, Mul, PointF, Sub, Sum, Then,
+        closure::Compose, test_functor_laws, tlist::ToHList, Add, Apply, Chain, Closure, Curry,
+        CurryN, Div, Flip, Fmap, FoldMap, Identity, Mul, PointF, Sub, Suffixed, Sum, Then,
     };
 
     #[test]
@@ -51,15 +51,14 @@ mod test {
         let id2: Identity<i32> = id1.fmap(Mul.curry_n().call(3));
         assert_eq!(id2, Identity(15));
 
-        let id3: Identity<CurriedA<Flipped<Sub>, i32>> = Identity(Sub.suffix(3));
+        let id3: Identity<Suffixed<Sub, i32>> = Identity(Sub.suffix(3));
         let id3: Identity<i32> = id3.apply(id2);
         assert_eq!(id3, Identity(12));
 
         let id4: Identity<i32> = id3.chain(
             PointF::<Identity<_>>::default()
                 .compose(Div.flip())
-                .curry_n()
-                .call(3),
+                .prefix(3),
         );
         assert_eq!(id4, Identity(4));
 

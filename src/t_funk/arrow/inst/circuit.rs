@@ -9,7 +9,7 @@ use crate::{
         Copointed, Pointed,
     },
     t_funk::{
-        arrow::First, category::Compose, function::Id, Arr, Closure, CurriedA, Curry, Split, Tuple,
+        arrow::First, category::Compose, function::Id, Arr, Closure, Curry, Prefixed, Split, Tuple,
     },
 };
 
@@ -19,7 +19,7 @@ use crate::{
 pub struct Circuit<F>(pub F);
 
 impl<F> crate::t_funk::category::Id for Circuit<F> {
-    type Id = Circuit<CurriedA<Tuple, Id>>;
+    type Id = Circuit<Prefixed<Tuple, Id>>;
 
     fn id() -> Self::Id {
         Circuit(Tuple.prefix(Id))

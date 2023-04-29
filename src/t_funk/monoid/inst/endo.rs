@@ -78,7 +78,7 @@ mod test {
     use crate::{
         t_funk::tlist::ToHList,
         t_funk::{
-            closure::Compose, Add, Closure, Composed, Curried, CurriedA, Curry, Foldr, Mappend,
+            closure::Compose, Add, Closure, Composed, Curried, Prefixed, Curry, Foldr, Mappend,
             PointF,
         },
     };
@@ -115,7 +115,7 @@ mod test {
         assert_eq!(add_endo_result, Endo(3));
 
         let add_curry_a: Curried<Add> = Add.curry();
-        let add_curry_b: CurriedA<Add, i32> = add_curry_a.call(1);
+        let add_curry_b: Prefixed<Add, i32> = add_curry_a.call(1);
         let add_curry_result: i32 = add_curry_b.call(1);
         assert_eq!(add_curry_result, 2);
 
@@ -123,7 +123,7 @@ mod test {
             PointF<Endo<<Curried<Add> as Closure<i32>>::Output>>,
             Curried<Add>,
         > = PointF::default().compose(Add.curry());
-        let Endo(add_curry_endo_b): Endo<CurriedA<Add, i32>> = add_curry_endo_a.call(1);
+        let Endo(add_curry_endo_b): Endo<Prefixed<Add, i32>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.call(2);
         assert_eq!(add_curry_endo_result, 3);
     }

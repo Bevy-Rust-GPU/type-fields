@@ -1,6 +1,6 @@
 use crate::macros::Closure;
 
-use crate::t_funk::{ApplyF, CurriedA, Curry, Fmap, Function};
+use crate::t_funk::{ApplyF, Prefixed, Curry, Fmap, Function};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct LiftA2;
@@ -9,7 +9,7 @@ impl<F, X> Function<(F, X)> for LiftA2
 where
     X: Fmap<F>,
 {
-    type Output = CurriedA<ApplyF, X::Fmap>;
+    type Output = Prefixed<ApplyF, X::Fmap>;
 
     fn call((f, x): (F, X)) -> Self::Output {
         ApplyF.prefix(x.fmap(f))

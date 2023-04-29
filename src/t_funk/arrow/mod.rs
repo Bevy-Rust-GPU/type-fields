@@ -107,7 +107,7 @@ mod test {
     };
 
     #[test]
-    fn test() {
+    fn test_arrow() {
         let a1 = Add.suffix(5);
         let a2 = Mul.suffix(2);
 
@@ -125,7 +125,7 @@ mod test {
         let res = a1.split(a2).call(q);
         assert_eq!(res, (6, 4));
 
-        let res = Fanout::fanout(a1, a2).call(5);
-        assert_eq!(res, (10, 10));
+        let res = a1.fanout(a2).call(6);
+        assert_eq!(res, (11, 12));
     }
 }

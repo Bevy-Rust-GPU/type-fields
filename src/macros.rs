@@ -5,9 +5,7 @@ pub mod applicative {
 }
 
 pub mod arrow {
-    pub use type_fields_macros::{
-        Arr, ArrowFirst as First, ArrowSecond as Second, Fanout, Split,
-    };
+    pub use type_fields_macros::{Arr, ArrowFirst as First, ArrowSecond as Second, Fanout, Split};
 }
 
 pub mod bifunctor {}
@@ -38,3 +36,20 @@ pub mod semigroup {
 
 pub mod traversable {}
 
+/// Convert `do` notation into the equivalent
+/// `x.chain(|y| z(y).chain(...))` composition.
+///
+/// Variable binding via `<-` uses unnameable closures,
+/// so is not suitable for use in generic contexts.
+#[macro_export]
+macro_rules! do_monad {
+    ($bind:ident <- $expr:expr; $($tt:tt)*) => {
+        $expr.chain(move |$bind| do_monad!($($tt)*))
+    };
+    ($expr:expr; $($tt:tt)*) => {
+        $expr.then(do_monad!($($tt)*))
+    };
+    ($expr:expr) => {
+        $expr
+    };
+}
