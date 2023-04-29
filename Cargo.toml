@@ -5,5 +5,4 @@ edition = "2021"
 
 [dependencies]
 type-fields-macros = { git = "https://github.com/bevy-rust-gpu/type-fields-macros" }
-glam = "0.24.0"
 
