@@ -1,28 +1,30 @@
 use crate::macros::Closure;
 
-use crate::t_funk::{ApplyF, Prefixed, Curry, Fmap, Function};
+use crate::t_funk::{Apply, Fmap, Function};
 
+/// Lift a binary function to actions
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct LiftA2;
 
-impl<F, X> Function<(F, X)> for LiftA2
+impl<F, A, B> Function<(F, A, B)> for LiftA2
 where
-    X: Fmap<F>,
+    A: Fmap<F>,
+    A::Fmap: Apply<B>,
 {
-    type Output = Prefixed<ApplyF, X::Fmap>;
+    type Output = <A::Fmap as Apply<B>>::Apply;
 
-    fn call((f, x): (F, X)) -> Self::Output {
-        ApplyF.prefix(x.fmap(f))
+    fn call((f, a, b): (F, A, B)) -> Self::Output {
+        a.fmap(f).apply(b)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{Closure, Curry, Just, LiftA2, Tuple};
+    use crate::t_funk::{Closure, Curry2, Just, LiftA2, Tuple};
 
     #[test]
     fn test_lift_a2() {
-        let foo = LiftA2.call((Tuple.curry(), Just(3))).call(Just(5));
+        let foo = LiftA2.call((Tuple.curry(), Just(3), Just(5)));
         assert_eq!(foo, Just((3, 5)));
     }
 }

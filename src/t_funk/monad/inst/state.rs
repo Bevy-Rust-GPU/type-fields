@@ -1,7 +1,7 @@
 use crate::macros::{Closure, Copointed, Pointed};
 
 use crate::t_funk::{
-    function::Const, function::Id, Apply, Chain, Closure, Prefixed, Curry, Fmap, Function, Pure,
+    function::Const, function::Id, Apply, monad::Chain, Closure, Curry2A, Curry2, Fmap, Function, applicative::Pure,
     Replace, Spread, Spreaded, Then,
 };
 
@@ -53,7 +53,7 @@ impl<F1, F2> Replace<F2> for State<F1> {
 }
 
 impl<F> Pure for State<F> {
-    type Pure<T> = State<Prefixed<Tuple, T>>;
+    type Pure<T> = State<Curry2A<Tuple, T>>;
 
     fn pure<T>(t: T) -> Self::Pure<T> {
         State(Tuple.prefix(t))
@@ -126,7 +126,7 @@ where
 pub struct Put;
 
 impl<I> Function<I> for Put {
-    type Output = State<Prefixed<Const, ((), I)>>;
+    type Output = State<Curry2A<Const, ((), I)>>;
 
     fn call(input: I) -> Self::Output {
         State(Const.prefix(((), input)))
@@ -149,7 +149,7 @@ mod test {
     use crate::macros::Closure;
 
     use crate::t_funk::{
-        function::Const, tlist::ToHList, Chain, Closure, Prefixed, Curry, Function, Put,
+        function::Const, tlist::ToHList, monad::Chain, Closure, Curry2A, Curry2, Function, Put,
         ReplicateM, SequenceA, State, Traverse,
     };
 
@@ -279,7 +279,7 @@ mod test {
         struct TurnS;
 
         impl<A> Function<A> for TurnS {
-            type Output = State<Prefixed<TurnSImpl, A>>;
+            type Output = State<Curry2A<TurnSImpl, A>>;
 
             fn call(a: A) -> Self::Output {
                 State(TurnSImpl.prefix(a))

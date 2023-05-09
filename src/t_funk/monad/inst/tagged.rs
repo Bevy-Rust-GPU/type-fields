@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::t_funk::{
-    function::Id, Apply, Chain, Closure, Copointed, Fmap, Fold, Foldr, Mappend, Mconcat, Mempty,
+    function::Id, Apply, monad::Chain, Closure, Copointed, Fmap, Fold, Foldr, Mappend, Mconcat, Mempty,
     Pointed, Replace, Then,
 };
 
@@ -194,7 +194,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        closure::Compose, test_functor_laws, Add, Apply, Chain, Closure, Copointed, Curry, CurryN,
+        closure::Compose, test_functor_laws, Add, Apply, monad::Chain, Closure, Copointed, Curry2, CurryN,
         Div, Flip, Fmap, FmapF, Mul, PointF, Pointed, Sub, Tagged, Then,
     };
 

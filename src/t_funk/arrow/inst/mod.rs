@@ -1,6 +1,5 @@
 mod circuit;
-mod free {
-}
+mod free;
 
 pub use circuit::*;
 pub use free::*;

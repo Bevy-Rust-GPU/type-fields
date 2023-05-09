@@ -41,7 +41,7 @@ impl<T> Foldable for T {
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        closure::Compose, tlist::ToHList, Closure, Curry, Dual, Endo, Flip, FoldMap, PointF, Sub,
+        closure::Compose, tlist::ToHList, Closure, Curry2, Dual, Endo, Flip, FoldMap, PointF, Sub,
     };
 
     // 'default' impl of Foldl with respect to Dual / Endo.

@@ -8,8 +8,8 @@ use crate::macros::{
 };
 
 use crate::t_funk::{
-    Applicative, Apply, Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Functor, Mappend,
-    Mconcat, Mempty, Monad, Pointed, Pure, Replace, Then,
+    Applicative, Apply, monad::Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Functor, Mappend,
+    Mconcat, Mempty, Monad, Pointed, applicative::Pure, Replace, Then,
 };
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -202,7 +202,7 @@ impl<T> Maybe<T> for Just<T> {}
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{test_functor_laws, Add, Closure, Curry, CurryN, Fmap, Mul};
+    use crate::t_funk::{test_functor_laws, Add, Closure, Curry2, CurryN, Fmap, Mul};
 
     use super::{Just, Nothing};
 

@@ -1,4 +1,4 @@
-use crate::t_funk::{Foldr, Mappend, MappendF, Mconcat, Mempty};
+use crate::t_funk::Mappend;
 
 impl<Head, Tail, U> Mappend<U> for (Head, Tail)
 where
@@ -16,25 +16,6 @@ impl<U> Mappend<U> for () {
 
     fn mappend(self, t: U) -> Self::Mappend {
         t
-    }
-}
-
-impl<Head, Tail> Mconcat for (Head, Tail)
-where
-    Self: Mempty + Foldr<MappendF, <Self as Mempty>::Mempty>,
-{
-    type Mconcat = <(Head, Tail) as Foldr<MappendF, <Self as Mempty>::Mempty>>::Foldr;
-
-    fn mconcat(self) -> Self::Mconcat {
-        self.foldr(MappendF::default(), Self::mempty())
-    }
-}
-
-impl Mconcat for () {
-    type Mconcat = ();
-
-    fn mconcat(self) -> Self::Mconcat {
-        ()
     }
 }
 

@@ -45,7 +45,7 @@ impl<T> Category for T {
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{category::Compose, category::Id, Add, Closure, Curry};
+    use crate::t_funk::{category::Compose, category::Id, Add, Closure, Curry2};
 
     #[test]
     fn test_category() {

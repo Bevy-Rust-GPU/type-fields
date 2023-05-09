@@ -9,7 +9,7 @@ use crate::{
         Copointed, Pointed,
     },
     t_funk::{
-        arrow::First, category::Compose, function::Id, Arr, Closure, Curry, Prefixed, Split, Tuple,
+        arrow::First, category::Compose, function::Id, Arr, Closure, Curry2, Curry2A, Split, Tuple,
     },
 };
 
@@ -19,7 +19,7 @@ use crate::{
 pub struct Circuit<F>(pub F);
 
 impl<F> crate::t_funk::category::Id for Circuit<F> {
-    type Id = Circuit<Prefixed<Tuple, Id>>;
+    type Id = Circuit<Curry2A<Tuple, Id>>;
 
     fn id() -> Self::Id {
         Circuit(Tuple.prefix(Id))
@@ -209,7 +209,7 @@ pub type Total<T> = Circuit<AccumImpl<T, AccumOutImpl<Add>>>;
 mod test {
     use crate::t_funk::{arrow::inst::circuit::Total, ComposeL, Div};
 
-    use crate::t_funk::{function::Const, Arr, Closure, Curry, Fanout};
+    use crate::t_funk::{function::Const, Arr, Closure, Curry2, Fanout};
 
     use super::Circuit;
 

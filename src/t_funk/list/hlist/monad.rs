@@ -1,4 +1,4 @@
-use crate::t_funk::{Chain, Closure};
+use crate::t_funk::{monad::Chain, Closure};
 
 impl<Head, Tail, F> Chain<F> for (Head, Tail)
 where

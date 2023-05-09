@@ -21,7 +21,7 @@ where
 mod test {
     use crate::macros::Closure;
 
-    use crate::t_funk::{monad::Pair, test_functor_laws, Add, Curry, Fmap, Function, Mul};
+    use crate::t_funk::{monad::Pair, test_functor_laws, Add, Curry2, Fmap, Function, Mul};
 
     #[test]
     fn test_pair() {

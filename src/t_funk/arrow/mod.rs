@@ -8,7 +8,6 @@ mod split;
 pub use arr::*;
 pub use fanout::*;
 pub use first::*;
-pub use inst::*;
 pub use second::*;
 pub use split::*;
 
@@ -103,7 +102,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        arrow::First, arrow::Second, closure::Compose, Add, Closure, Curry, Fanout, Mul, Split,
+        arrow::First, arrow::Second, closure::Compose, Add, Closure, Curry2, Fanout, Mul, Split,
     };
 
     #[test]

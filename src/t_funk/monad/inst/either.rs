@@ -74,7 +74,7 @@ impl<T> Either<T> for Right<T> {}
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{test_functor_laws, Add, Curry, Fmap, Mul};
+    use crate::t_funk::{test_functor_laws, Add, Curry2, Fmap, Mul};
 
     use super::{Left, Right};
 

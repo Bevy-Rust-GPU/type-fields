@@ -1,5 +1,5 @@
 use crate::t_funk::{
-    function::Id, Apply, Closure, Curried, Curry, Flip, Flipped, Fmap, Pure, SequenceA, Traverse,
+    function::Id, Apply, Closure, Curried2, Curry2, Flip, Flipped, Fmap, applicative::Pure, SequenceA, Traverse,
 };
 
 use super::PushFrontF;
@@ -7,12 +7,12 @@ use super::PushFrontF;
 impl<Head, Tail, F, P> Traverse<F, P> for (Head, Tail)
 where
     F: Clone + Closure<Head>,
-    F::Output: Fmap<Curried<Flipped<PushFrontF>>>,
-    <F::Output as Fmap<Curried<Flipped<PushFrontF>>>>::Fmap: Apply<Tail::Traverse>,
+    F::Output: Fmap<Curried2<Flipped<PushFrontF>>>,
+    <F::Output as Fmap<Curried2<Flipped<PushFrontF>>>>::Fmap: Apply<Tail::Traverse>,
     Tail: Traverse<F, P>,
 {
     type Traverse =
-        <<F::Output as Fmap<Curried<Flipped<PushFrontF>>>>::Fmap as Apply<Tail::Traverse>>::Apply;
+        <<F::Output as Fmap<Curried2<Flipped<PushFrontF>>>>::Fmap as Apply<Tail::Traverse>>::Apply;
 
     fn traverse(self, f: F) -> Self::Traverse {
         f.clone()

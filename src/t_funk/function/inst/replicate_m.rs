@@ -1,13 +1,16 @@
 use core::marker::PhantomData;
 
-use crate::macros::{
-    arrow::{Arr, Fanout, First, Second, Split},
-    category::{Compose, Id},
+use crate::{
+    macros::{
+        arrow::{Arr, Fanout, First, Second, Split},
+        category::{Compose, Id},
+    },
+    t_funk::Apply,
 };
 
 use crate::t_funk::{
-    hlist::PushFrontF, ApplyF, Closure, Curried, Prefixed, Curry, Flip, Flipped, Fmap, Function,
-    LiftA2, Pure, Then,
+    applicative::Pure, hlist::PushFrontF, ApplyF, Closure, Curried2, Curry2, Flip, Flipped, Fmap,
+    Function, LiftA2, Curry2A, Then,
 };
 
 #[derive(Id, Compose, Arr, First, Second, Split, Fanout)]
@@ -16,18 +19,19 @@ pub struct ReplicateM<C, P>(PhantomData<(C, P)>);
 impl<F, Next, P> Function<F> for ReplicateM<(Next,), P>
 where
     ReplicateM<Next, P>: Function<F>,
-    F: Clone + Fmap<Curried<Flipped<PushFrontF>>>,
-    Prefixed<ApplyF, <F as Fmap<Curried<Flipped<PushFrontF>>>>::Fmap>:
+    F: Clone + Fmap<Curried2<Flipped<PushFrontF>>>,
+    Curry2A<ApplyF, <F as Fmap<Curried2<Flipped<PushFrontF>>>>::Fmap>:
         Closure<<ReplicateM<Next, P> as Function<F>>::Output>,
+    F::Fmap: Apply<<ReplicateM<Next, P> as Function<F>>::Output>,
 {
-    type Output = <Prefixed<ApplyF, <F as Fmap<Curried<Flipped<PushFrontF>>>>::Fmap> as Closure<
-        <ReplicateM<Next, P> as Function<F>>::Output,
-    >>::Output;
+    type Output = <F::Fmap as Apply<<ReplicateM<Next, P> as Function<F>>::Output>>::Apply;
 
     fn call(f: F) -> Self::Output {
-        LiftA2
-            .call((PushFrontF.flip().curry(), f.clone()))
-            .call(ReplicateM::<Next, P>::call(f))
+        LiftA2.call((
+            PushFrontF.flip().curry(),
+            f.clone(),
+            ReplicateM::<Next, P>::call(f),
+        ))
     }
 }
 

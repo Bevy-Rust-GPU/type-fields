@@ -1,7 +1,7 @@
 use crate::macros::{Copointed, Pointed};
 
 use crate::t_funk::{
-    closure::Compose, function::Id, Apply, Closure, Composed, Fmap, Mappend, Mempty, Pure,
+    closure::Compose, function::Id, Apply, Closure, Composed, Fmap, Mappend, Mempty, applicative::Pure,
 };
 
 /// The monoid of endomorphisms under composition.
@@ -78,7 +78,7 @@ mod test {
     use crate::{
         t_funk::tlist::ToHList,
         t_funk::{
-            closure::Compose, Add, Closure, Composed, Curried, Prefixed, Curry, Foldr, Mappend,
+            closure::Compose, Add, Closure, Composed, Curried2, Curry2A, Curry2, Foldr, Mappend,
             PointF,
         },
     };
@@ -114,16 +114,16 @@ mod test {
         let add_endo_result: Endo<i32> = add_endo.call((1, 2));
         assert_eq!(add_endo_result, Endo(3));
 
-        let add_curry_a: Curried<Add> = Add.curry();
-        let add_curry_b: Prefixed<Add, i32> = add_curry_a.call(1);
+        let add_curry_a: Curried2<Add> = Add.curry();
+        let add_curry_b: Curry2A<Add, i32> = add_curry_a.call(1);
         let add_curry_result: i32 = add_curry_b.call(1);
         assert_eq!(add_curry_result, 2);
 
         let add_curry_endo_a: Composed<
-            PointF<Endo<<Curried<Add> as Closure<i32>>::Output>>,
-            Curried<Add>,
+            PointF<Endo<<Curried2<Add> as Closure<i32>>::Output>>,
+            Curried2<Add>,
         > = PointF::default().compose(Add.curry());
-        let Endo(add_curry_endo_b): Endo<Prefixed<Add, i32>> = add_curry_endo_a.call(1);
+        let Endo(add_curry_endo_b): Endo<Curry2A<Add, i32>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.call(2);
         assert_eq!(add_curry_endo_result, 3);
     }

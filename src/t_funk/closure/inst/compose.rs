@@ -1,4 +1,7 @@
-use crate::macros::{functions, Copointed, Pointed};
+use crate::macros::{
+    category::{Compose, Id},
+    functions, Copointed, Pointed,
+};
 
 use crate::t_funk::Closure;
 
@@ -19,7 +22,21 @@ impl<T, F> Compose<F> for T {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Id,
+    Compose,
+)]
 pub struct Composed<F1, F2>(F1, F2);
 
 impl<F1, F2, A> Closure<A> for Composed<F1, F2>

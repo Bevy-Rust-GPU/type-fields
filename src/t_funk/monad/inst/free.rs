@@ -1,6 +1,6 @@
 use crate::{
     macros::{monad::Then, Closure},
-    t_funk::{Chain, ChainF, Closure, Curry, Fmap, Function, Suffixed},
+    t_funk::{monad::{Chain, ChainF}, Closure, Curry2, Fmap, Function, Curry2B},
 };
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Then)]
@@ -22,9 +22,9 @@ impl<T> Function<T> for MakeReturn {
 
 impl<T, F> Chain<F> for Free<T>
 where
-    T: Fmap<Suffixed<ChainF, F>>,
+    T: Fmap<Curry2B<ChainF, F>>,
 {
-    type Chain = Free<<T as Fmap<Suffixed<ChainF, F>>>::Fmap>;
+    type Chain = Free<<T as Fmap<Curry2B<ChainF, F>>>::Fmap>;
 
     fn chain(self, f: F) -> Self::Chain {
         Free(self.0.fmap(ChainF.suffix(f)))
@@ -62,7 +62,7 @@ mod test {
         do_monad,
         macros::Closure,
         t_funk::{
-            closure::Compose, function::Id, Chain, Closure, Composed, Fmap, Free, Function,
+            closure::Compose, function::Id, monad::Chain, Closure, Composed, Fmap, Free, Function,
             LiftFree, MakeReturn, Then,
         },
     };

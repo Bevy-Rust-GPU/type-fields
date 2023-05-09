@@ -6,27 +6,27 @@ use crate::macros::{
 
 use crate::t_funk::Closure;
 
-/// Utility trait for constructing a CurryA from a Function<(A, B)>
-pub trait Curry: Sized {
+/// Utility trait for currying a binary function
+pub trait Curry2: Sized {
     /// Convert `F(A, B) -> *` into `F(A) -> F(B) -> *`
-    fn curry(self) -> Curried<Self> {
-        Curried(self)
+    fn curry(self) -> Curried2<Self> {
+        Curried2(self)
     }
 
     /// Curry `A` into `F(A, B) -> *` to produce `F(B) -> *`
-    fn prefix<A>(self, a: A) -> Prefixed<Self, A> {
-        Prefixed(self, a)
+    fn prefix<A>(self, a: A) -> Curry2A<Self, A> {
+        Curry2A(self, a)
     }
 
     /// Curry `B` into `F(A, B) -> *` to produce `F(A) -> *`
-    fn suffix<B>(self, b: B) -> Suffixed<Self, B> {
-        Suffixed(self, b)
+    fn suffix<B>(self, b: B) -> Curry2B<Self, B> {
+        Curry2B(self, b)
     }
 }
 
-impl<T> Curry for T {}
+impl<T> Curry2 for T {}
 
-/// Curry function with F stored
+/// Curried binary function
 #[derive(
     Debug,
     Default,
@@ -47,17 +47,17 @@ impl<T> Curry for T {}
     Split,
     Fanout,
 )]
-pub struct Curried<F>(pub F);
+pub struct Curried2<F>(pub F);
 
-impl<F, A> Closure<A> for Curried<F> {
-    type Output = Prefixed<F, A>;
+impl<F, A> Closure<A> for Curried2<F> {
+    type Output = Curry2A<F, A>;
 
     fn call(self, input: A) -> Self::Output {
-        Prefixed(self.0, input)
+        Curry2A(self.0, input)
     }
 }
 
-/// Curry function with F, A stored
+/// Curried binary function with F, A stored
 #[derive(
     Debug,
     Default,
@@ -76,9 +76,9 @@ impl<F, A> Closure<A> for Curried<F> {
     Split,
     Fanout,
 )]
-pub struct Prefixed<F, A>(pub F, pub A);
+pub struct Curry2A<F, A>(pub F, pub A);
 
-impl<F, A, B> Closure<B> for Prefixed<F, A>
+impl<F, A, B> Closure<B> for Curry2A<F, A>
 where
     F: Closure<(A, B)>,
 {
@@ -89,7 +89,7 @@ where
     }
 }
 
-/// Curry function with F, B stored
+/// Curried binary function with F, B stored
 #[derive(
     Debug,
     Default,
@@ -108,9 +108,9 @@ where
     Split,
     Fanout,
 )]
-pub struct Suffixed<F, B>(pub F, pub B);
+pub struct Curry2B<F, B>(pub F, pub B);
 
-impl<F, B, A> Closure<A> for Suffixed<F, B>
+impl<F, B, A> Closure<A> for Curry2B<F, B>
 where
     F: Closure<(A, B)>,
 {
@@ -123,7 +123,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{Add, Closure, Curry};
+    use crate::t_funk::{Add, Closure, Curry2};
 
     #[test]
     fn test_curry() {

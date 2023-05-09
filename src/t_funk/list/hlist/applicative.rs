@@ -1,4 +1,4 @@
-use crate::t_funk::{Apply, Fmap, Mappend, Pure};
+use crate::t_funk::{Apply, Fmap, Mappend, applicative::Pure};
 
 impl<Head, Tail, U> Apply<U> for (Head, Tail)
 where
@@ -34,7 +34,7 @@ impl Pure for () {
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{Add, Apply, Curry, Mul};
+    use crate::t_funk::{Add, Apply, Curry2, Mul};
 
     #[test]
     fn test_hlist_applicative() {

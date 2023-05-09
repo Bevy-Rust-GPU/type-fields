@@ -3,14 +3,14 @@ use crate::macros::{
     Copointed, Pointed,
 };
 
-use crate::t_funk::{Closure, Curried, Fmap};
+use crate::t_funk::{Closure, Curried2, Fmap};
 
 /// A lens over getter `G` and setter `S`
-pub type Lens<G, S> = Curried<Lensed<G, Curried<S>>>;
+pub type Lens<G, S> = Curried2<Lensed<G, Curried2<S>>>;
 
 /// Construct a lens given instances of getter `G` and setter `S`
 pub const fn lens<G, S>(get: G, set: S) -> Lens<G, S> {
-    Curried(Lensed(get, Curried(set)))
+    Curried2(Lensed(get, Curried2(set)))
 }
 
 /// Closure constructing a lens from a getter and setter
@@ -51,7 +51,7 @@ mod test {
     use crate::macros::Lenses;
 
     use crate::t_funk::{
-        closure::Compose, function::Const, functor::Const as FConst, Closure, Curry, Identity,
+        closure::Compose, function::Const, functor::Const as FConst, Closure, Curry2, Identity,
     };
 
     #[derive(Debug, Default, Copy, Clone, PartialEq, PartialOrd, Lenses)]
