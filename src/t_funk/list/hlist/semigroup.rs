@@ -1,17 +1,19 @@
 use crate::t_funk::Mappend;
 
-impl<Head, Tail, U> Mappend<U> for (Head, Tail)
+use super::{Cons, Nil};
+
+impl<T, N, U> Mappend<U> for Cons<T, N>
 where
-    Tail: Mappend<U>,
+    N: Mappend<U>,
 {
-    type Mappend = (Head, Tail::Mappend);
+    type Mappend = Cons<T, N::Mappend>;
 
     fn mappend(self, t: U) -> Self::Mappend {
-        (self.0, self.1.mappend(t))
+        Cons(self.0, self.1.mappend(t))
     }
 }
 
-impl<U> Mappend<U> for () {
+impl<U> Mappend<U> for Nil {
     type Mappend = U;
 
     fn mappend(self, t: U) -> Self::Mappend {

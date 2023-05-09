@@ -1,8 +1,11 @@
 use core::marker::PhantomData;
 
-use crate::macros::{
-    arrow::{Arr, Fanout, First, Second, Split},
-    category::{Compose, Id},
+use crate::{
+    macros::{
+        arrow::{Arr, Fanout, First, Second, Split},
+        category::{Compose, Id},
+    },
+    t_funk::hlist::{Cons, Nil},
 };
 
 use crate::t_funk::{
@@ -22,22 +25,22 @@ where
     T: Closure<I>,
     I: ToHList,
 {
-    type Curried = CurriedN<T, (), I::HList>;
+    type Curried = CurriedN<T, Nil, I::HList>;
 
     fn curry_n(self) -> Self::Curried {
-        CurriedN(self, (), PhantomData)
+        CurriedN(self, Nil, PhantomData)
     }
 }
 
 #[derive(Id, Compose, Arr, First, Second, Split, Fanout)]
 pub struct CurriedN<F, AO, AI>(F, AO, PhantomData<AI>);
 
-impl<F, AI> Default for CurriedN<F, (), AI>
+impl<F, AI> Default for CurriedN<F, Nil, AI>
 where
     F: Default,
 {
     fn default() -> Self {
-        CurriedN(Default::default(), (), PhantomData)
+        CurriedN(Default::default(), Nil, PhantomData)
     }
 }
 
@@ -58,7 +61,7 @@ where
 {
 }
 
-impl<F, AI> Pointed for CurriedN<F, (), AI>
+impl<F, AI> Pointed for CurriedN<F, Nil, AI>
 where
     F: Closure<AI::TList>,
     AI: HList,
@@ -66,11 +69,11 @@ where
     type Pointed = F;
 
     fn point(unit: Self::Pointed) -> Self {
-        CurriedN(unit, (), PhantomData)
+        CurriedN(unit, Nil, PhantomData)
     }
 }
 
-impl<F, AO, I> Closure<I> for CurriedN<F, AO, (I, ())>
+impl<F, AO, I> Closure<I> for CurriedN<F, AO, Cons<I, Nil>>
 where
     AO: PushBack<I>,
     F: Closure<<AO::PushBack as ToTList>::TList>,
@@ -82,11 +85,11 @@ where
     }
 }
 
-impl<F, AO, Tail, Tail2, I> Closure<I> for CurriedN<F, AO, (I, (Tail, Tail2))>
+impl<F, AO, Tail, Tail2, I> Closure<I> for CurriedN<F, AO, Cons<I, Cons<Tail, Tail2>>>
 where
     AO: PushBack<I>,
 {
-    type Output = CurriedN<F, AO::PushBack, (Tail, Tail2)>;
+    type Output = CurriedN<F, AO::PushBack, Cons<Tail, Tail2>>;
 
     fn call(self, input: I) -> Self::Output {
         CurriedN(self.0, self.1.push_back(input), PhantomData)

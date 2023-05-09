@@ -1,4 +1,4 @@
-use super::HList;
+use super::{Cons, HList};
 
 pub trait PopFront: HList {
     type PopFront: HList;
@@ -6,12 +6,12 @@ pub trait PopFront: HList {
     fn pop_front(self) -> Self::PopFront;
 }
 
-impl<Head, Tail> PopFront for (Head, Tail)
+impl<T, N> PopFront for Cons<T, N>
 where
-    (Head, Tail): HList,
-    Tail: HList,
+    Cons<T, N>: HList,
+    N: HList,
 {
-    type PopFront = Tail;
+    type PopFront = N;
 
     fn pop_front(self) -> Self::PopFront {
         self.1
@@ -20,16 +20,19 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::tlist::ToHList;
+    use crate::t_funk::{
+        hlist::{Cons, Nil},
+        tlist::ToHList,
+    };
 
     use super::PopFront;
 
     #[test]
     fn test_hlist_pop_front() {
-        let list: (usize, (f32, (&str, ()))) = (1, 2.0, "three").to_hlist();
-        let list: (f32, (&str, ())) = list.pop_front();
-        let list: (&str, ()) = list.pop_front();
-        let list: () = list.pop_front();
-        assert_eq!((), list);
+        let list: Cons<usize, Cons<f32, Cons<&str, Nil>>> = (1, 2.0, "three").to_hlist();
+        let list: Cons<f32, Cons<&str, Nil>> = list.pop_front();
+        let list: Cons<&str, Nil> = list.pop_front();
+        let list: Nil = list.pop_front();
+        assert_eq!(Nil, list);
     }
 }

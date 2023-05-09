@@ -42,7 +42,7 @@ macro_rules! impl_cons_tuple {
             }
         }
 
-        impl<$($tys),*> ToTList for crate::cons_ident!($($tys),*) {
+        impl<$($tys),*> ToTList for crate::cons_ty!($($tys),*) {
             type TList = ($($tys,)*);
 
             fn to_tlist(self) -> Self::TList {

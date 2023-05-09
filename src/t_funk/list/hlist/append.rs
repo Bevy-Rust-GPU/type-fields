@@ -1,4 +1,4 @@
-use super::HList;
+use super::{Cons, HList, Nil};
 
 pub trait Append<T>: HList {
     type Appended;
@@ -6,19 +6,19 @@ pub trait Append<T>: HList {
     fn append(self, t: T) -> Self::Appended;
 }
 
-impl<Head, Tail, T> Append<T> for (Head, Tail)
+impl<Head, Tail, T> Append<T> for Cons<Head, Tail>
 where
     Self: HList,
     Tail: Append<T>,
 {
-    type Appended = (Head, Tail::Appended);
+    type Appended = Cons<Head, Tail::Appended>;
 
     fn append(self, t: T) -> Self::Appended {
-        (self.0, self.1.append(t))
+        Cons(self.0, self.1.append(t))
     }
 }
 
-impl<T> Append<T> for ()
+impl<T> Append<T> for Nil
 where
     Self: HList,
     T: HList,

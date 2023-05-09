@@ -1,4 +1,4 @@
-use super::HList;
+use super::{Cons, HList, Nil};
 
 pub trait PopBack: HList {
     type PopBack: HList;
@@ -6,39 +6,42 @@ pub trait PopBack: HList {
     fn pop_back(self) -> Self::PopBack;
 }
 
-impl<Head, Tail> PopBack for (Head, Tail)
+impl<T, N> PopBack for Cons<T, N>
 where
-    (Head, Tail): HList,
-    Tail: PopBack,
-    (Head, Tail::PopBack): HList,
+    Cons<T, N>: HList,
+    N: PopBack,
+    Cons<T, N::PopBack>: HList,
 {
-    type PopBack = (Head, Tail::PopBack);
+    type PopBack = Cons<T, N::PopBack>;
 
     fn pop_back(self) -> Self::PopBack {
-        (self.0, self.1.pop_back())
+        Cons(self.0, self.1.pop_back())
     }
 }
 
-impl<Head> PopBack for (Head, ()) {
-    type PopBack = ();
+impl<T> PopBack for Cons<T, Nil> {
+    type PopBack = Nil;
 
     fn pop_back(self) -> Self::PopBack {
-        ()
+        Nil
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::t_funk::tlist::ToHList;
+    use crate::t_funk::{
+        hlist::{Cons, Nil},
+        tlist::ToHList,
+    };
 
     use super::PopBack;
 
     #[test]
     fn test_hlist_pop_back() {
-        let list: (usize, (f32, (&str, ()))) = (1, 2.0, "three").to_hlist();
-        let list: (usize, (f32, ())) = list.pop_back();
-        let list: (usize, ()) = list.pop_back();
-        let list: () = list.pop_back();
-        assert_eq!((), list);
+        let list: Cons<usize, Cons<f32, Cons<&str, Nil>>> = (1, 2.0, "three").to_hlist();
+        let list: Cons<usize, Cons<f32, Nil>> = list.pop_back();
+        let list: Cons<usize, Nil> = list.pop_back();
+        let list: Nil = list.pop_back();
+        assert_eq!(list, Nil);
     }
 }

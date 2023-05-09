@@ -1,8 +1,8 @@
 use crate::t_funk::{Closure, Foldl};
 
-use super::HList;
+use super::{Cons, HList, Nil};
 
-impl<Head, Tail, T, F> Foldl<F, T> for (Head, Tail)
+impl<Head, Tail, T, F> Foldl<F, T> for Cons<Head, Tail>
 where
     Self: HList,
     Tail: Foldl<F, F::Output>,
@@ -15,7 +15,7 @@ where
     }
 }
 
-impl<F, T> Foldl<F, T> for () {
+impl<F, T> Foldl<F, T> for Nil {
     type Foldl = T;
 
     fn foldl(self, _: F, z: T) -> Self::Foldl {

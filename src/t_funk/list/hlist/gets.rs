@@ -1,30 +1,30 @@
 use crate::t_funk::hlist::{Path, Paths};
 
-use super::{Get, HList};
+use super::{Cons, Get, HList, Nil};
 
 /// Fetch multiple items by type from a `HList`.
 pub trait GetsImpl<T, P>: HList {
     fn gets_impl(self) -> T;
 }
 
-impl<T, Head, Tail, PathHead, PathTail> GetsImpl<(Head, Tail), (PathHead, PathTail)> for T
+impl<T, Head, Tail, PathHead, PathTail> GetsImpl<Cons<Head, Tail>, Cons<PathHead, PathTail>> for T
 where
     T: Get<Head, PathHead> + GetsImpl<Tail, PathTail> + Clone,
     PathTail: Paths,
-    (PathHead, PathTail): Paths,
+    Cons<PathHead, PathTail>: Paths,
 {
-    fn gets_impl(self) -> (Head, Tail) {
-        (self.clone().get(), self.gets_impl())
+    fn gets_impl(self) -> Cons<Head, Tail> {
+        Cons(self.clone().get(), self.gets_impl())
     }
 }
 
-impl<T, Head, PathHead> GetsImpl<(Head, ()), (PathHead, ())> for T
+impl<T, Head, PathHead> GetsImpl<Cons<Head, Nil>, Cons<PathHead, Nil>> for T
 where
     T: Get<Head, PathHead>,
     PathHead: Path,
 {
-    fn gets_impl(self) -> (Head, ()) {
-        (self.get(), ())
+    fn gets_impl(self) -> Cons<Head, Nil> {
+        Cons(self.get(), Nil)
     }
 }
 
@@ -49,14 +49,14 @@ where
 #[cfg(test)]
 mod tests {
     use crate::t_funk::{
-        hlist::{GetsImpl, ToTList},
+        hlist::{GetsImpl, ToTList, Cons, Nil},
         tlist::ToHList,
     };
 
     #[test]
     fn test_hlist_gets() {
         let list = (1, 2.0, "three").to_hlist();
-        let gets: (&str, (f32, (usize, ()))) = list.gets_impl();
+        let gets: Cons<&str, Cons<f32, Cons<usize, Nil>>> = list.gets_impl();
         assert_eq!(("three", 2.0, 1), gets.to_tlist());
     }
 }

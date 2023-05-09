@@ -1,3 +1,5 @@
+use crate::t_funk::hlist::{Cons, Nil};
+
 /// Type-level path
 pub trait Path<T> {
     type Type;
@@ -20,7 +22,7 @@ where
 
 /// Cons cell blanket impls.
 /// Allows nested cons cells to be treated as a path.
-impl<LHS, RHS, T> Path<T> for (LHS, RHS)
+impl<LHS, RHS, T> Path<T> for Cons<LHS, RHS>
 where
     LHS: Path<T>,
     RHS: Path<LHS::Type>,
@@ -29,12 +31,12 @@ where
     type Type = <RHS as Path<LHS::Type>>::Type;
 
     fn field(self, t: &mut T) -> &mut Self::Type {
-        let (lhs, rhs) = self;
+        let Cons(lhs, rhs) = self;
         rhs.field(lhs.field(t))
     }
 }
 
-impl<T> Path<T> for () {
+impl<T> Path<T> for Nil {
     type Type = T;
 
     fn field(self, t: &mut T) -> &mut Self::Type {
@@ -45,7 +47,7 @@ impl<T> Path<T> for () {
 #[macro_export]
 macro_rules ! path {
     ($ident:ident . $($next:ident).*) => {
-        (path!($ident), path!($($next).*))
+        Cons(path!($ident), path!($($next).*))
     };
     ($ident:ident) => {
         $ident

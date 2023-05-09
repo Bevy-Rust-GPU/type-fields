@@ -1,8 +1,8 @@
 use crate::t_funk::{Closure, Foldr};
 
-use super::HList;
+use super::{Cons, HList, Nil};
 
-impl<Head, Tail, F, T> Foldr<F, T> for (Head, Tail)
+impl<Head, Tail, F, T> Foldr<F, T> for Cons<Head, Tail>
 where
     Self: HList,
     Tail: Foldr<F, T>,
@@ -15,7 +15,7 @@ where
     }
 }
 
-impl<F, T> Foldr<F, T> for () {
+impl<F, T> Foldr<F, T> for Nil {
     type Foldr = T;
 
     fn foldr(self, _: F, z: T) -> Self::Foldr {

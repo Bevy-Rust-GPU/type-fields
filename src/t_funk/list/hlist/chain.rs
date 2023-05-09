@@ -1,20 +1,21 @@
+use super::{Cons, Nil};
 use crate::t_funk::Closure;
 
 /// A list of closures with chainable I/O is itself a valid closure
-impl<LHS, RHS, I> Closure<I> for (LHS, RHS)
+impl<T, N, I> Closure<I> for Cons<T, N>
 where
-    LHS: Closure<I>,
-    RHS: Closure<LHS::Output>,
+    T: Closure<I>,
+    N: Closure<T::Output>,
 {
-    type Output = <RHS as Closure<LHS::Output>>::Output;
+    type Output = <N as Closure<T::Output>>::Output;
 
     fn call(self, input: I) -> Self::Output {
-        let (lhs, rhs) = self;
+        let Cons(lhs, rhs) = self;
         rhs.call(lhs.call(input))
     }
 }
 
-impl<I> Closure<I> for () {
+impl<I> Closure<I> for Nil {
     type Output = I;
 
     fn call(self, input: I) -> Self::Output {

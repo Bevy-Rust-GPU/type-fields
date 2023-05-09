@@ -1,4 +1,4 @@
-use super::HListRef;
+use super::{Cons, HListRef, Nil};
 
 /// A HList of mutable references
 pub trait HListMut<'a>: HListRef<'a> {
@@ -9,7 +9,7 @@ pub trait HListMut<'a>: HListRef<'a> {
     fn tail_mut(self) -> Self::TailMut;
 }
 
-impl<'a, Head, Tail> HListMut<'a> for (&'a mut Head, Tail)
+impl<'a, Head, Tail> HListMut<'a> for Cons<&'a mut Head, Tail>
 where
     Self: HListRef<'a>,
     Tail: HListMut<'a>,
@@ -26,15 +26,15 @@ where
     }
 }
 
-impl HListMut<'_> for () {
-    type HeadMut = ();
-    type TailMut = ();
+impl HListMut<'_> for Nil {
+    type HeadMut = Self;
+    type TailMut = Self;
 
     fn head_mut(self) -> Self::HeadMut {
-        ()
+        self
     }
 
     fn tail_mut(self) -> Self::TailMut {
-        ()
+        self
     }
 }

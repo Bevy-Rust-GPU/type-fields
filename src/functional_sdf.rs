@@ -1,10 +1,13 @@
 use core::ops::{Add, BitAnd, BitOr, Deref, DerefMut, Div, Mul, Sub};
 
-use crate::{macros::{
-    functions,
-    functor::{Fmap, Replace},
-    Closure,
-}, t_funk::{Lt, Gt}};
+use crate::{
+    macros::{
+        functions,
+        functor::{Fmap, Replace},
+        Closure,
+    },
+    t_funk::{hlist::{Cons, Nil}, Gt, Lt},
+};
 
 use crate::t_funk::{function::Id, tlist::ToHList, Closure, Fmap, Function};
 
@@ -135,23 +138,23 @@ pub trait Distance {
     fn distance(self) -> Self::Distance;
 }
 
-impl<LHS, RHS> Distance for (LHS, RHS)
+impl<LHS, RHS> Distance for Cons<LHS, RHS>
 where
     LHS: Distance,
     RHS: Distance,
 {
-    type Distance = (LHS::Distance, RHS::Distance);
+    type Distance = Cons<LHS::Distance, RHS::Distance>;
 
     fn distance(self) -> Self::Distance {
-        (self.0.distance(), self.1.distance())
+        Cons(self.0.distance(), self.1.distance())
     }
 }
 
-impl Distance for () {
-    type Distance = ();
+impl Distance for Nil {
+    type Distance = Nil;
 
     fn distance(self) -> Self::Distance {
-        ()
+        Nil
     }
 }
 
@@ -163,23 +166,23 @@ pub trait Gradient {
     fn gradient(self) -> Self::Gradient;
 }
 
-impl<LHS, RHS> Gradient for (LHS, RHS)
+impl<LHS, RHS> Gradient for Cons<LHS, RHS>
 where
     LHS: Gradient,
     RHS: Gradient,
 {
-    type Gradient = (LHS::Gradient, RHS::Gradient);
+    type Gradient = Cons<LHS::Gradient, RHS::Gradient>;
 
     fn gradient(self) -> Self::Gradient {
-        (self.0.gradient(), self.1.gradient())
+        Cons(self.0.gradient(), self.1.gradient())
     }
 }
 
-impl Gradient for () {
-    type Gradient = ();
+impl Gradient for Nil {
+    type Gradient = Nil;
 
     fn gradient(self) -> Self::Gradient {
-        ()
+        Nil
     }
 }
 
@@ -683,4 +686,3 @@ mod test {
         //panic!("{arr:#?}");
     }
 }
-

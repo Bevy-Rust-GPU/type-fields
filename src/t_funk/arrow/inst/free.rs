@@ -6,7 +6,7 @@ use crate::{
         arrow::{First, Second},
         category::{Compose, Id},
         function::Id as IdF,
-        Arr, Closure, Copointed, Mappend, Pointed, Split,
+        Arr, Closure, Copointed, Mappend, Pointed, Split, hlist::Nil,
     },
 };
 
@@ -253,9 +253,10 @@ where
 }
 
 impl<F, A, P> Closure<Pure<P>> for Analyze<F, A> {
-    type Output = (); //<MemptyF<A> as crate::t_funk::applicative::Pure>::Pure<A>;
+    type Output = Nil; //<MemptyF<A> as crate::t_funk::applicative::Pure>::Pure<A>;
 
     fn call(self, _: Pure<P>) -> Self::Output {
+        Nil
         //<MemptyF<A> as crate::t_funk::applicative::Pure>::pure(Default::default())
     }
 }

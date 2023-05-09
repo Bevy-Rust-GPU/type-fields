@@ -1,4 +1,4 @@
-use crate::t_funk::hlist::HList;
+use crate::t_funk::hlist::{HList, Nil};
 
 /// Convert a flat tuple into a cons list.
 /// ex. `(1, 2, 3, 4)` -> `(1, (2, (3, (4, ()))))`
@@ -9,9 +9,9 @@ pub trait ToHList {
 }
 
 impl ToHList for () {
-    type HList = ();
+    type HList = Nil;
 
     fn to_hlist(self) -> Self::HList {
-        ()
+        Nil
     }
 }

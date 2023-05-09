@@ -2,7 +2,7 @@ use type_fields_macros::Closure;
 
 use crate::macros::arrow::Fanout;
 
-use crate::t_funk::{Add, ComposeL, Function, Swap};
+use crate::t_funk::{ComposeL, Function, Swap};
 use crate::{
     macros::{
         category::{Compose, Id},
@@ -202,16 +202,16 @@ where
     }
 }
 
-// Concrete accumulator for totaling some numeric type via addition
-pub type Total<T> = Circuit<AccumImpl<T, AccumOutImpl<Add>>>;
-
 #[cfg(test)]
 mod test {
-    use crate::t_funk::{arrow::inst::circuit::Total, ComposeL, Div};
+    use crate::t_funk::{Add, ComposeL, Div};
 
     use crate::t_funk::{function::Const, Arr, Closure, Curry2, Fanout};
 
-    use super::Circuit;
+    use super::{AccumImpl, AccumOutImpl, Circuit};
+
+    // Concrete accumulator for totaling some numeric type via addition
+    pub type Total<T> = Circuit<AccumImpl<T, AccumOutImpl<Add>>>;
 
     #[test]
     fn test_circuit() {

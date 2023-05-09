@@ -1,4 +1,4 @@
-use super::HList;
+use super::{Cons, HList, Nil};
 
 /// `Path` component referencing the next cell.
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -16,8 +16,8 @@ pub struct This;
 ///
 /// Practically, this is a HList that can only contain `Next` and `Here`.
 pub trait Path {}
-impl<PathNext> Path for (Next, PathNext) where PathNext: Path {}
-impl Path for (Here, ()) {}
+impl<PathNext> Path for Cons<Next, PathNext> where PathNext: Path {}
+impl Path for Cons<Here, Nil> {}
 impl Path for This {}
 
 pub trait Paths: HList {
@@ -25,21 +25,21 @@ pub trait Paths: HList {
     type TailPath;
 }
 
-impl<Head, Tail> Paths for (Head, Tail)
+impl<T, N> Paths for Cons<T, N>
 where
     Self: HList,
-    Head: Path,
-    Tail: Paths,
+    T: Path,
+    N: Paths,
 {
-    type HeadPath = Head;
-    type TailPath = Tail;
+    type HeadPath = T;
+    type TailPath = N;
 }
 
-impl<Head> Paths for (Head, ())
+impl<T> Paths for Cons<T, Nil>
 where
     Self: HList,
-    Head: Path,
+    T: Path,
 {
-    type HeadPath = Head;
-    type TailPath = ();
+    type HeadPath = T;
+    type TailPath = Nil;
 }

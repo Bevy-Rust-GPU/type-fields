@@ -1,24 +1,24 @@
 use crate::t_funk::hlist::{Here, Next, Path};
 
-use super::HList;
+use super::{HList, Cons, Nil};
 
 /// A `ConsList` that can retrieve an item by type.
 pub trait Get<T, P>: HList {
     fn get(self) -> T;
 }
 
-impl<Head, Tail, PathTail, T> Get<T, (Next, PathTail)> for (Head, Tail)
+impl<T, N, PathTail, U> Get<U, Cons<Next, PathTail>> for Cons<T, N>
 where
     Self: HList,
-    Tail: Get<T, PathTail>,
+    N: Get<U, PathTail>,
     PathTail: Path,
 {
-    fn get(self) -> T {
+    fn get(self) -> U {
         self.1.get()
     }
 }
 
-impl<Tail, T> Get<T, (Here, ())> for (T, Tail)
+impl<Tail, T> Get<T, Cons<Here, Nil>> for Cons<T, Tail>
 where
     Self: HList,
 {

@@ -13,10 +13,3 @@ pub trait Apply<T> {
     fn apply(self, a: T) -> Self::Apply;
 }
 
-impl<T> Apply<T> for () {
-    type Apply = ();
-
-    fn apply(self, _: T) -> Self::Apply {
-        ()
-    }
-}

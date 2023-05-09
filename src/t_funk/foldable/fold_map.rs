@@ -1,7 +1,5 @@
 use crate::macros::functions;
 
-use crate::t_funk::Fmap;
-
 #[functions]
 pub trait FoldMap<F> {
     type FoldMap;

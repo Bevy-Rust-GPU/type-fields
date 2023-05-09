@@ -1,26 +1,28 @@
+use super::{Cons, Nil};
+
 /// A `HList` with a known length.
 pub trait HListLength {
     const LENGTH: usize;
 }
 
-impl<Head, Tail> HListLength for (Head, Tail)
+impl<T, N> HListLength for Cons<T, N>
 where
-    Tail: HListLength,
+    N: HListLength,
 {
-    const LENGTH: usize = <Tail as HListLength>::LENGTH + 1;
+    const LENGTH: usize = <N as HListLength>::LENGTH + 1;
 }
 
-impl HListLength for () {
+impl HListLength for Nil {
     const LENGTH: usize = 0;
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::t_funk::{hlist::HListLength, tlist::ToHList};
+    use crate::t_funk::{hlist::{HListLength, Nil}, tlist::ToHList};
 
     #[test]
     fn test_cons_length() {
-        assert_eq!(0, <() as HListLength>::LENGTH);
+        assert_eq!(0, <Nil as HListLength>::LENGTH);
         assert_eq!(1, <<((),) as ToHList>::HList as HListLength>::LENGTH);
         assert_eq!(2, <<((), ()) as ToHList>::HList as HListLength>::LENGTH);
         assert_eq!(3, <<((), (), ()) as ToHList>::HList as HListLength>::LENGTH);

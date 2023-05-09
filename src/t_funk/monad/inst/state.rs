@@ -1,8 +1,8 @@
 use crate::macros::{Closure, Copointed, Pointed};
 
 use crate::t_funk::{
-    function::Const, function::Id, Apply, monad::Chain, Closure, Curry2A, Curry2, Fmap, Function, applicative::Pure,
-    Replace, Spread, Spreaded, Then,
+    applicative::Pure, function::Const, function::Id, monad::Chain, Apply, Closure, Curry2,
+    Curry2A, Fmap, Function, Replace, Spread, Spreaded, Then,
 };
 
 /// 2-tuple constructor
@@ -148,8 +148,9 @@ impl Function<()> for Get {
 mod test {
     use crate::macros::Closure;
 
+    use crate::t_funk::hlist::{Cons, Nil};
     use crate::t_funk::{
-        function::Const, tlist::ToHList, monad::Chain, Closure, Curry2A, Curry2, Function, Put,
+        function::Const, monad::Chain, tlist::ToHList, Closure, Curry2, Curry2A, Function, Put,
         ReplicateM, SequenceA, State, Traverse,
     };
 
@@ -217,7 +218,13 @@ mod test {
         let monday_s = (coin_s, push_s, push_s, coin_s, push_s).to_hlist();
         let State(res) = SequenceA::<State<()>>::sequence_a(monday_s);
         let res = res.call(Unlocked);
-        assert_eq!(res, ((Thank, (Open, (Tut, (Thank, (Open, ()))))), Locked));
+        assert_eq!(
+            res,
+            (
+                Cons(Thank, Cons(Open, Cons(Tut, Cons(Thank, Cons(Open, Nil))))),
+                Locked
+            )
+        );
 
         // Put
         let State(put) = SequenceA::<State<()>>::sequence_a(
@@ -293,6 +300,12 @@ mod test {
         let list = (Coin, Push, Push, Coin, Push).to_hlist();
         let State(res) = Traverse::<TurnS, State<()>>::traverse(list, TurnS);
         let res = res.call(Locked);
-        assert_eq!(res, ((Thank, (Open, (Tut, (Thank, (Open, ()))))), Locked));
+        assert_eq!(
+            res,
+            (
+                Cons(Thank, Cons(Open, Cons(Tut, Cons(Thank, Cons(Open, Nil))))),
+                Locked
+            )
+        );
     }
 }

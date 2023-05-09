@@ -1,26 +1,43 @@
+use super::{Cons, Nil};
 use crate::t_funk::{Closure, Fmap, Replace};
 
-impl<Head, Tail, F> Fmap<F> for (Head, Tail)
+impl<T, N, F> Fmap<F> for Cons<T, N>
 where
-    F: Clone + Closure<Head>,
-    Tail: Fmap<F>,
+    F: Clone + Closure<T>,
+    N: Fmap<F>,
 {
-    type Fmap = (F::Output, Tail::Fmap);
+    type Fmap = Cons<F::Output, N::Fmap>;
 
     fn fmap(self, f: F) -> Self::Fmap {
-        (f.clone().call(self.0), self.1.fmap(f))
+        Cons(f.clone().call(self.0), self.1.fmap(f))
     }
 }
 
-impl<Head, Tail, T> Replace<T> for (Head, Tail)
-where
-    T: Clone,
-    Tail: Replace<T>,
-{
-    type Replace = (T, Tail::Replace);
+impl<F> Fmap<F> for Nil {
+    type Fmap = Nil;
 
-    fn replace(self, t: T) -> Self::Replace {
-        (t.clone(), self.1.replace(t))
+    fn fmap(self, _: F) -> Self::Fmap {
+        self
+    }
+}
+
+impl<T, N, U> Replace<U> for Cons<T, N>
+where
+    U: Clone,
+    N: Replace<U>,
+{
+    type Replace = Cons<U, N::Replace>;
+
+    fn replace(self, t: U) -> Self::Replace {
+        Cons(t.clone(), self.1.replace(t))
+    }
+}
+
+impl<T> Replace<T> for Nil {
+    type Replace = Nil;
+
+    fn replace(self, _: T) -> Self::Replace {
+        self
     }
 }
 

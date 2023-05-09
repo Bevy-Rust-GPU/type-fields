@@ -1,4 +1,7 @@
-use crate::{t_funk::tlist::TList, t_funk::Function};
+use crate::{
+    t_funk::Function,
+    t_funk::{hlist::Nil, tlist::TList},
+};
 
 /// A cons list that can be converted into a flat tuple,
 /// ex. `(1, (2, (3, (4, ())))) -> (1, 2, 3, 4)`
@@ -11,7 +14,7 @@ pub trait ToTList {
     fn to_tlist(self) -> Self::TList;
 }
 
-impl ToTList for () {
+impl ToTList for Nil {
     type TList = ();
 
     fn to_tlist(self) -> Self::TList {

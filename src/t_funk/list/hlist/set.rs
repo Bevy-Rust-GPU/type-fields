@@ -1,6 +1,6 @@
 use crate::t_funk::hlist::{Here, Next, Path};
 
-use super::HList;
+use super::{Cons, HList, Nil};
 
 /// A `ConsList` that can replace an item by type.
 ///
@@ -10,23 +10,23 @@ pub trait Set<T, P>: HList {
     fn set(self, t: T) -> Self;
 }
 
-impl<Head, Tail, PathTail, T> Set<T, (Next, PathTail)> for (Head, Tail)
+impl<T, N, PathTail, U> Set<U, Cons<Next, PathTail>> for Cons<T, N>
 where
     Self: HList,
-    Tail: Set<T, PathTail>,
+    N: Set<U, PathTail>,
     PathTail: Path,
 {
-    fn set(self, t: T) -> Self {
-        (self.0, self.1.set(t))
+    fn set(self, t: U) -> Self {
+        Cons(self.0, self.1.set(t))
     }
 }
 
-impl<Tail, T> Set<T, (Here, ())> for (T, Tail)
+impl<Tail, T> Set<T, Cons<Here, Nil>> for Cons<T, Tail>
 where
     Self: HList,
 {
     fn set(self, t: T) -> Self {
-        (t, self.1)
+        Cons(t, self.1)
     }
 }
 

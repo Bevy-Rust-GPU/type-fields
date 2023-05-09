@@ -1,4 +1,4 @@
-use super::{HList, HListRef};
+use super::{HList, HListRef, Cons, Nil};
 
 /// A cons list that can have its items taken by reference
 pub trait AsRef<'a>: HList {
@@ -7,24 +7,24 @@ pub trait AsRef<'a>: HList {
     fn as_ref(&'a self) -> Self::AsRef;
 }
 
-impl<'a, Head, Tail> AsRef<'a> for (Head, Tail)
+impl<'a, T, N> AsRef<'a> for Cons<T, N>
 where
     Self: HList,
-    Head: 'a,
-    Tail: AsRef<'a>,
-    (&'a Head, Tail::AsRef): HListRef<'a>,
+    T: 'a,
+    N: AsRef<'a>,
+    Cons<&'a T, N::AsRef>: HListRef<'a>,
 {
-    type AsRef = (&'a Head, Tail::AsRef);
+    type AsRef = Cons<&'a T, N::AsRef>;
 
     fn as_ref(&'a self) -> Self::AsRef {
-        (&self.0, self.1.as_ref())
+        Cons(&self.0, self.1.as_ref())
     }
 }
 
-impl<'a> AsRef<'a> for () {
-    type AsRef = ();
+impl<'a> AsRef<'a> for Nil {
+    type AsRef = Nil;
 
     fn as_ref(&'a self) -> Self::AsRef {
-        ()
+        Nil
     }
 }

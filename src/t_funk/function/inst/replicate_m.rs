@@ -5,12 +5,11 @@ use crate::{
         arrow::{Arr, Fanout, First, Second, Split},
         category::{Compose, Id},
     },
-    t_funk::Apply,
+    t_funk::{Apply, Curried2, Curry2, hlist::Nil},
 };
 
 use crate::t_funk::{
-    applicative::Pure, hlist::PushFrontF, ApplyF, Closure, Curried2, Curry2, Flip, Flipped, Fmap,
-    Function, LiftA2, Curry2A, Then,
+    applicative::Pure, hlist::PushFrontF, Closure, Flip, Flipped, Fmap, Function, LiftA2, Then,
 };
 
 #[derive(Id, Compose, Arr, First, Second, Split, Fanout)]
@@ -20,11 +19,11 @@ impl<F, Next, P> Function<F> for ReplicateM<(Next,), P>
 where
     ReplicateM<Next, P>: Function<F>,
     F: Clone + Fmap<Curried2<Flipped<PushFrontF>>>,
-    Curry2A<ApplyF, <F as Fmap<Curried2<Flipped<PushFrontF>>>>::Fmap>:
-        Closure<<ReplicateM<Next, P> as Function<F>>::Output>,
     F::Fmap: Apply<<ReplicateM<Next, P> as Function<F>>::Output>,
 {
-    type Output = <F::Fmap as Apply<<ReplicateM<Next, P> as Function<F>>::Output>>::Apply;
+    type Output = <<F as Fmap<Curried2<Flipped<PushFrontF>>>>::Fmap as Apply<
+        <ReplicateM<Next, P> as Function<F>>::Output,
+    >>::Apply;
 
     fn call(f: F) -> Self::Output {
         LiftA2.call((
@@ -39,10 +38,10 @@ impl<F, P> Function<F> for ReplicateM<(), P>
 where
     P: Pure,
 {
-    type Output = P::Pure<()>;
+    type Output = P::Pure<Nil>;
 
     fn call(_: F) -> Self::Output {
-        P::pure(())
+        P::pure(Nil)
     }
 }
 

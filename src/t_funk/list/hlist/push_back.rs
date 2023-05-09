@@ -1,4 +1,4 @@
-use crate::t_funk::hlist::{HList, Next};
+use crate::t_funk::hlist::{Cons, HList, Next, Nil};
 
 /// A `ConsList` that can push a new element to its back.
 pub trait PushBack<T> {
@@ -8,42 +8,42 @@ pub trait PushBack<T> {
     fn push_back(self, tail: T) -> Self::PushBack;
 }
 
-impl<Head, Tail, PathTail, T> PushBack<T> for (Head, Tail)
+impl<T, N, PathTail, U> PushBack<U> for Cons<T, N>
 where
     Self: HList,
-    (Head, Tail::PushBack): HList,
-    Tail: PushBack<T, Path = PathTail>,
+    Cons<T, N::PushBack>: HList,
+    N: PushBack<U, Path = PathTail>,
     //PathTail: Path,
 {
-    type Path = (Next, PathTail);
-    type PushBack = (Head, Tail::PushBack);
+    type Path = Cons<Next, PathTail>;
+    type PushBack = Cons<T, N::PushBack>;
 
-    fn push_back(self, tail: T) -> Self::PushBack {
-        (self.0, self.1.push_back(tail))
+    fn push_back(self, tail: U) -> Self::PushBack {
+        Cons(self.0, self.1.push_back(tail))
     }
 }
 
-impl<T> PushBack<T> for () {
-    type Path = ();
-    type PushBack = (T, ());
+impl<T> PushBack<T> for Nil {
+    type Path = Nil;
+    type PushBack = Cons<T, Nil>;
 
     fn push_back(self, tail: T) -> Self::PushBack {
-        (tail, ())
+        Cons(tail, Nil)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::t_funk::hlist::ToTList;
+    use crate::t_funk::hlist::{Cons, Nil, ToTList};
 
     use super::PushBack;
 
     #[test]
     fn test_hlist_push_back() {
-        let list: () = ();
-        let list: (usize, ()) = list.push_back(1);
-        let list: (usize, (usize, ())) = list.push_back(2);
-        let list: (usize, (usize, (usize, ()))) = list.push_back(3);
+        let list: Nil = Nil;
+        let list: Cons<usize, Nil> = list.push_back(1);
+        let list: Cons<usize, Cons<usize, Nil>> = list.push_back(2);
+        let list: Cons<usize, Cons<usize, Cons<usize, Nil>>> = list.push_back(3);
         assert_eq!((1, 2, 3), list.to_tlist());
     }
 }

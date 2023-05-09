@@ -18,10 +18,10 @@ macro_rules! cons {
 #[macro_export]
 macro_rules! cons_ident {
     ($ident:ident $(, $idents:ident)+) => {
-        ($ident, crate::cons_ident!($($idents),*))
+        crate::t_funk::list::hlist::Cons($ident, crate::cons_ident!($($idents),*))
     };
     ($ident:ident) => {
-        ($ident, ())
+        crate::t_funk::list::hlist::Cons($ident, crate::t_funk::list::hlist::Nil)
     };
     () => {};
 }
@@ -30,10 +30,10 @@ macro_rules! cons_ident {
 #[macro_export]
 macro_rules! cons_expr {
     ($expr:expr $(, $exprs:expr)+) => {
-        ($expr, crate::cons_expr!($($exprs),*))
+        Cons($expr, crate::cons_expr!($($exprs),*))
     };
     ($expr:expr) => {
-        ($expr, ())
+        Cons($expr, ())
     };
     () => {};
 }
@@ -42,10 +42,10 @@ macro_rules! cons_expr {
 #[macro_export]
 macro_rules! cons_ty {
     ($ty:ty $(, $tys:ty)+) => {
-        ($ty, crate::cons_ty!($($tys),*))
+        crate::t_funk::list::hlist::Cons<$ty, crate::cons_ty!($($tys),*)>
     };
     ($ty:ty) => {
-        ($ty, ())
+        crate::t_funk::list::hlist::Cons<$ty, crate::t_funk::list::hlist::Nil>
     };
     () => {};
 }
@@ -61,4 +61,3 @@ macro_rules! macro_cons {
         $call!($ident);
     }
 }
-

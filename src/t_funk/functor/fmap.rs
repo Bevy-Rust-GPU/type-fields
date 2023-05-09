@@ -12,6 +12,6 @@ impl<F> Fmap<F> for () {
     type Fmap = ();
 
     fn fmap(self, _: F) -> Self::Fmap {
-        self
+        ()
     }
 }

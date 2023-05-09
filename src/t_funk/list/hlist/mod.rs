@@ -62,3 +62,9 @@ pub use set::*;
 pub use sets::*;
 pub use to_tlist::*;
 pub use traversable::*;
+
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Cons<T, N>(pub T, pub N);
+
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Nil;

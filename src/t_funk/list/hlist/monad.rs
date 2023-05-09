@@ -1,6 +1,7 @@
+use super::{Cons, Nil};
 use crate::t_funk::{monad::Chain, Closure};
 
-impl<Head, Tail, F> Chain<F> for (Head, Tail)
+impl<Head, Tail, F> Chain<F> for Cons<Head, Tail>
 where
     F: Clone + Closure<Head>,
     Tail: Chain<F>,
@@ -12,8 +13,8 @@ where
     }
 }
 
-impl<F> Chain<F> for () {
-    type Chain = ();
+impl<F> Chain<F> for Nil {
+    type Chain = Self;
 
     fn chain(self, _: F) -> Self::Chain {
         self

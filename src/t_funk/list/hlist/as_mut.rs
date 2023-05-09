@@ -1,4 +1,4 @@
-use super::{HList, HListMut};
+use super::{HList, HListMut, Cons, Nil};
 
 /// A cons list that can have its items taken by reference
 pub trait AsMut<'a>: HList {
@@ -7,22 +7,22 @@ pub trait AsMut<'a>: HList {
     fn as_mut(&'a mut self) -> Self::AsMut;
 }
 
-impl<'a, Head, Tail> AsMut<'a> for (Head, Tail)
+impl<'a, T, N> AsMut<'a> for Cons<T, N>
 where
     Self: HList,
-    Head: 'a,
-    Tail: AsMut<'a>,
-    (&'a mut Head, Tail::AsMut): HListMut<'a>,
+    T: 'a,
+    N: AsMut<'a>,
+    (&'a mut T, N::AsMut): HListMut<'a>,
 {
-    type AsMut = (&'a mut Head, Tail::AsMut);
+    type AsMut = (&'a mut T, N::AsMut);
 
     fn as_mut(&'a mut self) -> Self::AsMut {
         (&mut self.0, self.1.as_mut())
     }
 }
 
-impl<'a> AsMut<'a> for () {
-    type AsMut = ();
+impl<'a> AsMut<'a> for Nil {
+    type AsMut = Nil;
 
     fn as_mut(&'a mut self) -> Self::AsMut {
         *self
