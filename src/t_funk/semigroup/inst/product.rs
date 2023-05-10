@@ -25,13 +25,13 @@ use core::ops::Mul;
 )]
 pub struct Product<T>(pub T);
 
-impl<T> Mappend<Product<T>> for Product<T>
+impl<T, U> Mappend<Product<U>> for Product<T>
 where
-    T: Mul<T>,
+    T: Mul<U>,
 {
     type Mappend = Product<T::Output>;
 
-    fn mappend(self, t: Product<T>) -> Self::Mappend {
+    fn mappend(self, t: Product<U>) -> Self::Mappend {
         Product(self.0 * t.0)
     }
 }

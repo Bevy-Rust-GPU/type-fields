@@ -1,3 +1,4 @@
+use core::fmt::Debug;
 use core::marker::PhantomData;
 
 mod foldable;
@@ -11,6 +12,12 @@ pub use monoid::*;
 pub use semigroup::*;
 
 pub struct Leaf<T = ()>(PhantomData<T>);
+
+impl<T> Debug for Leaf<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("Leaf").field(&self.0).finish()
+    }
+}
 
 impl<T> Default for Leaf<T> {
     fn default() -> Self {

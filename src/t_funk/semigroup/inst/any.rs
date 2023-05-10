@@ -22,13 +22,13 @@ use crate::t_funk::Mappend;
 )]
 pub struct Any<T>(pub T);
 
-impl<T> Mappend<Any<T>> for Any<T>
+impl<T, U> Mappend<Any<U>> for Any<T>
 where
-    T: core::ops::BitOr<T>,
+    T: core::ops::BitOr<U>,
 {
     type Mappend = Any<T::Output>;
 
-    fn mappend(self, t: Any<T>) -> Self::Mappend {
+    fn mappend(self, t: Any<U>) -> Self::Mappend {
         Any(self.0 | t.0)
     }
 }

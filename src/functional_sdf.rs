@@ -6,7 +6,10 @@ use crate::{
         functor::{Fmap, Replace},
         Closure,
     },
-    t_funk::{hlist::{Cons, Nil}, Gt, Lt},
+    t_funk::{
+        hlist::{Cons, Nil},
+        Gt, Lt,
+    },
 };
 
 use crate::t_funk::{function::Id, tlist::ToHList, Closure, Fmap, Function};
@@ -660,7 +663,10 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::t_funk::{CallF, ComposeL, Curry2, Split};
+    use crate::t_funk::{
+        branch, branch_l, branch_r, leaf, root, All, Any, CallF, ComposeL, Curry2, Foldr, MconcatF,
+        Split,
+    };
 
     #[test]
     fn test_functional_sdf() {
@@ -676,11 +682,11 @@ mod test {
         //panic!("{eval:#?}");
 
         let arr = Id.split(GradientF.compose_l(CallF.suffix(p))).call(eval);
-        panic!("{arr:#?}");
+        //panic!("{arr:#?}");
 
         let shape_e = (Translate(-1.0, -1.0), joined, Isosurface(2.0)).shape();
         let eval = shape_e.evaluate(p);
-        //panic!("{eval:#?}");
+        panic!("{eval:#?}");
 
         //let arr = Id.split(GradientF.compose_l(CallF.suffix(p))).call(eval);
         //panic!("{arr:#?}");

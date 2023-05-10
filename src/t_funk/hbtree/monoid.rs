@@ -29,7 +29,7 @@ impl<L, T, R> Mempty for Branch<L, T, R> {
 
 impl<L, T, R> Mconcat for Branch<L, T, R>
 where
-    Self: Mempty + Foldr<MappendF, <Self as Mempty>::Mempty>,
+    Branch<L, T, R>: Mempty + Foldr<MappendF, <Self as Mempty>::Mempty>,
 {
     type Mconcat = <Branch<L, T, R> as Foldr<MappendF, <Self as Mempty>::Mempty>>::Foldr;
 
@@ -37,4 +37,3 @@ where
         self.foldr(MappendF::default(), Self::mempty())
     }
 }
-

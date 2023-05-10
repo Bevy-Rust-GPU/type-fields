@@ -31,13 +31,13 @@ where
     }
 }
 
-impl<T> Mappend<Sum<T>> for Sum<T>
+impl<T, U> Mappend<Sum<U>> for Sum<T>
 where
-    T: Add<T>,
+    T: Add<U>,
 {
     type Mappend = Sum<T::Output>;
 
-    fn mappend(self, t: Sum<T>) -> Self::Mappend {
+    fn mappend(self, t: Sum<U>) -> Self::Mappend {
         Sum(self.0 + t.0)
     }
 }

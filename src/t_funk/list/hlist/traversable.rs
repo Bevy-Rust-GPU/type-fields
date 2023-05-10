@@ -61,9 +61,9 @@ mod test {
     use crate::t_funk::{function::Id, hlist::Nil, tlist::ToHList, SequenceA, Traverse};
 
     #[test]
-    fn test_sequence_a() {
+    fn test_traverse() {
         let list = ((0,).to_hlist(), (0, 1).to_hlist(), (0, 1, 2).to_hlist()).to_hlist();
-        let decafisbad = SequenceA::<Nil>::sequence_a(list);
+        let decafisbad = Traverse::<Id, Nil>::traverse(list, Id);
         assert_eq!(
             decafisbad,
             (
@@ -79,9 +79,9 @@ mod test {
     }
 
     #[test]
-    fn test_traverse() {
+    fn test_sequence_a() {
         let list = ((0,).to_hlist(), (0, 1).to_hlist(), (0, 1, 2).to_hlist()).to_hlist();
-        let decafisbad = Traverse::<Id, Nil>::traverse(list, Id);
+        let decafisbad = SequenceA::<Nil>::sequence_a(list);
         assert_eq!(
             decafisbad,
             (

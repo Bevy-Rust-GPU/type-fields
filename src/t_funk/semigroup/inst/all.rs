@@ -24,13 +24,13 @@ use crate::t_funk::Mappend;
 )]
 pub struct All<T>(pub T);
 
-impl<T> Mappend<All<T>> for All<T>
+impl<T, U> Mappend<All<U>> for All<T>
 where
-    T: core::ops::BitAnd<T>,
+    T: core::ops::BitAnd<U>,
 {
     type Mappend = All<T::Output>;
 
-    fn mappend(self, t: All<T>) -> Self::Mappend {
+    fn mappend(self, t: All<U>) -> Self::Mappend {
         All(self.0 & t.0)
     }
 }
