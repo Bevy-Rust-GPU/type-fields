@@ -1,4 +1,4 @@
-use crate::macros::{Closure, Copointed, Pointed};
+use crate::macros::{arrow::arrow, category::category, Closure, Copointed, Pointed};
 
 use crate::t_funk::{
     applicative::Pure, function::Const, function::Id, monad::Chain, Apply, Closure, Curry2,
@@ -6,6 +6,8 @@ use crate::t_funk::{
 };
 
 /// 2-tuple constructor
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct Tuple;
 
@@ -122,6 +124,8 @@ where
     }
 }
 
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct Put;
 
@@ -133,6 +137,8 @@ impl<I> Function<I> for Put {
     }
 }
 
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct Get;
 
@@ -251,7 +257,7 @@ mod test {
         );
 
         // ReplicateM
-        let State(res) = ReplicateM::<(((((((),),),),),),), State<()>>::call(push_s);
+        let State(res) = ReplicateM::<(((((((),),),),),),), State<()>>::default().call(push_s);
         let res = res.call(Unlocked);
         assert_eq!(res, ((Open, Tut, Tut, Tut, Tut, Tut).to_hlist(), Locked));
 

@@ -12,6 +12,8 @@ pub trait Closure<Input>: Sized {
     fn call(self, input: Input) -> Self::Output;
 }
 
+pub type OutputT<T, U> = <T as Closure<U>>::Output;
+
 /// Blanket impl for value-level functions.
 ///
 /// API-friendly simplification for non-generic functions.

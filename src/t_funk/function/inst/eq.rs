@@ -1,5 +1,10 @@
-use crate::{t_funk::Function, macros::Closure};
+use crate::{
+    macros::{arrow::arrow, category::category, Closure},
+    t_funk::Function,
+};
 
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct Eq;
 
@@ -10,4 +15,3 @@ impl Function<(f32, f32)> for Eq {
         l.eq(&r)
     }
 }
-

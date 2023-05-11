@@ -1,8 +1,4 @@
-use crate::macros::{
-    arrow::{Arr, Fanout, First, Second, Split},
-    category::{Compose, Id},
-    Copointed, Pointed,
-};
+use crate::macros::{arrow::arrow, category::category, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 
@@ -27,26 +23,9 @@ pub trait Curry2: Sized {
 impl<T> Curry2 for T {}
 
 /// Curried binary function
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Curried2<F>(pub F);
 
 impl<F, A> Closure<A> for Curried2<F> {
@@ -58,24 +37,9 @@ impl<F, A> Closure<A> for Curried2<F> {
 }
 
 /// Curried binary function with F, A stored
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Curry2A<F, A>(pub F, pub A);
 
 impl<F, A, B> Closure<B> for Curry2A<F, A>
@@ -90,24 +54,9 @@ where
 }
 
 /// Curried binary function with F, B stored
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Curry2B<F, B>(pub F, pub B);
 
 impl<F, B, A> Closure<A> for Curry2B<F, B>

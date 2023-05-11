@@ -90,7 +90,7 @@ mod test {
             root(4)
         );
 
-        let tree = tree.fmap(ToString);
+        let _tree = tree.fmap(ToString);
         //panic!("{tree:#?}");
 
         #[rustfmt::skip]
@@ -103,10 +103,10 @@ mod test {
             root(4)
         );
 
-        let right = tree.foldr(Add.curry(), 0);
+        let _right = tree.foldr(Add.curry(), 0);
         //panic!("{right:}");
 
-        let left = tree.foldl(Add.curry(), 0);
+        let _left = tree.foldl(Add.curry(), 0);
         //panic!("{left:}");
 
         #[rustfmt::skip]

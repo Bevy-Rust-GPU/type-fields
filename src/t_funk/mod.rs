@@ -69,6 +69,7 @@ pub mod monoid;
 pub mod pointed;
 pub mod semigroup;
 pub mod traversable;
+pub mod either;
 
 pub use applicative::*;
 pub use arrow::*;
@@ -88,3 +89,4 @@ pub use monoid::*;
 pub use pointed::*;
 pub use semigroup::*;
 pub use traversable::*;
+pub use either::*;

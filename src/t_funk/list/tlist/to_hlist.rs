@@ -1,7 +1,11 @@
-use crate::t_funk::hlist::{HList, Nil};
+use crate::{
+    macros::functions,
+    t_funk::hlist::{HList, Nil},
+};
 
 /// Convert a flat tuple into a cons list.
 /// ex. `(1, 2, 3, 4)` -> `(1, (2, (3, (4, ()))))`
+#[functions]
 pub trait ToHList {
     type HList: HList<TList = Self>;
 

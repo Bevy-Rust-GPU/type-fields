@@ -1,6 +1,10 @@
-use crate::t_funk::hlist::{Cons, HList, Next, Nil};
+use crate::{
+    macros::functions,
+    t_funk::hlist::{Cons, HList, Next, Nil},
+};
 
 /// A `ConsList` that can push a new element to its back.
+#[functions]
 pub trait PushBack<T> {
     type Path;
     type PushBack: HList;

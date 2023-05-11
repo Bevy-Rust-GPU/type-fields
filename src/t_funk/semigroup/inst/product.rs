@@ -1,28 +1,17 @@
 use crate::macros::{
-    applicative::Apply, functor::Fmap, monad::Chain, monoid::Mempty, Copointed, Pointed,
+    applicative::applicative, foldable::foldable, functor::functor, monad::monad, monoid::monoid, Copointed, Pointed,
 };
 
 use crate::t_funk::Mappend;
 use core::ops::Mul;
 
 /// A `Semigroup` wrapper that can append multiplicatively.
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Fmap,
-    Apply,
-    Chain,
-    Mempty,
-)]
+#[functor]
+#[applicative]
+#[monad]
+#[monoid]
+#[foldable]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Product<T>(pub T);
 
 impl<T, U> Mappend<Product<U>> for Product<T>

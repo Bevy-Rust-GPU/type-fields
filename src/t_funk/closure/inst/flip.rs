@@ -1,8 +1,4 @@
-use crate::macros::{
-    arrow::{Arr, Fanout, First, Second, Split},
-    category::{Compose, Id},
-    functions, Copointed, Pointed,
-};
+use crate::macros::{arrow::arrow, category::category, functions, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 
@@ -18,26 +14,9 @@ impl<T> Flip for T {
     }
 }
 
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Flipped<F>(pub F);
 
 impl<F, A, B> Closure<(B, A)> for Flipped<F>

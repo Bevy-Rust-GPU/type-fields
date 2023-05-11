@@ -8,6 +8,8 @@ pub trait Fmap<F>: Sized {
     fn fmap(self, f: F) -> Self::Fmap;
 }
 
+pub type FmapT<T, F> = <T as Fmap<F>>::Fmap;
+
 impl<F> Fmap<F> for () {
     type Fmap = ();
 

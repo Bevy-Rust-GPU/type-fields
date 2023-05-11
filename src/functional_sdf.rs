@@ -1,14 +1,11 @@
-use core::ops::{Add, BitAnd, BitOr, Deref, DerefMut, Div, Mul, Sub};
+use core::ops::{Add, BitAnd, BitOr, Div, Mul, Sub};
 
 use crate::{
-    macros::{
-        functions,
-        functor::{Fmap, Replace},
-        Closure,
-    },
+    macros::{arrow::arrow, category::category, functions, functor::Replace, Closure},
     t_funk::{
-        hlist::{Cons, Nil},
-        Gt, Lt,
+        hlist::{Cons, Nil, PushBackF},
+        CallF, ComposeL, ComposeLT, Composed, Curry2, Curry2B, Either, Fanout, FanoutT, FmapT, Fst,
+        Gt, Lt, MakeIf, MakePair, OutputT, Split, SplitT, Splitted,
     },
 };
 
@@ -35,6 +32,8 @@ impl<T> Gradient for Translate<T> {
 }
 
 // General translation function
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct TranslateF<T>(T, T);
 
@@ -70,6 +69,8 @@ impl Gradient for Point {
     }
 }
 
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 struct PointDistance;
 
@@ -84,6 +85,8 @@ where
     }
 }
 
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 struct PointGradient;
 
@@ -119,6 +122,8 @@ impl<T> Gradient for Isosurface<T> {
     }
 }
 
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct IsosurfaceDistance<T>(T);
 
@@ -141,12 +146,14 @@ pub trait Distance {
     fn distance(self) -> Self::Distance;
 }
 
+pub type DistanceT<T> = <T as Distance>::Distance;
+
 impl<LHS, RHS> Distance for Cons<LHS, RHS>
 where
     LHS: Distance,
     RHS: Distance,
 {
-    type Distance = Cons<LHS::Distance, RHS::Distance>;
+    type Distance = Cons<DistanceT<LHS>, DistanceT<RHS>>;
 
     fn distance(self) -> Self::Distance {
         Cons(self.0.distance(), self.1.distance())
@@ -169,12 +176,14 @@ pub trait Gradient {
     fn gradient(self) -> Self::Gradient;
 }
 
+pub type GradientT<T> = <T as Gradient>::Gradient;
+
 impl<LHS, RHS> Gradient for Cons<LHS, RHS>
 where
     LHS: Gradient,
     RHS: Gradient,
 {
-    type Gradient = Cons<LHS::Gradient, RHS::Gradient>;
+    type Gradient = Cons<GradientT<LHS>, GradientT<RHS>>;
 
     fn gradient(self) -> Self::Gradient {
         Cons(self.0.gradient(), self.1.gradient())
@@ -189,22 +198,27 @@ impl Gradient for Nil {
     }
 }
 
-// Given a point, evaluate a distance and corresponding shape
-#[functions]
-pub trait Evaluate<P, E> {
-    type Evaluate;
-
-    fn evaluate(self, p: P) -> (E, Self::Evaluate);
-}
-
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Fmap, Replace)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Replace)]
 pub struct Shape<T>(pub T);
+
+impl<T, F> Fmap<F> for Shape<T>
+where
+    T: Fmap<F>,
+{
+    type Fmap = Shape<FmapT<T, F>>;
+
+    fn fmap(self, f: F) -> Self::Fmap {
+        Shape(self.0.fmap(f))
+    }
+}
 
 impl<T> Distance for Shape<T>
 where
     T: Distance,
 {
-    type Distance = Shape<T::Distance>;
+    type Distance = Shape<DistanceT<T>>;
 
     fn distance(self) -> Self::Distance {
         Shape(self.0.distance())
@@ -215,7 +229,7 @@ impl<T> Gradient for Shape<T>
 where
     T: Gradient,
 {
-    type Gradient = Shape<T::Gradient>;
+    type Gradient = Shape<GradientT<T>>;
 
     fn gradient(self) -> Self::Gradient {
         Shape(self.0.gradient())
@@ -226,22 +240,10 @@ impl<T, I> Closure<I> for Shape<T>
 where
     T: Closure<I>,
 {
-    type Output = T::Output;
+    type Output = OutputT<T, I>;
 
     fn call(self, input: I) -> Self::Output {
         self.0.call(input)
-    }
-}
-
-impl<T, P, E> Evaluate<P, E> for Shape<T>
-where
-    Shape<T>: Clone + Distance,
-    <Shape<T> as Distance>::Distance: Closure<P, Output = E>,
-{
-    type Evaluate = T;
-
-    fn evaluate(self, p: P) -> (E, Self::Evaluate) {
-        (self.clone().distance().call(p), self.0)
     }
 }
 
@@ -302,39 +304,15 @@ where
     }
 }
 
-impl<L, R> Distance for Joined<L, R>
-where
-    L: Distance,
-    R: Distance,
-{
-    type Distance = Joined<L::Distance, R::Distance>;
-
-    fn distance(self) -> Self::Distance {
-        Joined(self.0.distance(), self.1.distance())
-    }
-}
-
-impl<L, R> Gradient for Joined<L, R>
-where
-    L: Gradient,
-    R: Gradient,
-{
-    type Gradient = Joined<L::Gradient, R::Gradient>;
-
-    fn gradient(self) -> Self::Gradient {
-        Joined(self.0.gradient(), self.1.gradient())
-    }
-}
-
 impl<L, R, P> Closure<P> for Joined<L, R>
 where
     L: Clone + Closure<P>,
-    L::Output: Clone,
-    R: Clone + Closure<P, Output = L::Output>,
+    OutputT<L, P>: Clone,
+    R: Clone + Closure<P, Output = OutputT<L, P>>,
     P: Clone,
-    Lt: Closure<(L::Output, L::Output), Output = bool>,
+    Lt: Closure<(OutputT<L, P>, OutputT<L, P>), Output = bool>,
 {
-    type Output = L::Output;
+    type Output = OutputT<L, P>;
 
     fn call(self, p: P) -> Self::Output {
         let dl = self.0.clone().call(p.clone());
@@ -344,30 +322,6 @@ where
             dl
         } else {
             dr
-        }
-    }
-}
-
-impl<L, R, P, E> Evaluate<P, E> for Joined<L, R>
-where
-    L: Clone,
-    L: Evaluate<P, E>,
-    R: Clone,
-    R: Evaluate<P, E>,
-    P: Clone,
-    E: Clone,
-    Lt: Closure<(E, E), Output = bool>,
-{
-    type Evaluate = Either<L::Evaluate, R::Evaluate>;
-
-    fn evaluate(self, p: P) -> (E, Self::Evaluate) {
-        let (dl, l) = self.0.clone().evaluate(p.clone());
-        let (dr, r) = self.1.clone().evaluate(p);
-
-        if Lt.call((dl.clone(), dr.clone())) {
-            (dl, Either::Left(l))
-        } else {
-            (dr, Either::Right(r))
         }
     }
 }
@@ -400,30 +354,6 @@ impl<L, R> Meet<R> for L {}
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Meeted<T, U>(pub T, pub U);
 
-impl<L, R> Distance for Meeted<L, R>
-where
-    L: Distance,
-    R: Distance,
-{
-    type Distance = Meeted<L::Distance, R::Distance>;
-
-    fn distance(self) -> Self::Distance {
-        Meeted(self.0.distance(), self.1.distance())
-    }
-}
-
-impl<L, R> Gradient for Meeted<L, R>
-where
-    L: Gradient,
-    R: Gradient,
-{
-    type Gradient = Meeted<L::Gradient, R::Gradient>;
-
-    fn gradient(self) -> Self::Gradient {
-        Meeted(self.0.gradient(), self.1.gradient())
-    }
-}
-
 impl<L, R, F> Fmap<F> for Meeted<L, R>
 where
     L: Fmap<F>,
@@ -440,12 +370,12 @@ where
 impl<L, R, P> Closure<P> for Meeted<L, R>
 where
     L: Clone + Closure<P>,
-    L::Output: Clone,
-    R: Clone + Closure<P, Output = L::Output>,
+    OutputT<L, P>: Clone,
+    R: Clone + Closure<P, Output = OutputT<L, P>>,
     P: Clone,
-    Gt: Closure<(L::Output, L::Output), Output = bool>,
+    Gt: Closure<(OutputT<L, P>, OutputT<L, P>), Output = bool>,
 {
-    type Output = L::Output;
+    type Output = OutputT<L, P>;
 
     fn call(self, p: P) -> Self::Output {
         let dl = self.0.clone().call(p.clone());
@@ -455,30 +385,6 @@ where
             dl
         } else {
             dr
-        }
-    }
-}
-
-impl<L, R, P, E> Evaluate<P, E> for Meeted<L, R>
-where
-    L: Clone,
-    L: Evaluate<P, E>,
-    R: Clone,
-    R: Evaluate<P, E>,
-    P: Clone,
-    E: Clone,
-    Gt: Closure<(E, E), Output = bool>,
-{
-    type Evaluate = Either<L::Evaluate, R::Evaluate>;
-
-    fn evaluate(self, p: P) -> (E, Self::Evaluate) {
-        let (dl, l) = self.0.clone().evaluate(p.clone());
-        let (dr, r) = self.1.clone().evaluate(p);
-
-        if Gt.call((dl.clone(), dr.clone())) {
-            (dl, Either::Left(l))
-        } else {
-            (dr, Either::Right(r))
         }
     }
 }
@@ -499,107 +405,12 @@ impl<L1, L2, R> BitOr<R> for Meeted<L1, L2> {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
-struct Min;
-
-impl Function<(f32, f32)> for Min {
-    type Output = f32;
-
-    fn call((l, r): (f32, f32)) -> Self::Output {
-        l.min(r)
-    }
-}
-
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
-struct Max;
-
-impl Function<(f32, f32)> for Max {
-    type Output = f32;
-
-    fn call((l, r): (f32, f32)) -> Self::Output {
-        l.max(r)
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Either<L, R> {
-    Left(L),
-    Right(R),
-}
-
-impl<T> Deref for Either<T, T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        match self {
-            Either::Left(l) => l,
-            Either::Right(r) => r,
-        }
-    }
-}
-
-impl<T> DerefMut for Either<T, T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        match self {
-            Either::Left(l) => l,
-            Either::Right(r) => r,
-        }
-    }
-}
-
-impl<L, R> Either<L, R> {
-    pub fn try_left(self) -> Option<L> {
-        match self {
-            Either::Left(l) => Some(l),
-            Either::Right(_) => None,
-        }
-    }
-
-    pub fn try_right(self) -> Option<R> {
-        match self {
-            Either::Left(_) => None,
-            Either::Right(r) => Some(r),
-        }
-    }
-
-    pub fn left(self) -> L {
-        self.try_left().expect("Called left() on a Right value")
-    }
-
-    pub fn right(self) -> R {
-        self.try_right().expect("Called right() on a Left value")
-    }
-}
-
-impl<T> Either<T, T> {
-    pub fn unwrap(self) -> T {
-        match self {
-            Either::Left(t) | Either::Right(t) => t,
-        }
-    }
-}
-
-impl<L, R, F> Fmap<F> for Either<L, R>
-where
-    L: Fmap<F>,
-    R: Fmap<F>,
-{
-    type Fmap = Either<L::Fmap, R::Fmap>;
-
-    fn fmap(self, f: F) -> Self::Fmap {
-        match self {
-            Either::Left(l) => Either::Left(l.fmap(f)),
-            Either::Right(r) => Either::Right(r.fmap(f)),
-        }
-    }
-}
-
 impl<L, R> Distance for Either<L, R>
 where
     L: Distance,
     R: Distance,
 {
-    type Distance = Either<L::Distance, R::Distance>;
+    type Distance = Either<DistanceT<L>, DistanceT<R>>;
 
     fn distance(self) -> Self::Distance {
         match self {
@@ -614,7 +425,7 @@ where
     L: Gradient,
     R: Gradient,
 {
-    type Gradient = Either<L::Gradient, R::Gradient>;
+    type Gradient = Either<GradientT<L>, GradientT<R>>;
 
     fn gradient(self) -> Self::Gradient {
         match self {
@@ -627,9 +438,9 @@ where
 impl<L, R, I> Closure<I> for Either<L, R>
 where
     L: Closure<I>,
-    R: Closure<I, Output = L::Output>,
+    R: Closure<I, Output = OutputT<L, I>>,
 {
-    type Output = L::Output;
+    type Output = OutputT<L, I>;
 
     fn call(self, i: I) -> Self::Output {
         match self {
@@ -639,33 +450,158 @@ where
     }
 }
 
-impl<L, R, P, E> Evaluate<P, E> for Either<L, R>
-where
-    L: Evaluate<P, E>,
-    R: Evaluate<P, E>,
-{
-    type Evaluate = Either<L::Evaluate, R::Evaluate>;
+#[functions]
+pub trait Evaluate {
+    type Evaluate;
 
-    fn evaluate(self, p: P) -> (E, Self::Evaluate) {
-        match self {
-            Either::Left(l) => {
-                let (e, l) = l.evaluate(p);
-                (e, Either::Left(l))
-            }
-            Either::Right(r) => {
-                let (e, r) = r.evaluate(p);
-                (e, Either::Right(r))
-            }
-        }
+    fn evaluate(self) -> Self::Evaluate;
+}
+
+pub type EvaluateT<T> = <T as Evaluate>::Evaluate;
+
+impl<T> Evaluate for T
+where
+    T: Clone + Distance,
+    DistanceT<T>: Split<Curry2B<PushBackF, T>>,
+{
+    type Evaluate = SplitT<DistanceT<T>, Curry2B<PushBackF, T>>;
+
+    fn evaluate(self) -> Self::Evaluate {
+        let d = self.clone().distance();
+        d.split(PushBackF.suffix(self))
+    }
+}
+
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+pub struct MakeCons;
+
+impl<T> Function<T> for MakeCons {
+    type Output = Cons<T, Nil>;
+
+    fn call(input: T) -> Self::Output {
+        Cons(input, Nil)
+    }
+}
+
+impl<T, U> Evaluate for Meeted<T, U>
+where
+    T: Clone + Evaluate,
+    U: Clone + Evaluate,
+    EvaluateT<T>: Fanout<EvaluateT<U>>,
+    FanoutT<EvaluateT<T>, EvaluateT<U>>: ComposeL<TransposeTuple>,
+{
+    type Evaluate = Composed<
+        Splitted<Composed<UnwrapEither, CallF>, Composed<MakeCons, CallF>>,
+        Composed<
+            TransposeTuple,
+            Composed<
+                Composed<
+                    Splitted<
+                        Splitted<MakeIf, MakeIf>,
+                        Composed<Composed<Splitted<Id, Id>, MakePair>, Composed<Gt, Fst>>,
+                    >,
+                    MakePair,
+                >,
+                ComposeLT<FanoutT<EvaluateT<T>, EvaluateT<U>>, TransposeTuple>,
+            >,
+        >,
+    >;
+
+    fn evaluate(self) -> Self::Evaluate {
+        let d0 = self.0.clone().evaluate();
+        let d1 = self.1.clone().evaluate();
+
+        d0.fanout(d1)
+            .compose_l(TransposeTuple)
+            .compose_l(
+                MakeIf
+                    .split(MakeIf)
+                    .fanout(Fst.compose_l(Gt).compose_l(Id.fanout(Id))),
+            )
+            .compose_l(TransposeTuple)
+            .compose_l((CallF.compose_l(UnwrapEither)).split(CallF.compose_l(MakeCons)))
+    }
+}
+
+impl<T, U> Evaluate for Joined<T, U>
+where
+    T: Clone + Evaluate,
+    U: Clone + Evaluate,
+    EvaluateT<T>: Fanout<EvaluateT<U>>,
+    FanoutT<EvaluateT<T>, EvaluateT<U>>: ComposeL<TransposeTuple>,
+{
+    type Evaluate = Composed<
+        Splitted<Composed<UnwrapEither, CallF>, Composed<MakeCons, CallF>>,
+        Composed<
+            TransposeTuple,
+            Composed<
+                Composed<
+                    Splitted<
+                        Splitted<MakeIf, MakeIf>,
+                        Composed<Composed<Splitted<Id, Id>, MakePair>, Composed<Lt, Fst>>,
+                    >,
+                    MakePair,
+                >,
+                ComposeLT<FanoutT<EvaluateT<T>, EvaluateT<U>>, TransposeTuple>,
+            >,
+        >,
+    >;
+
+    fn evaluate(self) -> Self::Evaluate {
+        let d0 = self.0.clone().evaluate();
+        let d1 = self.1.clone().evaluate();
+
+        d0.fanout(d1)
+            .compose_l(TransposeTuple)
+            .compose_l(
+                MakeIf
+                    .split(MakeIf)
+                    .fanout(Fst.compose_l(Lt).compose_l(Id.fanout(Id))),
+            )
+            .compose_l(TransposeTuple)
+            .compose_l((CallF.compose_l(UnwrapEither)).split(CallF.compose_l(MakeCons)))
+    }
+}
+
+// Given a matrix described by a 2x2 tuple, transpose it
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+pub struct TransposeTuple;
+
+impl<A, B, C, D> Function<((A, B), (C, D))> for TransposeTuple {
+    type Output = ((A, C), (B, D));
+
+    fn call(((a, b), (c, d)): ((A, B), (C, D))) -> Self::Output {
+        ((a, c), (b, d))
+    }
+}
+
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+pub struct UnwrapEither;
+
+impl<T> Function<Either<T, T>> for UnwrapEither {
+    type Output = T;
+
+    fn call(input: Either<T, T>) -> Self::Output {
+        input.unwrap()
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crate::t_funk::{
-        branch, branch_l, branch_r, leaf, root, All, Any, CallF, ComposeL, Curry2, Foldr, MconcatF,
-        Split,
+    use crate::{
+        functional_sdf::{
+            Evaluate, EvaluateF, GradientF, Isosurface, Point, ToShape, Translate, TransposeTuple,
+        },
+        t_funk::{
+            closure::Compose, function::Id, list::hlist::Nil, CallF, Closure, Curry2, Either,
+            Fanout, Fmap, FmapF, Fst, Lt, MakeIf, Split, arrow::Second,
+        },
     };
 
     #[test]
@@ -675,20 +611,44 @@ mod test {
         let shape_c = (Translate(0.0, 1.0), Point, Isosurface(3.0)).shape();
         let shape_d = (Translate(0.0, -1.0), Point, Isosurface(1.5)).shape();
 
-        let p = (0.0, 0.0);
+        let p = (-1.0, 0.0);
 
-        let joined = shape_a | shape_b | shape_c & shape_d;
-        let eval = joined.evaluate(p);
-        //panic!("{eval:#?}");
+        let oof = shape_a
+            .evaluate()
+            .fanout(shape_b.evaluate())
+            .compose_l(TransposeTuple)
+            .compose_l(
+                MakeIf
+                    .split(MakeIf)
+                    .fanout(Fst.compose_l(Lt).compose_l(Id.fanout(Id))),
+            )
+            .compose_l(TransposeTuple)
+            .compose_l((CallF.compose_l(Either::unwrap)).split(CallF));
+        let _rab = oof.call((p, Nil));
+        //panic!("{rab:#?}");
 
-        let arr = Id.split(GradientF.compose_l(CallF.suffix(p))).call(eval);
-        //panic!("{arr:#?}");
+        let foo = shape_a.evaluate();
+        let _bar = foo.call((p, Nil));
+        //panic!("{bar:#?}");
 
-        let shape_e = (Translate(-1.0, -1.0), joined, Isosurface(2.0)).shape();
-        let eval = shape_e.evaluate(p);
-        panic!("{eval:#?}");
+        let foo = shape_a | shape_b | shape_c & shape_d;
+        let bar = foo.evaluate();
+        let _baz = bar.call((p, Nil));
+        //panic!("{baz:#?}");
 
-        //let arr = Id.split(GradientF.compose_l(CallF.suffix(p))).call(eval);
-        //panic!("{arr:#?}");
+        let foo = (Translate(-1.0, -1.0), foo, Isosurface(2.0))
+            .shape()
+            .fmap(EvaluateF);
+
+        let bar = foo.call((p, Nil));
+        //panic!("{bar:#?}");
+
+        let baz = FmapF
+            .suffix(GradientF)
+            .compose_l(CallF.suffix(p))
+            .second()
+            .call(bar);
+
+        panic!("{baz:#?}");
     }
 }

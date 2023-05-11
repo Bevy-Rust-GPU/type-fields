@@ -1,15 +1,11 @@
 use crate::macros::{
-    applicative::{Apply, Pure},
-    foldable::{Fold, FoldMap, Foldl, Foldr},
-    functor::{Fmap, Replace},
-    monad::{Chain, Then},
-    monoid::Mconcat,
-    Copointed, Pointed,
+    applicative::applicative, foldable::foldable, functor::functor, monad::monad, Copointed,
+    Pointed,
 };
 
 use crate::t_funk::{
-    Applicative, Apply, monad::Chain, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Functor, Mappend,
-    Mconcat, Mempty, Monad, Pointed, applicative::Pure, Replace, Then,
+    applicative::Pure, monad::Chain, Apply, Copointed, Fmap, Fold, FoldMap, Foldl, Foldr, Mappend,
+    Mconcat, Mempty, Pointed, Replace, Then,
 };
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -143,30 +139,11 @@ impl Fold for Nothing {
     }
 }
 
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Fmap,
-    Replace,
-    Pure,
-    Apply,
-    Chain,
-    Then,
-    Mconcat,
-    FoldMap,
-    Foldr,
-    Foldl,
-    Fold,
-)]
+#[functor]
+#[applicative]
+#[monad]
+#[foldable]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Just<T>(pub T);
 
 impl<T> Mempty for Just<T> {
@@ -196,7 +173,7 @@ where
     }
 }
 
-pub trait Maybe<T>: Pointed + Copointed + Functor + Applicative + Monad {}
+pub trait Maybe<T>: Pointed + Copointed {}
 impl<T> Maybe<T> for Nothing {}
 impl<T> Maybe<T> for Just<T> {}
 

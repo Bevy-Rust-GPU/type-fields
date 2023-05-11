@@ -1,7 +1,4 @@
-use crate::macros::{
-    category::{Compose, Id},
-    Copointed, Pointed,
-};
+use crate::macros::{arrow::arrow, category::category, Copointed, Pointed};
 
 use crate::t_funk::{Closure, Curried2, Fmap};
 
@@ -14,21 +11,9 @@ pub const fn lens<G, S>(get: G, set: S) -> Lens<G, S> {
 }
 
 /// Closure constructing a lens from a getter and setter
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Id,
-    Compose,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Lensed<G, S>(pub G, pub S);
 
 impl<G, S, F, T> Closure<(F, T)> for Lensed<G, S>

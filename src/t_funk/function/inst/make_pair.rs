@@ -1,13 +1,10 @@
-use crate::macros::{
-    category::{Compose, Id},
-    Closure,
-};
+use crate::macros::{arrow::arrow, category::category, Closure};
 
 use crate::t_funk::Function;
 
-#[derive(
-    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Id, Compose,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct MakePair;
 
 impl<T> Function<T> for MakePair

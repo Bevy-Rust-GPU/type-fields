@@ -1,76 +1,25 @@
 use crate::macros::{
-    applicative::{Apply, Pure},
-    foldable::{FoldMap, Foldl, Foldr},
-    functor::{Fmap, Replace},
-    monad::{Chain, Then},
-    monoid::{Mconcat, Mempty},
-    semigroup::Mappend,
-    Copointed, Pointed,
+    applicative::applicative, foldable::foldable, functor::functor, monad::monad, monoid::monoid,
+    semigroup::semigroup, Copointed, Pointed,
 };
 
-use crate::t_funk::{Applicative, Copointed, Functor, Monad, Pointed};
-
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Fmap,
-    Replace,
-    Pure,
-    Apply,
-    Chain,
-    Then,
-    Mempty,
-    Mappend,
-    Mconcat,
-    FoldMap,
-    Foldr,
-    Foldl,
-)]
+#[functor]
+#[applicative]
+#[monad]
+#[semigroup]
+#[monoid]
+#[foldable]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Left<T>(pub T);
 
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Fmap,
-    Replace,
-    Pure,
-    Apply,
-    Chain,
-    Then,
-    Mempty,
-    Mappend,
-    Mconcat,
-    FoldMap,
-    Foldr,
-    Foldl,
-)]
+#[functor]
+#[applicative]
+#[monad]
+#[semigroup]
+#[monoid]
+#[foldable]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Right<T>(pub T);
-
-pub trait Either<T>:
-    Pointed<Pointed = T> + Copointed<Copointed = T> + Functor + Applicative + Monad
-{
-}
-
-impl<T> Either<T> for Left<T> {}
-impl<T> Either<T> for Right<T> {}
 
 #[cfg(test)]
 mod test {

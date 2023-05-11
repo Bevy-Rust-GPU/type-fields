@@ -1,7 +1,12 @@
-use crate::{macros::Closure, t_funk::Function};
+use crate::{
+    macros::{arrow::arrow, category::category, Closure},
+    t_funk::Function,
+};
 
 extern crate alloc;
 
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct ToString;
 
@@ -15,4 +20,3 @@ where
         input.to_string()
     }
 }
-

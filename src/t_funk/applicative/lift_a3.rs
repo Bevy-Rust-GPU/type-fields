@@ -1,8 +1,10 @@
-use crate::macros::Closure;
+use crate::macros::{arrow::arrow, category::category, Closure};
 
 use crate::t_funk::{Apply, Closure, Fmap, Function, LiftA2};
 
 /// Lift a ternary function to actions
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct LiftA3;
 
@@ -18,4 +20,3 @@ where
         LiftA2.call((f, a, b)).apply(c)
     }
 }
-

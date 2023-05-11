@@ -1,11 +1,7 @@
-use crate::macros::arrow::{Fanout, Split};
+use crate::macros::{arrow::arrow, category::category};
 
 use crate::{
-    macros::{
-        arrow::{Arr, First, Second},
-        category::{Compose, Id},
-        functions, Copointed, Pointed,
-    },
+    macros::{functions, Copointed, Pointed},
     t_funk::Closure,
 };
 
@@ -21,26 +17,9 @@ impl<T> Spread for T {
     }
 }
 
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Spreaded<F>(pub F);
 
 impl<F, A> Closure<A> for Spreaded<F>

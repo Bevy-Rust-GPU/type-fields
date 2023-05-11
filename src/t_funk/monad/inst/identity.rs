@@ -1,46 +1,23 @@
 use crate::macros::{
-    applicative::{Apply, Pure},
-    foldable::{Fold, FoldMap, Foldl, Foldr},
-    functor::{Fmap, Replace},
-    monad::{Chain, Then},
-    monoid::{Mconcat, Mempty},
-    semigroup::Mappend,
-    Copointed, Pointed,
+    applicative::applicative, foldable::foldable, functor::functor, monad::monad, monoid::monoid,
+    semigroup::semigroup, Copointed, Pointed,
 };
 
 /// Identity monad, used to lift values into a monadic context.
-#[derive(
-    Debug,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Fmap,
-    Replace,
-    Pure,
-    Apply,
-    Chain,
-    Then,
-    Mempty,
-    Mappend,
-    Mconcat,
-    FoldMap,
-    Foldr,
-    Foldl,
-    Fold,
-)]
+#[functor]
+#[applicative]
+#[monad]
+#[semigroup]
+#[monoid]
+#[foldable]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Identity<T>(pub T);
 
 #[cfg(test)]
 mod test {
     use crate::t_funk::{
-        closure::Compose, test_functor_laws, tlist::ToHList, Add, Apply, monad::Chain, Closure, Curry2,
-        CurryN, Div, Flip, Fmap, FoldMap, Identity, Mul, PointF, Sub, Curry2B, Sum, Then,
+        closure::Compose, monad::Chain, test_functor_laws, tlist::ToHList, Add, Apply, Closure,
+        Curry2, Curry2B, CurryN, Div, Flip, Fmap, FoldMap, Identity, Mul, PointF, Sub, Sum, Then,
     };
 
     #[test]

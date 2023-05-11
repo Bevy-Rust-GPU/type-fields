@@ -1,8 +1,4 @@
-use crate::macros::{
-    arrow::{Arr, Fanout, First, Second, Split},
-    category::{Compose, Id},
-    Copointed, Pointed,
-};
+use crate::macros::{arrow::arrow, category::category, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 
@@ -22,26 +18,9 @@ pub trait Curry3: Sized {
 impl<T> Curry3 for T {}
 
 /// Curried ternary function
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Curried3<F>(pub F);
 
 impl<F, A> Closure<A> for Curried3<F> {
@@ -53,24 +32,9 @@ impl<F, A> Closure<A> for Curried3<F> {
 }
 
 /// Curried ternary function with F, A stored
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Curry3A<F, A>(pub F, pub A);
 
 impl<F, A, B> Closure<B> for Curry3A<F, A>
@@ -85,24 +49,9 @@ where
 }
 
 /// Curried ternary function with F, A, B stored
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
-)]
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Curry3AB<F, A, B>(pub F, pub A, pub B);
 
 impl<F, A, B, C> Closure<C> for Curry3AB<F, A, B>
@@ -115,4 +64,3 @@ where
         self.0.call((self.1, self.2, input))
     }
 }
-

@@ -1,24 +1,13 @@
 use crate::{
-    macros::{monad::Then, Closure},
-    t_funk::{monad::{Chain, ChainF}, Closure, Curry2, Fmap, Function, Curry2B},
+    macros::{arrow::arrow, category::category, monad::Then, Closure},
+    t_funk::{
+        monad::{Chain, ChainF},
+        Closure, Curry2, Curry2B, Fmap, Function,
+    },
 };
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Then)]
 pub struct Free<F>(pub F);
-
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Then)]
-pub struct Return<F>(pub F);
-
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
-pub struct MakeReturn;
-
-impl<T> Function<T> for MakeReturn {
-    type Output = Return<T>;
-
-    fn call(input: T) -> Self::Output {
-        Return(input)
-    }
-}
 
 impl<T, F> Chain<F> for Free<T>
 where
@@ -31,6 +20,21 @@ where
     }
 }
 
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Then)]
+pub struct Return<F>(pub F);
+
+#[category]
+#[arrow]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+pub struct MakeReturn;
+
+impl<T> Function<T> for MakeReturn {
+    type Output = Return<T>;
+
+    fn call(input: T) -> Self::Output {
+        Return(input)
+    }
+}
 impl<T, F> Chain<F> for Return<T>
 where
     F: Closure<T>,
@@ -42,6 +46,8 @@ where
     }
 }
 
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct LiftFree;
 

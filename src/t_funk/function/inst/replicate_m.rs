@@ -1,19 +1,24 @@
 use core::marker::PhantomData;
 
 use crate::{
-    macros::{
-        arrow::{Arr, Fanout, First, Second, Split},
-        category::{Compose, Id},
-    },
-    t_funk::{Apply, Curried2, Curry2, hlist::Nil},
+    macros::{arrow::arrow, category::category, Closure},
+    t_funk::{hlist::Nil, Apply, Curried2, Curry2},
 };
 
 use crate::t_funk::{
     applicative::Pure, hlist::PushFrontF, Closure, Flip, Flipped, Fmap, Function, LiftA2, Then,
 };
 
-#[derive(Id, Compose, Arr, First, Second, Split, Fanout)]
+#[category]
+#[arrow]
+#[derive(Closure)]
 pub struct ReplicateM<C, P>(PhantomData<(C, P)>);
+
+impl<C, P> Default for ReplicateM<C, P> {
+    fn default() -> Self {
+        ReplicateM(PhantomData)
+    }
+}
 
 impl<F, Next, P> Function<F> for ReplicateM<(Next,), P>
 where
@@ -29,7 +34,7 @@ where
         LiftA2.call((
             PushFrontF.flip().curry(),
             f.clone(),
-            ReplicateM::<Next, P>::call(f),
+            ReplicateM::<Next, P>::default().call(f),
         ))
     }
 }
@@ -45,7 +50,16 @@ where
     }
 }
 
+#[category]
+#[arrow]
+#[derive(Closure)]
 pub struct ReplicateMDiscard<C>(PhantomData<C>);
+
+impl<C> Default for ReplicateMDiscard<C> {
+    fn default() -> Self {
+        Self(PhantomData)
+    }
+}
 
 impl<F, Next> Function<F> for ReplicateMDiscard<(Next,)>
 where
@@ -55,7 +69,7 @@ where
     type Output = F::Then;
 
     fn call(f: F) -> Self::Output {
-        f.clone().then(ReplicateMDiscard::<Next>::call(f))
+        f.clone().then(ReplicateMDiscard::<Next>::default().call(f))
     }
 }
 

@@ -6,3 +6,5 @@ pub trait Fanout<F> {
 
     fn fanout(self, f: F) -> Self::Fanout;
 }
+
+pub type FanoutT<T, U> = <T as Fanout<U>>::Fanout;

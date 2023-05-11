@@ -13,6 +13,8 @@ pub trait Split<G>: Sized {
     fn split(self, g: G) -> Self::Split;
 }
 
+pub type SplitT<T, G> = <T as Split<G>>::Split;
+
 #[derive(
     Debug,
     Default,
@@ -33,7 +35,7 @@ pub trait Split<G>: Sized {
     Split,
     Fanout,
 )]
-pub struct Splitted<F, G>(F, G);
+pub struct Splitted<F, G>(pub F, pub G);
 
 impl<F, G, X, Y> Closure<(X, Y)> for Splitted<F, G>
 where

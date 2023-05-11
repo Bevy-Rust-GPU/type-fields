@@ -16,6 +16,8 @@ pub trait ComposeL<F>: Sized {
     fn compose_l(self, f: F) -> Self::ComposeL;
 }
 
+pub type ComposeLT<T, U> = <T as ComposeL<U>>::ComposeL;
+
 impl<T, F> ComposeL<F> for T
 where
     F: Compose<T>,

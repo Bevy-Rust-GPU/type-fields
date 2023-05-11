@@ -1,8 +1,10 @@
-use crate::macros::Closure;
+use crate::macros::{arrow::arrow, category::category, Closure};
 
 use crate::t_funk::{Apply, Fmap, Function};
 
 /// Lift a binary function to actions
+#[category]
+#[arrow]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct LiftA2;
 

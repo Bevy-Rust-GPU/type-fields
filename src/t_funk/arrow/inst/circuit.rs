@@ -4,10 +4,7 @@ use crate::macros::arrow::Fanout;
 
 use crate::t_funk::{ComposeL, Function, Swap};
 use crate::{
-    macros::{
-        category::{Compose, Id},
-        Copointed, Pointed,
-    },
+    macros::{category::category, Copointed, Pointed},
     t_funk::{
         arrow::First, category::Compose, function::Id, Arr, Closure, Curry2, Curry2A, Split, Tuple,
     },
@@ -34,7 +31,8 @@ impl<C1, C2> Compose<Circuit<C2>> for Circuit<C1> {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Id, Compose)]
+#[category]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CircuitCompose<C1, C2>(pub C1, pub C2);
 
 impl<C1, C2, A, C1A, B, C2A, C> Closure<A> for CircuitCompose<C1, C2>
@@ -60,21 +58,8 @@ impl<T, F> Arr<F> for Circuit<T> {
     }
 }
 
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Id,
-    Compose,
-)]
+#[category]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct CircuitArr<F>(pub F);
 
 impl<F, A> Closure<A> for CircuitArr<F>
@@ -96,21 +81,8 @@ impl<T> First for Circuit<T> {
     }
 }
 
-#[derive(
-    Debug,
-    Default,
-    Copy,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Pointed,
-    Copointed,
-    Id,
-    Compose,
-)]
+#[category]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct CircuitFirst<CI>(CI);
 
 impl<CI, CA, B, C, D> Closure<(B, D)> for CircuitFirst<CI>
@@ -143,9 +115,8 @@ impl<T, F> Split<Circuit<F>> for Circuit<T> {
 }
 
 /// Accumulator that outputs a value determined by the supplied function
-#[derive(
-    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Id, Compose,
-)]
+#[category]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
 pub struct Accum;
 
 impl<A, F> Function<(A, F)> for Accum {
