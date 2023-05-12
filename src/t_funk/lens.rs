@@ -1,4 +1,4 @@
-use crate::macros::{arrow::arrow, category::category, Copointed, Pointed};
+use crate::macros::{arrow::Arrow, category::Category, Copointed, Pointed};
 
 use crate::t_funk::{Closure, Curried2, Fmap};
 
@@ -11,9 +11,21 @@ pub const fn lens<G, S>(get: G, set: S) -> Lens<G, S> {
 }
 
 /// Closure constructing a lens from a getter and setter
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Category,
+    Arrow,
+)]
 pub struct Lensed<G, S>(pub G, pub S);
 
 impl<G, S, F, T> Closure<(F, T)> for Lensed<G, S>
@@ -63,7 +75,7 @@ mod test {
         let identity = Atom::point.call(Identity).call(atom);
         let get = Atom::point.call(FConst).call(atom);
         let set = Atom::point
-            .call(Identity.compose(Const.prefix(point)))
+            .call(Identity.compose(Const.prefix2(point)))
             .call(atom);
 
         assert_eq!(identity, Identity(atom));
@@ -89,7 +101,7 @@ mod test {
         let identity = atom_point_x_lens.call(Identity).call(atom);
         let get = atom_point_x_lens.call(FConst).call(atom);
         let set = atom_point_x_lens
-            .call(Identity.compose(Const.prefix(3.0)))
+            .call(Identity.compose(Const.prefix2(3.0)))
             .call(atom);
 
         assert_eq!(identity, Identity(atom));

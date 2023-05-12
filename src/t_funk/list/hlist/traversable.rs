@@ -18,7 +18,7 @@ where
     fn traverse(self, f: F) -> Self::Traverse {
         f.clone()
             .call(self.0)
-            .fmap(PushFrontF.flip().curry())
+            .fmap(PushFrontF.flip().curry2())
             .apply(self.1.traverse(f))
     }
 }

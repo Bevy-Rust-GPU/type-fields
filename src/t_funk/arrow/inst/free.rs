@@ -377,11 +377,11 @@ mod test {
     use super::{Effect, EvalA};
 
     fn add(n: f32) -> Effect<Curry2A<Add, f32>> {
-        Effect(Add.prefix(n))
+        Effect(Add.prefix2(n))
     }
 
     fn mul(n: f32) -> Effect<Curry2A<Mul, f32>> {
-        Effect(Mul.prefix(n))
+        Effect(Mul.prefix2(n))
     }
 
     fn div() -> Effect<Div> {

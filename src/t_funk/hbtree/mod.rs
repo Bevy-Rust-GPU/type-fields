@@ -103,10 +103,10 @@ mod test {
             root(4)
         );
 
-        let _right = tree.foldr(Add.curry(), 0);
+        let _right = tree.foldr(Add.curry2(), 0);
         //panic!("{right:}");
 
-        let _left = tree.foldl(Add.curry(), 0);
+        let _left = tree.foldl(Add.curry2(), 0);
         //panic!("{left:}");
 
         #[rustfmt::skip]

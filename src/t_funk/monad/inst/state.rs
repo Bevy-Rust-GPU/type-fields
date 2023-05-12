@@ -1,4 +1,4 @@
-use crate::macros::{arrow::arrow, category::category, Closure, Copointed, Pointed};
+use crate::macros::{arrow::Arrow, category::Category, Closure, Copointed, Pointed};
 
 use crate::t_funk::{
     applicative::Pure, function::Const, function::Id, monad::Chain, Apply, Closure, Curry2,
@@ -6,9 +6,9 @@ use crate::t_funk::{
 };
 
 /// 2-tuple constructor
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct Tuple;
 
 impl<A, B> Function<(A, B)> for Tuple {
@@ -58,7 +58,7 @@ impl<F> Pure for State<F> {
     type Pure<T> = State<Curry2A<Tuple, T>>;
 
     fn pure<T>(t: T) -> Self::Pure<T> {
-        State(Tuple.prefix(t))
+        State(Tuple.prefix2(t))
     }
 }
 
@@ -124,22 +124,22 @@ where
     }
 }
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct Put;
 
 impl<I> Function<I> for Put {
     type Output = State<Curry2A<Const, ((), I)>>;
 
     fn call(input: I) -> Self::Output {
-        State(Const.prefix(((), input)))
+        State(Const.prefix2(((), input)))
     }
 }
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct Get;
 
 impl Function<()> for Get {
@@ -215,7 +215,7 @@ mod test {
         let arr = Coin.call(Locked);
         assert_eq!(arr, (Thank, Unlocked));
 
-        let State(arr) = coin_s.chain(Const.prefix(push_s));
+        let State(arr) = coin_s.chain(Const.prefix2(push_s));
         let arr = arr.call(Unlocked);
 
         assert_eq!(arr, (Open, Locked));
@@ -295,7 +295,7 @@ mod test {
             type Output = State<Curry2A<TurnSImpl, A>>;
 
             fn call(a: A) -> Self::Output {
-                State(TurnSImpl.prefix(a))
+                State(TurnSImpl.prefix2(a))
             }
         }
 

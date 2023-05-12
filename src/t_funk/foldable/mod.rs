@@ -25,7 +25,7 @@ mod test {
         let Dual(Endo(f)) = t.fold_map(
             PointF::<Dual<_>>::default()
                 .compose(PointF::<Endo<_>>::default())
-                .compose(Sub.flip().curry()),
+                .compose(Sub.flip().curry2()),
         );
 
         let res = f.call(0);

@@ -1,13 +1,13 @@
 use crate::{
-    macros::{arrow::arrow, category::category, Closure},
+    macros::{arrow::Arrow, category::Category, Closure},
     t_funk::Function,
 };
 
 extern crate alloc;
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct ToString;
 
 impl<T> Function<T> for ToString

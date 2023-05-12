@@ -1,10 +1,10 @@
-use crate::macros::{arrow::arrow, category::category, Closure};
+use crate::macros::{arrow::Arrow, category::Category, Closure};
 
 use crate::t_funk::Function;
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct Mul;
 
 impl<A, B> Function<(A, B)> for Mul

@@ -1,39 +1,39 @@
 pub use type_fields_macros::{functions, Closure, Copointed, Field, Lenses, Pointed};
 
 pub mod applicative {
-    pub use type_fields_macros::{applicative, Apply, Pure};
+    pub use type_fields_macros::{Applicative, Apply, Pure};
 }
 
 pub mod arrow {
     pub use type_fields_macros::{
-        arrow, Arr, ArrowFirst as First, ArrowSecond as Second, Fanout, Split,
+        Arrow, Arr, ArrowFirst as First, ArrowSecond as Second, Fanout, Split,
     };
 }
 
 pub mod bifunctor {}
 
 pub mod category {
-    pub use type_fields_macros::{category, Compose, Id};
+    pub use type_fields_macros::{Category, Compose, Id};
 }
 
 pub mod foldable {
-    pub use type_fields_macros::{foldable, Fold, FoldMap, Foldl, Foldr};
+    pub use type_fields_macros::{Foldable, Fold, FoldMap, Foldl, Foldr};
 }
 
 pub mod functor {
-    pub use type_fields_macros::{functor, Fmap, Replace};
+    pub use type_fields_macros::{Functor, Fmap, Replace};
 }
 
 pub mod monad {
-    pub use type_fields_macros::{monad, Chain, Then};
+    pub use type_fields_macros::{Monad, Chain, Then};
 }
 
 pub mod monoid {
-    pub use type_fields_macros::{monoid, Mconcat, Mempty};
+    pub use type_fields_macros::{Monoid, Mconcat, Mempty};
 }
 
 pub mod semigroup {
-    pub use type_fields_macros::{semigroup, Mappend};
+    pub use type_fields_macros::{Semigroup, Mappend};
 }
 
 pub mod traversable {}

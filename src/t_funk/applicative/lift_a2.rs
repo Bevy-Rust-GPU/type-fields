@@ -1,11 +1,11 @@
-use crate::macros::{arrow::arrow, category::category, Closure};
+use crate::macros::{arrow::Arrow, category::Category, Closure};
 
 use crate::t_funk::{Apply, Fmap, Function};
 
 /// Lift a binary function to actions
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct LiftA2;
 
 impl<F, A, B> Function<(F, A, B)> for LiftA2
@@ -26,7 +26,7 @@ mod test {
 
     #[test]
     fn test_lift_a2() {
-        let foo = LiftA2.call((Tuple.curry(), Just(3), Just(5)));
+        let foo = LiftA2.call((Tuple.curry2(), Just(3), Just(5)));
         assert_eq!(foo, Just((3, 5)));
     }
 }

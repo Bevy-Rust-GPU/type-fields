@@ -1,5 +1,5 @@
 use crate::{
-    macros::{arrow::arrow, category::category, monad::Then, Closure},
+    macros::{arrow::Arrow, category::Category, monad::Then, Closure},
     t_funk::{
         monad::{Chain, ChainF},
         Closure, Curry2, Curry2B, Fmap, Function,
@@ -16,16 +16,16 @@ where
     type Chain = Free<<T as Fmap<Curry2B<ChainF, F>>>::Fmap>;
 
     fn chain(self, f: F) -> Self::Chain {
-        Free(self.0.fmap(ChainF.suffix(f)))
+        Free(self.0.fmap(ChainF.suffix2(f)))
     }
 }
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Then)]
 pub struct Return<F>(pub F);
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct MakeReturn;
 
 impl<T> Function<T> for MakeReturn {
@@ -46,9 +46,9 @@ where
     }
 }
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct LiftFree;
 
 impl<T> Function<T> for LiftFree

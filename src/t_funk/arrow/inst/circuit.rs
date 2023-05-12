@@ -4,7 +4,7 @@ use crate::macros::arrow::Fanout;
 
 use crate::t_funk::{ComposeL, Function, Swap};
 use crate::{
-    macros::{category::category, Copointed, Pointed},
+    macros::{category::Category, Copointed, Pointed},
     t_funk::{
         arrow::First, category::Compose, function::Id, Arr, Closure, Curry2, Curry2A, Split, Tuple,
     },
@@ -19,7 +19,7 @@ impl<F> crate::t_funk::category::Id for Circuit<F> {
     type Id = Circuit<Curry2A<Tuple, Id>>;
 
     fn id() -> Self::Id {
-        Circuit(Tuple.prefix(Id))
+        Circuit(Tuple.prefix2(Id))
     }
 }
 
@@ -31,8 +31,7 @@ impl<C1, C2> Compose<Circuit<C2>> for Circuit<C1> {
     }
 }
 
-#[category]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Category)]
 pub struct CircuitCompose<C1, C2>(pub C1, pub C2);
 
 impl<C1, C2, A, C1A, B, C2A, C> Closure<A> for CircuitCompose<C1, C2>
@@ -58,8 +57,9 @@ impl<T, F> Arr<F> for Circuit<T> {
     }
 }
 
-#[category]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed, Category,
+)]
 pub struct CircuitArr<F>(pub F);
 
 impl<F, A> Closure<A> for CircuitArr<F>
@@ -81,8 +81,9 @@ impl<T> First for Circuit<T> {
     }
 }
 
-#[category]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed, Category,
+)]
 pub struct CircuitFirst<CI>(CI);
 
 impl<CI, CA, B, C, D> Closure<(B, D)> for CircuitFirst<CI>
@@ -115,8 +116,7 @@ impl<T, F> Split<Circuit<F>> for Circuit<T> {
 }
 
 /// Accumulator that outputs a value determined by the supplied function
-#[category]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category)]
 pub struct Accum;
 
 impl<A, F> Function<(A, F)> for Accum {
@@ -212,7 +212,7 @@ mod test {
         let total = Total::<f64>::default();
 
         let Circuit(cir) = total
-            .fanout(<Circuit<()> as Arr<_>>::arr(Const.prefix(1.0)).compose_l(total))
+            .fanout(<Circuit<()> as Arr<_>>::arr(Const.prefix2(1.0)).compose_l(total))
             .compose_l(<Circuit<()> as Arr<_>>::arr(Div));
 
         let (Circuit(cir), res) = cir.call(0.0);

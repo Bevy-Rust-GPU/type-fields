@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["alloc"]
+default = ["std"]
 alloc = []
+std = ["alloc"]
 
 [dependencies]
 type-fields-macros = { git = "https://github.com/bevy-rust-gpu/type-fields-macros", tag = "prerelease" }

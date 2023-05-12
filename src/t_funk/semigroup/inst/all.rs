@@ -1,15 +1,28 @@
 use crate::macros::{
-    applicative::applicative, functor::functor, monad::monad,
-    Copointed, Pointed,
+    applicative::Applicative, foldable::Foldable, functor::Functor, monad::Monad, Copointed,
+    Pointed,
 };
 
 use crate::t_funk::Mappend;
 
 /// A `Semigroup` wrapper that can append with AND semantics.
-#[functor]
-#[applicative]
-#[monad]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Functor,
+    Applicative,
+    Monad,
+    Foldable,
+)]
 pub struct All<T>(pub T);
 
 impl<T, U> Mappend<All<U>> for All<T>

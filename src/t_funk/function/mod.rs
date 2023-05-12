@@ -10,3 +10,5 @@ pub trait Function<Inputs> {
 
     fn call(input: Inputs) -> Self::Output;
 }
+
+pub type OutputT<F, T> = <F as Function<T>>::Output;

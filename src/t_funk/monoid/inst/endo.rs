@@ -87,9 +87,9 @@ mod test {
 
     #[test]
     fn test_endo() {
-        let foo = Endo(Add.prefix(1));
-        let foo = foo.mappend(Endo(Add.prefix(2)));
-        let Endo(foo) = foo.mappend(Endo(Add.prefix(3)));
+        let foo = Endo(Add.prefix2(1));
+        let foo = foo.mappend(Endo(Add.prefix2(2)));
+        let Endo(foo) = foo.mappend(Endo(Add.prefix2(3)));
         let foo = foo.call(4);
         assert_eq!(foo, 10);
     }
@@ -114,7 +114,7 @@ mod test {
         let add_endo_result: Endo<i32> = add_endo.call((1, 2));
         assert_eq!(add_endo_result, Endo(3));
 
-        let add_curry_a: Curried2<Add> = Add.curry();
+        let add_curry_a: Curried2<Add> = Add.curry2();
         let add_curry_b: Curry2A<Add, i32> = add_curry_a.call(1);
         let add_curry_result: i32 = add_curry_b.call(1);
         assert_eq!(add_curry_result, 2);
@@ -122,7 +122,7 @@ mod test {
         let add_curry_endo_a: Composed<
             PointF<Endo<<Curried2<Add> as Closure<i32>>::Output>>,
             Curried2<Add>,
-        > = PointF::default().compose(Add.curry());
+        > = PointF::default().compose(Add.curry2());
         let Endo(add_curry_endo_b): Endo<Curry2A<Add, i32>> = add_curry_endo_a.call(1);
         let add_curry_endo_result: i32 = add_curry_endo_b.call(2);
         assert_eq!(add_curry_endo_result, 3);

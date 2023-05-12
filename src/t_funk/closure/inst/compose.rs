@@ -1,4 +1,4 @@
-use crate::macros::{arrow::arrow, category::category, functions, Copointed, Pointed};
+use crate::macros::{arrow::Arrow, category::Category, functions, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 
@@ -11,6 +11,9 @@ pub trait Compose<F>: Sized {
     fn compose(self, f: F) -> Self::Compose;
     fn compose_l(self, f: F) -> Self::ComposeL;
 }
+
+pub type ComposeT<T, F> = <T as Compose<F>>::Compose;
+pub type ComposeLT<T, F> = <T as Compose<F>>::ComposeL;
 
 impl<T, F> Compose<F> for T {
     type Compose = Composed<T, F>;
@@ -26,9 +29,21 @@ impl<T, F> Compose<F> for T {
     }
 }
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Category,
+    Arrow,
+)]
 pub struct Composed<F1, F2>(pub F1, pub F2);
 
 impl<F1, F2, A> Closure<A> for Composed<F1, F2>

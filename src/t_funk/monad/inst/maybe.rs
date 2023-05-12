@@ -1,5 +1,5 @@
 use crate::macros::{
-    applicative::applicative, foldable::foldable, functor::functor, monad::monad, Copointed,
+    applicative::Applicative, foldable::Foldable, functor::Functor, monad::Monad, Copointed,
     Pointed,
 };
 
@@ -139,11 +139,23 @@ impl Fold for Nothing {
     }
 }
 
-#[functor]
-#[applicative]
-#[monad]
-#[foldable]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Functor,
+    Applicative,
+    Monad,
+    Foldable,
+)]
 pub struct Just<T>(pub T);
 
 impl<T> Mempty for Just<T> {
@@ -196,7 +208,7 @@ mod test {
 
     #[test]
     fn test_functor_laws_maybe() {
-        test_functor_laws(Nothing, Add.prefix(2), Mul.prefix(2));
-        test_functor_laws(Just(1), Add.prefix(2), Mul.prefix(2));
+        test_functor_laws(Nothing, Add.prefix2(2), Mul.prefix2(2));
+        test_functor_laws(Just(1), Add.prefix2(2), Mul.prefix2(2));
     }
 }

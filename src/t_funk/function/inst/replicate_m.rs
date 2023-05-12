@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    macros::{arrow::arrow, category::category, Closure},
+    macros::{arrow::Arrow, category::Category, Closure},
     t_funk::{hlist::Nil, Apply, Curried2, Curry2},
 };
 
@@ -9,9 +9,7 @@ use crate::t_funk::{
     applicative::Pure, hlist::PushFrontF, Closure, Flip, Flipped, Fmap, Function, LiftA2, Then,
 };
 
-#[category]
-#[arrow]
-#[derive(Closure)]
+#[derive(Closure, Category, Arrow)]
 pub struct ReplicateM<C, P>(PhantomData<(C, P)>);
 
 impl<C, P> Default for ReplicateM<C, P> {
@@ -32,7 +30,7 @@ where
 
     fn call(f: F) -> Self::Output {
         LiftA2.call((
-            PushFrontF.flip().curry(),
+            PushFrontF.flip().curry2(),
             f.clone(),
             ReplicateM::<Next, P>::default().call(f),
         ))
@@ -50,9 +48,7 @@ where
     }
 }
 
-#[category]
-#[arrow]
-#[derive(Closure)]
+#[derive(Closure, Category, Arrow)]
 pub struct ReplicateMDiscard<C>(PhantomData<C>);
 
 impl<C> Default for ReplicateMDiscard<C> {

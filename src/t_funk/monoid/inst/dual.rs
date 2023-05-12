@@ -1,13 +1,25 @@
 use crate::macros::{
-    applicative::applicative, foldable::foldable, functor::functor, monad::monad, monoid::monoid,
-    semigroup::semigroup, Copointed, Pointed,
+    applicative::Applicative, foldable::Foldable, functor::Functor, monad::Monad, monoid::Monoid,
+    semigroup::Semigroup, Copointed, Pointed,
 };
 
-#[functor]
-#[applicative]
-#[monad]
-#[semigroup]
-#[monoid]
-#[foldable]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Functor,
+    Applicative,
+    Monad,
+    Semigroup,
+    Monoid,
+    Foldable,
+)]
 pub struct Dual<T>(pub T);

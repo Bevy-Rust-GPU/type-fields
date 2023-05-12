@@ -9,7 +9,6 @@ pub mod macros;
 pub mod path;
 pub mod t_funk;
 pub mod type_machine;
-pub mod functional_sdf;
 
 #[cfg(test)]
 pub mod tests {

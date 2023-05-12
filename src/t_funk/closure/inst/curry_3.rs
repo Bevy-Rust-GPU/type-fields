@@ -1,16 +1,16 @@
-use crate::macros::{arrow::arrow, category::category, Copointed, Pointed};
+use crate::macros::{arrow::Arrow, category::Category, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 
 /// Utility trait for currying a ternary function
 pub trait Curry3: Sized {
     /// Convert `F(A, B) -> *` into `F(A) -> F(B) -> *`
-    fn curry(self) -> Curried3<Self> {
+    fn curry3(self) -> Curried3<Self> {
         Curried3(self)
     }
 
     /// Curry `A` into `F(A, B) -> *` to produce `F(B) -> *`
-    fn prefix<A>(self, a: A) -> Curry3A<Self, A> {
+    fn prefix3<A>(self, a: A) -> Curry3A<Self, A> {
         Curry3A(self, a)
     }
 }
@@ -18,9 +18,21 @@ pub trait Curry3: Sized {
 impl<T> Curry3 for T {}
 
 /// Curried ternary function
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Category,
+    Arrow,
+)]
 pub struct Curried3<F>(pub F);
 
 impl<F, A> Closure<A> for Curried3<F> {
@@ -32,15 +44,10 @@ impl<F, A> Closure<A> for Curried3<F> {
 }
 
 /// Curried ternary function with F, A stored
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Category, Arrow)]
 pub struct Curry3A<F, A>(pub F, pub A);
 
-impl<F, A, B> Closure<B> for Curry3A<F, A>
-where
-    F: Closure<(A, B)>,
-{
+impl<F, A, B> Closure<B> for Curry3A<F, A> {
     type Output = Curry3AB<F, A, B>;
 
     fn call(self, input: B) -> Self::Output {
@@ -49,9 +56,7 @@ where
 }
 
 /// Curried ternary function with F, A, B stored
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Category, Arrow)]
 pub struct Curry3AB<F, A, B>(pub F, pub A, pub B);
 
 impl<F, A, B, C> Closure<C> for Curry3AB<F, A, B>

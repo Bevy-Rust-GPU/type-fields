@@ -1,24 +1,33 @@
+use type_fields_macros::functions;
+
 use super::{Cons, Nil};
-use crate::t_funk::Closure;
+use crate::t_funk::{closure::Compose, ComposeT};
 
-/// A list of closures with chainable I/O is itself a valid closure
-impl<T, N, I> Closure<I> for Cons<T, N>
+#[functions]
+pub trait Chain {
+    type Chain;
+
+    fn chain(self) -> Self::Chain;
+}
+
+pub type ChainT<T> = <T as Chain>::Chain;
+
+impl<T, N> Chain for Cons<T, N>
 where
-    T: Closure<I>,
-    N: Closure<T::Output>,
+    N: Chain,
+    ChainT<N>: Compose<T>,
 {
-    type Output = <N as Closure<T::Output>>::Output;
+    type Chain = ComposeT<ChainT<N>, T>;
 
-    fn call(self, input: I) -> Self::Output {
-        let Cons(lhs, rhs) = self;
-        rhs.call(lhs.call(input))
+    fn chain(self) -> Self::Chain {
+        self.1.chain().compose(self.0)
     }
 }
 
-impl<I> Closure<I> for Nil {
-    type Output = I;
+impl<T> Chain for Cons<T, Nil> {
+    type Chain = T;
 
-    fn call(self, input: I) -> Self::Output {
-        input
+    fn chain(self) -> Self::Chain {
+        self.0
     }
 }

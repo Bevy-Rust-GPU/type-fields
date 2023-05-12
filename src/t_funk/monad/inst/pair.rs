@@ -53,6 +53,6 @@ mod test {
 
     #[test]
     fn test_functor_laws_pair() {
-        test_functor_laws(Pair(1, 2), Add.prefix(2), Mul.prefix(2));
+        test_functor_laws(Pair(1, 2), Add.prefix2(2), Mul.prefix2(2));
     }
 }

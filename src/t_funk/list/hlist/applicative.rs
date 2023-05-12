@@ -53,7 +53,7 @@ mod test {
 
     #[test]
     fn test_hlist_applicative() {
-        let funcs = Cons(Add.suffix(2), Cons(Mul.suffix(2), Nil));
+        let funcs = Cons(Add.suffix2(2), Cons(Mul.suffix2(2), Nil));
         let nums = Cons(1, Cons(2, Cons(3, Nil)));
         let res = funcs.apply(nums);
         assert_eq!(

@@ -1,21 +1,21 @@
-use crate::macros::{arrow::arrow, category::category, Copointed, Pointed};
+use crate::macros::{arrow::Arrow, category::Category, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 
 /// Utility trait for currying a binary function
 pub trait Curry2: Sized {
     /// Convert `F(A, B) -> *` into `F(A) -> F(B) -> *`
-    fn curry(self) -> Curried2<Self> {
+    fn curry2(self) -> Curried2<Self> {
         Curried2(self)
     }
 
     /// Curry `A` into `F(A, B) -> *` to produce `F(B) -> *`
-    fn prefix<A>(self, a: A) -> Curry2A<Self, A> {
+    fn prefix2<A>(self, a: A) -> Curry2A<Self, A> {
         Curry2A(self, a)
     }
 
     /// Curry `B` into `F(A, B) -> *` to produce `F(A) -> *`
-    fn suffix<B>(self, b: B) -> Curry2B<Self, B> {
+    fn suffix2<B>(self, b: B) -> Curry2B<Self, B> {
         Curry2B(self, b)
     }
 }
@@ -23,9 +23,21 @@ pub trait Curry2: Sized {
 impl<T> Curry2 for T {}
 
 /// Curried binary function
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Category,
+    Arrow,
+)]
 pub struct Curried2<F>(pub F);
 
 impl<F, A> Closure<A> for Curried2<F> {
@@ -37,9 +49,7 @@ impl<F, A> Closure<A> for Curried2<F> {
 }
 
 /// Curried binary function with F, A stored
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Category, Arrow)]
 pub struct Curry2A<F, A>(pub F, pub A);
 
 impl<F, A, B> Closure<B> for Curry2A<F, A>
@@ -54,9 +64,7 @@ where
 }
 
 /// Curried binary function with F, B stored
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Category, Arrow)]
 pub struct Curry2B<F, B>(pub F, pub B);
 
 impl<F, B, A> Closure<A> for Curry2B<F, B>
@@ -76,7 +84,7 @@ mod test {
 
     #[test]
     fn test_curry() {
-        let curried = Add.curry();
+        let curried = Add.curry2();
         let curried = curried.call(1);
         let curried = curried.call(1);
         assert_eq!(curried, 2);

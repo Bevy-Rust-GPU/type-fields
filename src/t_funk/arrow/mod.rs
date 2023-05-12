@@ -5,6 +5,7 @@ mod inst;
 mod second;
 mod split;
 
+pub use inst::*;
 pub use arr::*;
 pub use fanout::*;
 pub use first::*;
@@ -19,8 +20,8 @@ mod test {
 
     #[test]
     fn test_arrow() {
-        let a1 = Add.suffix(5);
-        let a2 = Mul.suffix(2);
+        let a1 = Add.suffix2(5);
+        let a2 = Mul.suffix2(2);
 
         let res = a1.compose(a2).call(3);
         assert_eq!(res, 11);

@@ -1,11 +1,11 @@
 use crate::{
-    macros::{arrow::arrow, category::category, Closure},
+    macros::{arrow::Arrow, category::Category, Closure},
     t_funk::{Closure, Either, Function},
 };
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct MakeIf;
 
 impl<T, U> Function<(T, U)> for MakeIf {
@@ -16,9 +16,7 @@ impl<T, U> Function<(T, U)> for MakeIf {
     }
 }
 
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Category, Arrow)]
 pub struct If<T, U>(pub T, pub U);
 
 impl<T, U> Closure<bool> for If<T, U> {

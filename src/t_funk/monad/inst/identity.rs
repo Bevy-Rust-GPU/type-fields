@@ -1,16 +1,27 @@
 use crate::macros::{
-    applicative::applicative, foldable::foldable, functor::functor, monad::monad, monoid::monoid,
-    semigroup::semigroup, Copointed, Pointed,
+    applicative::Applicative, foldable::Foldable, functor::Functor, monad::Monad, monoid::Monoid,
+    semigroup::Semigroup, Copointed, Pointed,
 };
 
 /// Identity monad, used to lift values into a monadic context.
-#[functor]
-#[applicative]
-#[monad]
-#[semigroup]
-#[monoid]
-#[foldable]
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Functor,
+    Applicative,
+    Monad,
+    Semigroup,
+    Monoid,
+    Foldable,
+)]
 pub struct Identity<T>(pub T);
 
 #[cfg(test)]
@@ -28,14 +39,14 @@ mod test {
         let id2: Identity<i32> = id1.fmap(Mul.curry_n().call(3));
         assert_eq!(id2, Identity(15));
 
-        let id3: Identity<Curry2B<Sub, i32>> = Identity(Sub.suffix(3));
+        let id3: Identity<Curry2B<Sub, i32>> = Identity(Sub.suffix2(3));
         let id3: Identity<i32> = id3.apply(id2);
         assert_eq!(id3, Identity(12));
 
         let id4: Identity<i32> = id3.chain(
             PointF::<Identity<_>>::default()
                 .compose(Div.flip())
-                .prefix(3),
+                .prefix2(3),
         );
         assert_eq!(id4, Identity(4));
 
@@ -50,6 +61,6 @@ mod test {
 
     #[test]
     fn test_functor_laws_identity() {
-        test_functor_laws(Identity(4), Add.prefix(2), Mul.prefix(2))
+        test_functor_laws(Identity(4), Add.prefix2(2), Mul.prefix2(2))
     }
 }

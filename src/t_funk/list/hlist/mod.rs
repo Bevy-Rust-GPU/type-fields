@@ -63,8 +63,26 @@ pub use sets::*;
 pub use to_tlist::*;
 pub use traversable::*;
 
+use crate::{
+    macros::{arrow::Arrow, category::Category, Closure},
+    t_funk::Function,
+};
+
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Cons<T, N>(pub T, pub N);
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Nil;
+
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
+pub struct MakeCons;
+
+impl<L, R> Function<(L, R)> for MakeCons {
+    type Output = Cons<L, R>;
+
+    fn call((l, r): (L, R)) -> Self::Output {
+        Cons(l, r)
+    }
+}

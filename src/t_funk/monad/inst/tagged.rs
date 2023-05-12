@@ -232,6 +232,6 @@ mod test {
     #[test]
     fn test_functor_laws_tagged() {
         enum Tag {}
-        test_functor_laws(Tagged::<Tag, _>::point(1), Add.prefix(2), Mul.prefix(2));
+        test_functor_laws(Tagged::<Tag, _>::point(1), Add.prefix2(2), Mul.prefix2(2));
     }
 }

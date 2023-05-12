@@ -1,6 +1,6 @@
 use crate::macros::{monad::Chain, Copointed, Pointed};
 
-use crate::t_funk::{Apply, Closure, Fmap, Mappend, Mempty, Pure};
+use crate::t_funk::{Apply, Closure, Fmap, Mappend, Mempty, applicative::Pure};
 use core::ops::Add;
 
 /// A `Semigroup` wrapper that can append additively.

@@ -1,16 +1,29 @@
 use crate::macros::{
-    applicative::applicative, foldable::foldable, functor::functor, monad::monad, monoid::monoid, Copointed, Pointed,
+    applicative::Applicative, foldable::Foldable, functor::Functor, monad::Monad, monoid::Monoid,
+    Copointed, Pointed,
 };
 
 use crate::t_funk::Mappend;
 
 /// A `Semigroup` wrapper that can append with OR semantics.
-#[functor]
-#[applicative]
-#[monad]
-#[monoid]
-#[foldable]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Pointed,
+    Copointed,
+    Functor,
+    Applicative,
+    Monad,
+    Monoid,
+    Foldable,
+)]
 pub struct Any<T>(pub T);
 
 impl<T, U> Mappend<Any<U>> for Any<T>

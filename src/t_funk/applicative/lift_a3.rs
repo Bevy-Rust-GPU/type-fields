@@ -1,11 +1,11 @@
-use crate::macros::{arrow::arrow, category::category, Closure};
+use crate::macros::{arrow::Arrow, category::Category, Closure};
 
 use crate::t_funk::{Apply, Closure, Fmap, Function, LiftA2};
 
 /// Lift a ternary function to actions
-#[category]
-#[arrow]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure)]
+#[derive(
+    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
+)]
 pub struct LiftA3;
 
 impl<F, A, B, C> Function<(F, A, B, C)> for LiftA3

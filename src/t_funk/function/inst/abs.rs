@@ -6,12 +6,12 @@ use crate::{
 #[derive(
     Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow,
 )]
-pub struct Min;
+pub struct Abs;
 
-impl Function<(f32, f32)> for Min {
+impl Function<f32> for Abs {
     type Output = f32;
 
-    fn call((l, r): (f32, f32)) -> Self::Output {
-        l.min(r)
+    fn call(input: f32) -> Self::Output {
+        input.abs()
     }
 }

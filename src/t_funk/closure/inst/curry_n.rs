@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    macros::{arrow::arrow, category::category},
+    macros::{arrow::Arrow, category::Category},
     t_funk::hlist::{Cons, Nil},
 };
 
@@ -29,8 +29,7 @@ where
     }
 }
 
-#[category]
-#[arrow]
+#[derive(Category, Arrow)]
 pub struct CurriedN<F, AO, AI>(F, AO, PhantomData<AI>);
 
 impl<F, AI> Default for CurriedN<F, Nil, AI>
