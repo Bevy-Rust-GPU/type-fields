@@ -8,6 +8,8 @@ pub trait Compose<F>: Sized {
     fn compose(self, f: F) -> Self::Compose;
 }
 
+pub type ComposeT<T, U> = <T as Compose<U>>::Compose;
+
 /// Left-to-right composition
 /// (>>>)
 #[functions]

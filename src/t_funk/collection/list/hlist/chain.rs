@@ -1,7 +1,7 @@
 use type_fields_macros::functions;
 
 use super::{Cons, Nil};
-use crate::t_funk::{closure::Compose, ComposeT};
+use crate::t_funk::closure::{Compose, ComposeT};
 
 #[functions]
 pub trait Chain {

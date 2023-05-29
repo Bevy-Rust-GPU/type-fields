@@ -1,4 +1,4 @@
-mod fmap;
+pub mod fmap;
 mod laws;
 mod replace;
 mod inst;

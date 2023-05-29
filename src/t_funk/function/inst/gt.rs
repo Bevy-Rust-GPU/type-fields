@@ -6,10 +6,10 @@ use crate::{
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Closure, Category, Arrow)]
 pub struct Gt;
 
-impl Function<(f32, f32)> for Gt {
+impl<T, U> Function<(T, U)> for Gt where T: PartialOrd<U> {
     type Output = bool;
 
-    fn call((l, r): (f32, f32)) -> Self::Output {
+    fn call((l, r): (T, U)) -> Self::Output {
         l > r
     }
 }

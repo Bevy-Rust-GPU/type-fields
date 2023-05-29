@@ -1,25 +1,23 @@
 use core::marker::PhantomData;
 
-use crate::{
-    macros::arrow::Fanout,
-    t_funk::{
-        arrow::{First, Second},
-        category::{Compose, Id},
-        function::Id as IdF,
-        Arr, Closure, Copointed, Mappend, Pointed, Split, hlist::Nil,
-    },
+use crate::t_funk::{
+    arrow::{First, Second},
+    category::{Compose, Id},
+    function::Id as IdF,
+    hlist::Nil,
+    Arr, Closure, ComposeL, Copointed, Fanout, MakePair, Mappend, Pointed, Split,
 };
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Fanout)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Pure<F>(pub F);
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Fanout)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Effect<F1>(pub F1);
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Fanout)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Seq<F1, F2>(pub F1, pub F2);
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Fanout)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Par<F1, F2>(pub F1, pub F2);
 
 impl<F> Id for Pure<F> {
@@ -214,6 +212,38 @@ impl<F1, F2, F3> Split<F3> for Par<F1, F2> {
     }
 }
 
+impl<F1, F2> Fanout<F2> for Pure<F1> {
+    type Fanout = Seq<Pure<MakePair>, Par<Pure<F1>, F2>>;
+
+    fn fanout(self, f: F2) -> Self::Fanout {
+        Self::arr(MakePair).compose_l(self.split(f))
+    }
+}
+
+impl<F1, F2> Fanout<F2> for Effect<F1> {
+    type Fanout = Seq<Pure<MakePair>, Par<Effect<F1>, F2>>;
+
+    fn fanout(self, f: F2) -> Self::Fanout {
+        Self::arr(MakePair).compose_l(self.split(f))
+    }
+}
+
+impl<F1, F2, F3> Fanout<F3> for Seq<F1, F2> {
+    type Fanout = Seq<Pure<MakePair>, Par<Seq<F1, F2>, F3>>;
+
+    fn fanout(self, f: F3) -> Self::Fanout {
+        Self::arr(MakePair).compose_l(self.split(f))
+    }
+}
+
+impl<F1, F2, F3> Fanout<F3> for Par<F1, F2> {
+    type Fanout = Seq<Pure<MakePair>, Par<Par<F1, F2>, F3>>;
+
+    fn fanout(self, f: F3) -> Self::Fanout {
+        Self::arr(MakePair).compose_l(self.split(f))
+    }
+}
+
 /// Traverses a free arrow construct,
 /// folding its contents using `Mappend`
 pub struct Analyze<F, A>(F, PhantomData<A>);
@@ -369,8 +399,8 @@ mod test {
             Closure,
         },
         t_funk::{
-            arrow::inst::Analyze, category::ComposeL, Add, Closure, Curry2, Div, Fanout, Function,
-            Mul, Curry2A, Sum,
+            arrow::inst::Analyze, category::ComposeL, Add, Closure, Curry2, Curry2A, Div, Fanout,
+            Function, Mul, Sum,
         },
     };
 

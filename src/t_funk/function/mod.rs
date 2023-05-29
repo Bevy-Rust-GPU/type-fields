@@ -12,3 +12,11 @@ pub trait Function<Inputs> {
 }
 
 pub type OutputT<F, T> = <F as Function<T>>::Output;
+
+impl Function<()> for () {
+    type Output = ();
+
+    fn call((): ()) -> Self::Output {
+        ()
+    }
+}

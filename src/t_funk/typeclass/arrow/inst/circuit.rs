@@ -1,18 +1,15 @@
 use type_fields_macros::Closure;
 
-use crate::macros::arrow::Fanout;
-
-use crate::t_funk::{ComposeL, Function, Swap};
+use crate::t_funk::{ComposeL, Function, MakePair, Swap};
 use crate::{
     macros::{category::Category, Copointed, Pointed},
     t_funk::{
-        arrow::First, category::Compose, function::Id, Arr, Closure, Curry2, Curry2A, Split, Tuple,
+        arrow::First, category::Compose, function::Id, Arr, Closure, Curry2, Curry2A, Fanout,
+        Split, Tuple,
     },
 };
 
-#[derive(
-    Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed, Fanout,
-)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Pointed, Copointed)]
 pub struct Circuit<F>(pub F);
 
 impl<F> crate::t_funk::category::Id for Circuit<F> {
@@ -112,6 +109,22 @@ impl<T, F> Split<Circuit<F>> for Circuit<T> {
             .compose_l(<Circuit<()> as Arr<_>>::arr(Swap))
             .compose_l(g.first())
             .compose_l(<Circuit<()> as Arr<_>>::arr(Swap))
+    }
+}
+
+impl<T, F> Fanout<Circuit<F>> for Circuit<T> {
+    type Fanout = Circuit<
+        CircuitCompose<
+            CircuitCompose<
+                CircuitArr<Swap>,
+                CircuitCompose<CircuitFirst<F>, CircuitCompose<CircuitArr<Swap>, CircuitFirst<T>>>,
+            >,
+            CircuitArr<MakePair>,
+        >,
+    >;
+
+    fn fanout(self, f: Circuit<F>) -> Self::Fanout {
+        Self::arr(MakePair).compose_l(type_fields::t_funk::Split::split(self, f))
     }
 }
 

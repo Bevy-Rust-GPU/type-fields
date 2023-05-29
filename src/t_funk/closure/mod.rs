@@ -27,3 +27,11 @@ where
         self(input)
     }
 }
+
+impl Closure<()> for () {
+    type Output = ();
+
+    fn call(self, (): ()) -> Self::Output {
+        ()
+    }
+}

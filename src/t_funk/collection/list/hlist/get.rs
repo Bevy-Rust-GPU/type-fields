@@ -1,6 +1,6 @@
 use crate::t_funk::hlist::{Here, Next, Path};
 
-use super::{HList, Cons, Nil};
+use super::{Cons, HList, Nil};
 
 /// A `ConsList` that can retrieve an item by type.
 pub trait Get<T, P>: HList {

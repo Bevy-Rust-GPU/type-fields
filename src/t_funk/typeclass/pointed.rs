@@ -6,7 +6,7 @@ use crate::macros::{
     Closure,
 };
 
-use super::Function;
+use crate::t_funk::Function;
 
 /// A type that can wrap a value
 pub trait Pointed

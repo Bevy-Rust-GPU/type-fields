@@ -1,0 +1,25 @@
+pub mod functor;
+pub mod applicative;
+pub mod arrow;
+pub mod bifunctor;
+pub mod category;
+pub mod copointed;
+pub mod foldable;
+pub mod monad;
+pub mod monoid;
+pub mod pointed;
+pub mod semigroup;
+pub mod traversable;
+
+pub use functor::*;
+pub use applicative::*;
+pub use arrow::*;
+pub use bifunctor::*;
+pub use category::*;
+pub use copointed::*;
+pub use foldable::*;
+pub use monad::*;
+pub use monoid::*;
+pub use pointed::*;
+pub use semigroup::*;
+pub use traversable::*;

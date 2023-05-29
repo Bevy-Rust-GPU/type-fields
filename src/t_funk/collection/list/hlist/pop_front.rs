@@ -1,5 +1,8 @@
+use type_fields_macros::functions;
+
 use super::{Cons, HList};
 
+#[functions]
 pub trait PopFront: HList {
     type PopFront: HList;
 

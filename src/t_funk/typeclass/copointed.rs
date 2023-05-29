@@ -11,3 +11,5 @@ where
     /// Unwrap `Unit` from `Self`
     fn copoint(self) -> Self::Copointed;
 }
+
+pub type CopointedT<T> = <T as Copointed>::Copointed;

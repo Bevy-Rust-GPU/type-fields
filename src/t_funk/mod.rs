@@ -52,41 +52,19 @@
 //! of all their component functions before any method can be called.
 //!
 
-pub mod applicative;
-pub mod arrow;
-pub mod bifunctor;
-pub mod category;
 pub mod closure;
-pub mod copointed;
-pub mod foldable;
 pub mod function;
-pub mod functor;
-pub mod hbtree;
 pub mod lens;
-pub mod list;
-pub mod monad;
-pub mod monoid;
-pub mod pointed;
-pub mod semigroup;
-pub mod traversable;
+pub mod collection;
+pub mod typeclass;
 pub mod either;
+pub mod peano;
 
-pub use applicative::*;
-pub use arrow::*;
-pub use bifunctor::*;
-pub use category::*;
 pub use closure::*;
-pub use copointed::*;
-pub use foldable::*;
-pub use foldable::*;
 pub use function::*;
-pub use functor::*;
-pub use hbtree::*;
 pub use lens::*;
-pub use list::*;
-pub use monad::*;
-pub use monoid::*;
-pub use pointed::*;
-pub use semigroup::*;
-pub use traversable::*;
+pub use collection::*;
+pub use typeclass::*;
 pub use either::*;
+pub use peano::*;
+

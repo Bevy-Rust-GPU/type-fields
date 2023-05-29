@@ -1,8 +1,4 @@
-use crate::macros::{
-    arrow::{Arr, Fanout, First, Second, Split},
-    category::{Compose, Id},
-    functions, Copointed, Pointed,
-};
+use crate::macros::{arrow::Arrow, category::Category, functions, Copointed, Pointed};
 
 use crate::t_funk::Closure;
 
@@ -27,13 +23,8 @@ pub type SplitT<T, G> = <T as Split<G>>::Split;
     Hash,
     Pointed,
     Copointed,
-    Id,
-    Compose,
-    Arr,
-    First,
-    Second,
-    Split,
-    Fanout,
+    Category,
+    Arrow,
 )]
 pub struct Splitted<F, G>(pub F, pub G);
 
