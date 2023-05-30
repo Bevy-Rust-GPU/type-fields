@@ -1,14 +1,14 @@
 use super::{Cons, Nil};
-use crate::t_funk::{Foldr, MappendF, Mconcat, Mempty};
+use crate::t_funk::{Foldl, MappendF, Mconcat, Mempty};
 
 impl<Head, Tail> Mconcat for Cons<Head, Tail>
 where
-    Self: Mempty + Foldr<MappendF, <Self as Mempty>::Mempty>,
+    Self: Mempty + Foldl<MappendF, <Self as Mempty>::Mempty>,
 {
-    type Mconcat = <Cons<Head, Tail> as Foldr<MappendF, <Self as Mempty>::Mempty>>::Foldr;
+    type Mconcat = <Cons<Head, Tail> as Foldl<MappendF, <Self as Mempty>::Mempty>>::Foldl;
 
     fn mconcat(self) -> Self::Mconcat {
-        self.foldr(MappendF::default(), Self::mempty())
+        self.foldl(MappendF::default(), Self::mempty())
     }
 }
 
