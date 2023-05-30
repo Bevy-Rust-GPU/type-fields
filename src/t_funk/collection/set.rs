@@ -2,12 +2,7 @@
 
 use type_fields_macros::functions;
 
-use crate::t_funk::{
-    arrow::{Fanout, Fanouted},
-    closure::{Closure, Compose, Composed, Curried2, Curry2, Flip, Flipped},
-    function::Id,
-    CallF,
-};
+use crate::t_funk::closure::{Closure, Compose, Composed, Curried2, Curry2, Flip, Flipped};
 
 #[functions]
 pub trait Set<T> {

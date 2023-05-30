@@ -36,13 +36,47 @@ where
     }
 }
 
-impl<T> Get<P0> for (T,) {
-    type Get = T;
+macro_rules! impl_get {
+    (($($ts:tt)*) => ($p:ident, $i:ident)) => {
+        impl<$($ts)*> Get<$p> for ($($ts)*) {
+            type Get = $i;
 
-    fn get(self) -> Self::Get {
-        self.0
-    }
+            #[allow(non_snake_case)]
+            #[allow(unused_variables)]
+            fn get(self) -> Self::Get {
+                let ($($ts)*) = self;
+                $i
+            }
+        }
+    };
 }
+
+impl_get!((A,) => (P0, A));
+
+impl_get!((A, B) => (P0, A));
+impl_get!((A, B) => (P1, B));
+
+impl_get!((A, B, C) => (P0, A));
+impl_get!((A, B, C) => (P1, B));
+impl_get!((A, B, C) => (P2, C));
+
+impl_get!((A, B, C, D) => (P0, A));
+impl_get!((A, B, C, D) => (P1, B));
+impl_get!((A, B, C, D) => (P2, C));
+impl_get!((A, B, C, D) => (P3, D));
+
+impl_get!((A, B, C, D, E) => (P0, A));
+impl_get!((A, B, C, D, E) => (P1, B));
+impl_get!((A, B, C, D, E) => (P2, C));
+impl_get!((A, B, C, D, E) => (P3, D));
+impl_get!((A, B, C, D, E) => (P4, E));
+
+impl_get!((A, B, C, D, E, F) => (P0, A));
+impl_get!((A, B, C, D, E, F) => (P1, B));
+impl_get!((A, B, C, D, E, F) => (P2, C));
+impl_get!((A, B, C, D, E, F) => (P3, D));
+impl_get!((A, B, C, D, E, F) => (P4, E));
+impl_get!((A, B, C, D, E, F) => (P5, F));
 
 #[cfg(test)]
 mod test {

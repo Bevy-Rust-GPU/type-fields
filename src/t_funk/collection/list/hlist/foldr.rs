@@ -2,16 +2,16 @@ use crate::t_funk::{Closure, Foldr};
 
 use super::{Cons, HList, Nil};
 
-impl<Head, Tail, F, T> Foldr<F, T> for Cons<Head, Tail>
+impl<Head, Tail, F, Z> Foldr<F, Z> for Cons<Head, Tail>
 where
     Self: HList,
-    Tail: Foldr<F, T>,
-    F: Clone + Closure<(Tail::Foldr, Head)>,
+    Tail: Foldr<F, Z>,
+    F: Clone + Closure<(Head, Tail::Foldr)>,
 {
     type Foldr = F::Output;
 
-    fn foldr(self, f: F, t: T) -> Self::Foldr {
-        f.clone().call((self.1.foldr(f, t), self.0))
+    fn foldr(self, f: F, z: Z) -> Self::Foldr {
+        f.clone().call((self.0, self.1.foldr(f, z)))
     }
 }
 

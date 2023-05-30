@@ -8,7 +8,6 @@ pub mod field;
 pub mod macros;
 pub mod path;
 pub mod t_funk;
-//pub mod type_machine;
 
 #[cfg(test)]
 pub mod tests {
