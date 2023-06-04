@@ -1,4 +1,4 @@
-use crate::t_funk::hlist::{Cons, Nil};
+use t_funk::collection::hlist::{Cons, Nil};
 
 /// Type-level path
 pub trait Path<T> {

@@ -1,4 +1,5 @@
-use crate::{path::Path, t_funk::tlist::ToHList};
+use crate::path::Path;
+use t_funk::collection::tlist::ToHList;
 
 /// Type-level field access using [`Path`]
 pub trait Field<V, P>: Sized

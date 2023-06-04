@@ -3,11 +3,7 @@ name = "type-fields"
 version = "0.1.0"
 edition = "2021"
 
-[features]
-default = ["std"]
-alloc = []
-std = ["alloc"]
-
 [dependencies]
 type-fields-macros = { git = "https://github.com/bevy-rust-gpu/type-fields-macros" }
+t-funk = { git = "https://github.com/bevy-rust-gpu/t-funk" }
 

@@ -5,9 +5,8 @@
 extern crate self as type_fields;
 
 pub mod field;
-pub mod macros;
 pub mod path;
-pub mod t_funk;
+pub mod macros;
 
 #[cfg(test)]
 pub mod tests {
