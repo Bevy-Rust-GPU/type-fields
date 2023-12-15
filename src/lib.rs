@@ -4,6 +4,8 @@
 
 extern crate self as type_fields;
 
+pub use t_funk;
+
 pub mod field;
 pub mod path;
 pub mod macros;

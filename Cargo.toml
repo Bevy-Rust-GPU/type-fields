@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 type-fields-macros = { git = "https://github.com/bevy-rust-gpu/type-fields-macros" }
-t-funk = { git = "https://github.com/bevy-rust-gpu/t-funk" }
+t-funk = { git = "https://github.com/bevy-rust-gpu/t-funk", default_features = false }
 
